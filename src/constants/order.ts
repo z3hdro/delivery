@@ -1,0 +1,5 @@
+export enum ORDER_STATUS {
+  WAITING_APPROVAL,
+  APPROVED,
+  IN_PROGRESS
+}

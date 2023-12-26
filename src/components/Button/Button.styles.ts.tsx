@@ -9,6 +9,8 @@ export const useStyles = () => {
       height: 48,
       borderRadius: 4,
       backgroundColor: colors.red,
+      justifyContent: 'center',
+      alignItems: 'center',
 
       shadowColor: colors.black,
       shadowOffset: {
@@ -18,6 +20,16 @@ export const useStyles = () => {
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
       elevation: 5,
+    },
+    text: {
+      fontFamily: 'Roboto',
+      fontSize: 14,
+      fontStyle: 'normal',
+      fontWeight: '500',
+      lineHeight: 16,
+      letterSpacing: 0.1,
+      textTransform: 'uppercase',
+      color: colors.white
     }
   }), []);
 };

@@ -8,13 +8,17 @@ export const useStyles = () => {
   
   return useMemo(() => StyleSheet.create({
     container: {
+      paddingTop: top,
       flex: 1,
       backgroundColor: colors.white,
       paddingHorizontal: 10,
     },
     logo: {
-      marginTop: top ? 0 : 16,
+      top: top ? 0 : 16,
       alignItems: 'center'
+    },
+    bottom: {
+      bottom: 12,
     }
   }), [top]);
 };

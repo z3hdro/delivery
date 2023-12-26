@@ -1,1 +1,16 @@
 export { default as LogoIcon } from './logo.svg';
+export { default as WarningIcon } from './warning_icon.svg';
+export { default as ArrowDownCircleIcon } from './arrow_down_circle_icon.svg';
+export { default as ArrowUpCircleIcon } from './arrow_up_circle_icon.svg';
+export { default as BackIcon } from './back_icon.svg';
+export { default as CloseIcon } from './close_icon.svg';
+export { default as FilterIcon } from './filter_icon.svg';
+export { default as MapIcon } from './map_icon.svg';
+export { default as PathIcon } from './path_icon.svg';
+export { default as TrackIcon } from './track_icon.svg';
+export { default as TransferIcon } from './transfer_icon.svg';
+export { default as CargoIcon } from './cargo_icon.svg';
+export { default as PlusIcon } from './plus_icon.svg';
+export { default as DriversIcon } from './drivers_icon.svg';
+export { default as HomeIcon } from './home_icon.svg';
+export { default as NomenclatureIcon } from './nomenclature_icon.svg';

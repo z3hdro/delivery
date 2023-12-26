@@ -25,6 +25,18 @@
       "localization/*": [
         "./src/localization/*"
       ],
+      "services/*": [
+        "./src/services/*"
+      ],
+      "providers/*": [
+        "./src/providers/*"
+      ],
+      "wrapper/*": [
+        "./src/wrapper/*"
+      ],
+      "mocks/*": [
+        "./src/mocks/*"
+      ]
     }
   }
 }

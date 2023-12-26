@@ -23,6 +23,16 @@
     },
     "experiments": {
       "tsconfigPaths": true
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysPermission": "Allow delivery-app to use your location.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ]
+    ]
   }
 }

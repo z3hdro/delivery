@@ -21,7 +21,9 @@
     "plugins": [
         "react",
         "react-hooks",
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "autofix",
+        "unused-imports"
     ],
     "rules": {
         "indent": ["error", 2, { "SwitchCase": 1 }],
@@ -41,7 +43,11 @@
                 "checksConditionals": false
             }
         ],
-        "max-len": ["error", { "code": 80 }]
+        "max-len": ["error", { "code": 120 }],
+        "autofix/no-debugger": "error",
+        "react-hooks/exhaustive-deps": "error",
+        "unused-imports/no-unused-imports": "error",
+        "@typescript-eslint/no-unsafe-enum-comparison": "off"
     },
     "settings": {
         "react": {
