@@ -1,0 +1,15 @@
+{
+  "Login_label": "Войти",
+  "Login_phone_input_placeholder": "Телефон",
+  "Login_password_input_placeholder": "Пароль",
+  "Login_button": "Войти",
+  "Login_forgot_password_button": "Забыли пароль?",
+  "Login_bottom_label": "Еще не зарегистрирован?",
+  "Login_bottom_button": "Зарегистрироваться",
+  "Registration_label": "Регистрация",
+  "Registration_phone_input_placeholder": "Телефон",
+  "Registration_password_input_placeholder": "Пароль",
+  "Registration_button": "Зарегистрироваться",
+  "Registration_bottom_label": "Уже зарегистрирован",
+  "Registration_bottom_button": "Войти"
+}
