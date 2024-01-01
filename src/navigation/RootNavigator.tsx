@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
-import { Loader } from 'components/Loader';
+import { Preloader } from 'src/components/Preloader';
 import { useAppData } from 'providers/AppProvider';
 import { LoginNavigator } from './LoginNavigator';
 import { ManagerNavigator } from './ManagerNavigator';
@@ -34,7 +34,7 @@ export const RootNavigator = () => {
   }, [approveDriver, setCurrentUser]);
   const renderNavigator = () => {
     if (isLoading) {
-      return <Loader />;
+      return <Preloader />;
     } else if (!userId) {
       return <LoginNavigator />;
     } else if (userId === MANAGER_PHONE) {

@@ -3,3 +3,9 @@ export enum ORDER_STATUS {
   APPROVED,
   IN_PROGRESS
 }
+
+export enum ORDER_LIST {
+  WAITING_APPROVAL,
+  IN_PROGRESS,
+  AVAILABLE
+}

@@ -5,12 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { ManagerOrderCard } from 'components/ManagerOrderCard';
 import { Preloader } from 'components/Preloader';
 import { useManagerNavigator } from 'navigation/hooks';
-import { useStyles } from './WaitingApprovalList.styles';
+import { useStyles } from './AvailableList.styles';
 import { ORDER_LIST } from 'constants/order';
 import { MOCK_ORDERS, MockOrder } from 'mocks/mockOrders';
 import { MOCK_ORDERS_PAGINATE } from 'mocks/mockOrdersPagination';
 
-export const WaitingApprovalList = () => {
+export const AvailableList = () => {
   const { t } = useTranslation();
   const { navigate } = useManagerNavigator();
   const styles = useStyles();
@@ -58,18 +58,18 @@ export const WaitingApprovalList = () => {
     }
   }, []);
 
-  const onApprovePress = useCallback( (order: MockOrder) => {
-    navigate('ViewOrderScreen', { order, type: ORDER_LIST.WAITING_APPROVAL });
+  const onEditPress = useCallback( (order: MockOrder) => {
+    navigate('ViewOrderScreen', { order, type: ORDER_LIST.AVAILABLE });
   }, [navigate]);
 
   const renderItem = useCallback(({ item }: { item: MockOrder}) => (
     <ManagerOrderCard
       order={item}
-      buttonTitle={t('CargoList_waiting_approval_button')}
+      buttonTitle={t('CargoList_available_button')}
       t={t}
-      onPress={onApprovePress}
+      onPress={onEditPress}
     />
-  ), [onApprovePress, t]);
+  ), [onEditPress, t]);
 
 
   return (

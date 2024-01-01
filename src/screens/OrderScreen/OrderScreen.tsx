@@ -34,7 +34,7 @@ export const OrderScreen = () => {
   const renderLeftPart = useCallback(() => {
     return (
       <Pressable onPress={goBack}>
-        <View style={styles.filter}>
+        <View style={styles.headerButton}>
           <BackIcon height={16} width={16} />
         </View>
       </Pressable>
@@ -82,8 +82,8 @@ export const OrderScreen = () => {
       style={styles.screen}
       header={
         <ScreenHeader
-          leftPart={renderLeftPart()}
           title={t('Orders_title')}
+          leftPart={renderLeftPart()}
         />
       }>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>

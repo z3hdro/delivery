@@ -14,3 +14,4 @@ export { default as PlusIcon } from './plus_icon.svg';
 export { default as DriversIcon } from './drivers_icon.svg';
 export { default as HomeIcon } from './home_icon.svg';
 export { default as NomenclatureIcon } from './nomenclature_icon.svg';
+export { default as ArrowBackIcon } from './arrow_back_icon.svg';

@@ -1,5 +1,6 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
 import { MockOrder } from 'mocks/mockOrders';
+import { ORDER_LIST } from 'constants/order';
 
 export type LoginStackParamList = {
   LoginScreen: undefined;
@@ -24,5 +25,9 @@ export type MainBottomTabNavigatorParamList = {
 }
 
 export type ManagerStackParamList = {
-  MainBottomTabNavigator: NavigatorScreenParams<MainBottomTabNavigatorParamList>
+  MainBottomTabNavigator: NavigatorScreenParams<MainBottomTabNavigatorParamList>;
+  ViewOrderScreen: {
+    order: MockOrder
+    type: ORDER_LIST
+  };
 }

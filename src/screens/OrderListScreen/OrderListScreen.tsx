@@ -5,7 +5,7 @@ import { FlatList, View } from 'react-native';
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
 import { RoundButton } from 'components/RoundButton';
-import { Loader } from 'components/Loader';
+import { Preloader } from 'src/components/Preloader';
 import { OrderCard } from 'components/OrderCard';
 import { useDriverNavigator } from 'navigation/hooks';
 
@@ -69,11 +69,9 @@ export const OrderListScreen = () => {
     navigate('OrderScreen', { order });
   }, [navigate]);
 
-  const renderItem = useCallback(({ item }: { item: MockOrder}) => {
-    return (
-      <OrderCard order={item} isDriver t={t} onPress={onOpenOrder} />
-    );
-  }, [onOpenOrder, t]);
+  const renderItem = useCallback(({ item }: { item: MockOrder}) => (
+    <OrderCard order={item} isDriver t={t} onPress={onOpenOrder} />
+  ), [onOpenOrder, t]);
 
   return (
     <Screen
@@ -101,7 +99,7 @@ export const OrderListScreen = () => {
           {/*/>*/}
         </View>
         {isLoading ? (
-          <Loader />
+          <Preloader />
         ) : (
           <FlatList
             style={styles.list}

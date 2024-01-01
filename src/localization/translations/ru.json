@@ -53,5 +53,19 @@
   "CargoList_waiting_approval_nomenclature_label": "Номенклатура",
   "CargoList_waiting_approval_button": "Подтвердить",
   "CargoList_in_progress_button": "Просмотр",
-  "CargoList_available_button": "Редактировать"
+  "CargoList_available_button": "Редактировать",
+  "ViewOrder_header_title": "Рейс",
+  "ViewOrder_first_section": "Водитель",
+  "ViewOrder_second_section": "Телефон",
+  "ViewOrder_third_section": "Дата погрузки план",
+  "ViewOrder_fourth_section": "Дата доставки план",
+  "ViewOrder_fifth_section": "VIN",
+  "ViewOrder_show_map_button": "Смотреть на карте",
+  "ViewOrder_hide_map_button": "Назад",
+  "ViewOrder_close_button": "Закрыть",
+  "ViewOrder_approve_button": "Подтвердить",
+  "ViewOrder_decline_button": "Отклонить",
+  "ViewOrder_save_button": "Сохранить",
+  "ViewOrder_cancel_button": "Отменить",
+  "ViewOrder_delete_button": "удалить"
 }

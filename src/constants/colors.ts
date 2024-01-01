@@ -7,5 +7,6 @@ export const colors: Colors = {
   color2: '#212121',
   color5: '#C5C5C5',
   color6: '#F2F2F2',
-  color7: '#828282'
+  color7: '#828282',
+  transparent: 'transparent'
 };

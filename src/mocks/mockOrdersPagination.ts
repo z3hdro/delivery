@@ -1,12 +1,12 @@
-export const MOCK_ORDERS = [
+export const MOCK_ORDERS_PAGINATE = [
   {
-    id: 1,
+    id: 5,
     departure: {
-      name: 'склад №2',
+      name: 'склад №1',
       address: {
-        name: 'склад №2',
+        name: 'склад №1',
         country: 'РФ',
-        city: 'Омск',
+        city: 'Владикавказ',
         street: 'Ленина',
         house: '45',
         building: '99',
@@ -39,7 +39,7 @@ export const MOCK_ORDERS = [
       address: {
         name: 'склад№3',
         country: 'РФ',
-        city: 'Чебоксары',
+        city: 'Астрахань',
         street: 'Мира',
         house: '33',
         building: '69',
@@ -59,7 +59,7 @@ export const MOCK_ORDERS = [
       ]
     },
     nomenclature: {
-      name: 'Лом 3А',
+      name: 'Лом 1А',
       measureName: 'т'
     },
     status: 0,
@@ -94,13 +94,13 @@ export const MOCK_ORDERS = [
     truckVin: '999 999 99 99',
   },
   {
-    id: 2,
+    id: 6,
     departure: {
-      name: 'склад №2',
+      name: 'склад №125',
       address: {
-        name: 'склад №2',
+        name: 'склад №125',
         country: 'РФ',
-        city: 'Якутск',
+        city: 'Оренбург',
         street: 'Ленина',
         house: '45',
         building: '14',
@@ -129,11 +129,11 @@ export const MOCK_ORDERS = [
       ]
     },
     destination: {
-      name: 'склад№3',
+      name: 'склад№6',
       address: {
-        name: 'склад№3',
+        name: 'склад№6',
         country: 'РФ',
-        city: 'Новокузнецк',
+        city: 'Самара',
         street: 'Мира',
         house: '33',
         building: '5',
@@ -153,7 +153,7 @@ export const MOCK_ORDERS = [
       ]
     },
     nomenclature: {
-      name: 'Лом 5А',
+      name: 'Лом 55А',
       measureName: 'т'
     },
     status: 1,
@@ -188,11 +188,11 @@ export const MOCK_ORDERS = [
     truckVin: '999 999 99 99',
   },
   {
-    id: 3,
+    id: 7,
     departure: {
-      name: 'склад №2',
+      name: 'склад №63',
       address: {
-        name: 'склад №2',
+        name: 'склад №63',
         country: 'РФ',
         city: 'Екатеринбург',
         street: 'Ленина',
@@ -227,8 +227,8 @@ export const MOCK_ORDERS = [
       address: {
         name: 'склад№6',
         country: 'РФ',
-        city: 'Тюмень',
-        street: 'Мира',
+        city: 'Москва',
+        street: 'Кошкина',
         house: '33',
         building: '104a',
         floor: '',
@@ -247,7 +247,7 @@ export const MOCK_ORDERS = [
       ]
     },
     nomenclature: {
-      name: 'Лом 3А',
+      name: 'Лом 21А',
       measureName: 'кг'
     },
     status: 2,
@@ -282,14 +282,14 @@ export const MOCK_ORDERS = [
     truckVin: '999 999 99 99',
   },
   {
-    id: 4,
+    id: 8,
     departure: {
       name: 'Промозона №16',
       address: {
         name: 'Промозона №16',
         country: 'РФ',
-        city: 'Москва',
-        street: 'Кошкина',
+        city: 'Санкт-Петербург',
+        street: 'Мира',
         house: '62',
         building: '10',
         floor: '',
@@ -317,11 +317,11 @@ export const MOCK_ORDERS = [
       ]
     },
     destination: {
-      name: 'склад№22',
+      name: 'мет.база1',
       address: {
-        name: 'склад№22',
+        name: 'мет.база1',
         country: 'РФ',
-        city: 'Казань',
+        city: 'Смоленск',
         street: 'Мира',
         house: '5',
         building: '104a',
@@ -341,7 +341,7 @@ export const MOCK_ORDERS = [
       ]
     },
     nomenclature: {
-      name: 'Лом 1А',
+      name: 'Лом 10А',
       measureName: 'т'
     },
     status: 1,
@@ -376,5 +376,3 @@ export const MOCK_ORDERS = [
     truckVin: '999 999 99 99',
   }
 ];
-
-export type MockOrder = typeof MOCK_ORDERS[0]

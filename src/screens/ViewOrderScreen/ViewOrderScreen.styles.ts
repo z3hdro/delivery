@@ -11,11 +11,10 @@ export const useStyles = () => {
       backgroundColor: colors.color6,
     },
     container: {
+      marginTop: 28,
       flex: 1,
     },
     content: {
-      paddingTop: 24,
-      backgroundColor: 'transparent',
       paddingBottom: bottom
     },
     headerButton: {
@@ -27,30 +26,39 @@ export const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    delivery: {
+    section: {
       marginTop: 8,
     },
-    infoBlock: {
-      marginTop: 18,
+    mapButtonContainer: {
+      marginVertical: 28,
+      alignItems: 'flex-end'
     },
-    button: {
-      marginTop: 24,
-      height: 50,
+    mapButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+    },
+    primaryButton: {
       borderRadius: 50,
-      paddingVertical: 9,
-      paddingHorizontal: 16,
     },
-    buttonText: {
+    primaryButtonText: {
+      fontFamily: 'Roboto-Bold',
       letterSpacing: 1,
-      textAlign: 'center'
     },
-    completeButton: {
-      marginTop: 24,
-      height: 50,
+    secondaryButtonContainer: {
+      marginTop: 16,
+    },
+    secondaryButton: {
       borderRadius: 50,
-      paddingVertical: 9,
-      paddingHorizontal: 16,
-      backgroundColor: colors.color2
+      backgroundColor: colors.color2,
+      width: 'auto',
+      flex: 1,
+    },
+    buttonsContainer: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      columnGap: 8,
     }
   }), [bottom]);
 };
