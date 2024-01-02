@@ -1,6 +1,7 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
 import { MockOrder } from 'mocks/mockOrders';
 import { ORDER_LIST } from 'constants/order';
+import { MockNomenclature } from 'mocks/mockNomenclature';
 
 export type LoginStackParamList = {
   LoginScreen: undefined;
@@ -30,4 +31,7 @@ export type ManagerStackParamList = {
     order: MockOrder
     type: ORDER_LIST
   };
+  NomenclatureViewScreen: {
+    nomenclature: MockNomenclature | undefined
+  }
 }

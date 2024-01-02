@@ -4,8 +4,11 @@ import { MainBottomTabNavigatorParamList } from 'types/navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomTab } from './components';
 
-import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'assets/images';
 import { CargoListScreen } from 'screens/CargoListScreen';
+import { CreateOrderScreen } from 'screens/CreateOrderScreen';
+import { NomenclatureScreen } from 'screens/NomenclatureScreen';
+
+import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'assets/images';
 
 const Tab = createBottomTabNavigator<MainBottomTabNavigatorParamList>();
 
@@ -22,6 +25,7 @@ export const MainBottomTabNavigator = () => {
   return (
     <Tab.Navigator
       tabBar={props => <BottomTab {...props} />}
+      initialRouteName={'AddOrderScreen'}
       screenOptions={customOptions}>
       <Tab.Screen
         name='CargoListScreen'
@@ -35,7 +39,7 @@ export const MainBottomTabNavigator = () => {
       />
       <Tab.Screen
         name='AddOrderScreen'
-        component={MockScreen}
+        component={CreateOrderScreen}
         options={{
           tabBarLabel: t('AddOrder'),
           tabBarIcon: ({ color, size }) => (
@@ -65,7 +69,7 @@ export const MainBottomTabNavigator = () => {
       />
       <Tab.Screen
         name='NomenclatureScreen'
-        component={MockScreen}
+        component={NomenclatureScreen}
         options={{
           tabBarLabel: t('Nomenclature'),
           tabBarIcon: ({ color, size }) => (

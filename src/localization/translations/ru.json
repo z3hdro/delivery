@@ -67,5 +67,24 @@
   "ViewOrder_decline_button": "Отклонить",
   "ViewOrder_save_button": "Сохранить",
   "ViewOrder_cancel_button": "Отменить",
-  "ViewOrder_delete_button": "удалить"
+  "ViewOrder_delete_button": "удалить",
+  "CreateOrder_header_title": "Создание заказа",
+  "CreateOrder_first_section": "Пункт погрузки",
+  "CreateOrder_second_section": "Пункт доставки",
+  "CreateOrder_third_section": "Груз",
+  "CreateOrder_fourth_section": "Вес брутто",
+  "CreateOrder_fifth_section": "Вес нетто",
+  "CreateOrder_sixth_section": "Плановая дата погрузки",
+  "CreateOrder_seventh_section": "Плановая дата доставки",
+  "CreateOrder_add_cargo_button": "Добавить груз",
+  "CreateOrder_create_button": "Создать",
+  "Nomenclature_header_title": "Список номенклатур",
+  "Nomenclature_add_position_button": "Добавить позицию",
+  "Nomenclature_add_first_section": "Наименование",
+  "Nomenclature_add_second_section": "Единица измерения",
+  "Nomenclature_add_button": "Добавить",
+  "Nomenclature_add_save_button": "Сохранить",
+  "Nomenclature_add_delete_button": "Удалить",
+  "Nomenclature_add_cancel_button": "Отмена"
+
 }

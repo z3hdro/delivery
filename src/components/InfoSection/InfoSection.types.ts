@@ -1,8 +1,11 @@
-import { ViewStyle } from 'react-native';
+import { TextStyle, ViewStyle } from 'react-native';
 
 export type Props = {
-  style?: ViewStyle;
   label: string;
   value: string;
-  onChangeText?: (text: string) => void;
+  onUpdate?: (text: string) => void;
+  editable?: boolean;
+  textInputStyle?: ViewStyle;
+  style?: ViewStyle;
+  labelStyle?: TextStyle;
 }

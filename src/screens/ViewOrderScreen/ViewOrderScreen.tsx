@@ -89,26 +89,31 @@ export const ViewOrderScreen = () => {
               style={styles.section}
               label={t('ViewOrder_first_section')}
               value={driverName}
+              editable={false}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_second_section')}
               value={order.driver.phone}
+              editable={false}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_third_section')}
               value={planDeparutureDate}
+              editable={false}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_fourth_section')}
               value={planDeliveryDate}
+              editable={false}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_fifth_section')}
               value={order.truckVin}
+              editable={false}
             />
           </>
         )}

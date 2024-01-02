@@ -26,11 +26,13 @@ export const ScreenHeader: FC<Props> = ({ leftPart, title, rightPart, style }) =
   return (
     <View style={[styles.container, style]}>
       {renderLeftIcon()}
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>
-          {title}
-        </Text>
-      </View>
+      {title && (
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>
+            {title}
+          </Text>
+        </View>
+      )}
       {renderRightIcon()}
     </View>
   );

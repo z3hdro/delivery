@@ -14,12 +14,14 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.z3hdro.cargodelivery"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.z3hdro.cargodelivery"
     },
     "experiments": {
       "tsconfigPaths": true
