@@ -1,4 +1,4 @@
-import { ViewStyle } from 'react-native';
+import { TextStyle, ViewStyle } from 'react-native';
 
 import { NavigationState, SceneRendererProps } from 'react-native-tab-view';
 
@@ -17,6 +17,8 @@ export type TabBarRoutes = {
   thirdScreen?: JSX.Element;
   thirdLabel?: string;
   tabsContainerStyle?: ViewStyle;
+  labelTextStyle?: TextStyle;
+  tabStyle?: ViewStyle;
 };
 
 export type RenderTabBarProps = SceneRendererProps & {

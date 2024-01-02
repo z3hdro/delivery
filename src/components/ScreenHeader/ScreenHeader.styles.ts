@@ -13,7 +13,6 @@ export const useStyles = () => {
       alignItems: 'flex-end'
     },
     titleContainer: {
-      flexGrow: 1,
       alignItems: 'center',
     },
     empty: {

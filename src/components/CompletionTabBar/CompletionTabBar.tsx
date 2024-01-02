@@ -24,6 +24,8 @@ export const CompletionTabBar: React.FC<TabBarRoutes> = ({
   firstLabel,
   secondLabel,
   thirdLabel,
+  labelTextStyle,
+  tabStyle,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const routes = useTabRoutes(
@@ -51,13 +53,14 @@ export const CompletionTabBar: React.FC<TabBarRoutes> = ({
               style={[
                 styles.tabItem,
                 tabItemProps.route.index === currentIndex
-                && styles.tabItemActive
+                && styles.tabItemActive,
+                tabStyle,
               ]}
               renderLabel={({
                 route: { title },
                 focused,
               }) => (
-                <Text style={[styles.tabText, focused && styles.tabTextActive]}>
+                <Text style={[styles.tabText, focused && styles.tabTextActive, labelTextStyle]}>
                   {title}
                 </Text>
               )}

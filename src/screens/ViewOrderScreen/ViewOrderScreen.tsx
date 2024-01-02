@@ -14,7 +14,7 @@ import { getPrimaryButtonText } from './ViewOrderScreen.utils';
 import { useStyles } from './ViewOrderScreen.styles';
 import { DISPLAY_DATE_FORMAT } from './ViewOrderScreen.consts';
 import { ORDER_LIST } from 'constants/order';
-import { ArrowBackIcon, BackIcon, MapIcon } from 'assets/images';
+import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
 
 export const ViewOrderScreen = () => {
   const { t } = useTranslation();

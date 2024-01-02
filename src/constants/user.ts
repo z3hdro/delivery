@@ -1,0 +1,4 @@
+export enum USER {
+  WAITING_APPROVAL,
+  APPROVED
+}

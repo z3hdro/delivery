@@ -16,7 +16,7 @@ import { colors } from 'constants/colors';
 import { useStyles } from './CreateOrderScreen.styles';
 import { Cargo } from './CreateOrderScreen.types';
 
-import { PlusIcon } from 'assets/images';
+import { PlusIcon } from 'src/assets/icons';
 
 export const CreateOrderScreen = () => {
   const { t } = useTranslation();

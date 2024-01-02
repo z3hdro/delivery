@@ -12,7 +12,7 @@ import { useDriverNavigator } from 'navigation/hooks';
 import { useStyles } from './OrderListScreen.styles';
 import { MOCK_ORDERS, MockOrder } from 'mocks/mockOrders';
 
-import { MapIcon } from 'assets/images';
+import { MapIcon } from 'src/assets/icons';
 
 export const OrderListScreen = () => {
   const { t } = useTranslation();

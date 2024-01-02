@@ -15,3 +15,5 @@ export { default as DriversIcon } from './drivers_icon.svg';
 export { default as HomeIcon } from './home_icon.svg';
 export { default as NomenclatureIcon } from './nomenclature_icon.svg';
 export { default as ArrowBackIcon } from './arrow_back_icon.svg';
+export { default as CheckboxIcon } from './checkbox_icon.svg';
+export { default as CheckboxFilledIcon } from './checkbox_filled_icon.svg';

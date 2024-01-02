@@ -15,11 +15,3 @@ export enum CARGO_KEYS {
   GROSS_WEIGHT = 'grossWeight',
   NET_WEIGHT = 'netWeight',
 }
-
-export enum KEYS {
-  DEPARTURE = 'departure',
-  DELIVERY = 'delivery',
-  CARGO = 'cargo',
-  DEPARTURE_DATE_PLAN = 'departureDatePlan',
-  DELIVERY_DATE_PLAN = 'deliveryDatePlan',
-}

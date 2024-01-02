@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, ScrollView, TouchableOpacity, View, Text } from 'react-native';
+import { FlatList, TouchableOpacity, View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from 'components/ScreenHeader';
 import { Screen } from 'components/Screen';
@@ -10,7 +10,7 @@ import { useManagerNavigator } from 'navigation/hooks';
 import { useStyles } from './NomenclatureScreen.styles';
 import { MOCK_NOMENCLATURE, MockNomenclature } from 'mocks/mockNomenclature';
 
-import { PlusIcon } from 'assets/images';
+import { PlusIcon } from 'src/assets/icons';
 
 export const NomenclatureScreen = () => {
   const { t } = useTranslation();
@@ -60,7 +60,7 @@ export const NomenclatureScreen = () => {
           title={t('CreateOrder_header_title')}
         />
       }>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.container}>
         <View style={styles.addPosition}>
           <RoundButton
             leftIcon={<PlusIcon height={12} width={12} color={colors.red} />}
@@ -69,8 +69,13 @@ export const NomenclatureScreen = () => {
           />
         </View>
         {isLoading && <Preloader style={styles.preloader} />}
-        <FlatList style={styles.list} data={data} renderItem={renderItem} />
-      </ScrollView>
+        <FlatList
+          style={styles.list}
+          data={data}
+          keyExtractor={item => item.id.toString()}
+          renderItem={renderItem}
+        />
+      </View>
     </Screen>
   );
 };

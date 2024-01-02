@@ -8,8 +8,7 @@ import { ORDER_STATUS } from 'constants/order';
 import { useStyles } from './OrderCard.styles';
 import { Props } from './OrderCard.types';
 
-import { PathIcon, TrackIcon } from 'assets/images';
-
+import { PathIcon, TrackIcon } from 'src/assets/icons';
 
 export const OrderCard: FC<Props> = ({
   order,

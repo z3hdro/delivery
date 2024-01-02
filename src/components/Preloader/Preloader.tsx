@@ -9,7 +9,9 @@ export const Preloader: FC<Props> = ({ style }) => {
 
   return (
     <View style={[styles.loader, style]}>
-      <ActivityIndicator size={'large'} color={colors.color2} />
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size={'large'} color={colors.white} />
+      </View>
     </View>
   );
 };

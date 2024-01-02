@@ -13,8 +13,6 @@ export const useStyles = () => {
     container: {
       marginTop: 26,
       flex: 1,
-    },
-    content: {
       backgroundColor: 'transparent',
       paddingBottom: bottom || 16
     },

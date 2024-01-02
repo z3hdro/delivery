@@ -2,6 +2,9 @@ import { NavigatorScreenParams } from '@react-navigation/native';
 import { MockOrder } from 'mocks/mockOrders';
 import { ORDER_LIST } from 'constants/order';
 import { MockNomenclature } from 'mocks/mockNomenclature';
+import { MockDriver } from 'mocks/mockDrivers';
+import { USER } from 'constants/user';
+import { MockUser } from 'mocks/mockUsers';
 
 export type LoginStackParamList = {
   LoginScreen: undefined;
@@ -30,6 +33,11 @@ export type ManagerStackParamList = {
   ViewOrderScreen: {
     order: MockOrder
     type: ORDER_LIST
+  };
+  UserViewScreen: {
+    type: USER
+    user?: MockUser
+    driver?: MockDriver
   };
   NomenclatureViewScreen: {
     nomenclature: MockNomenclature | undefined

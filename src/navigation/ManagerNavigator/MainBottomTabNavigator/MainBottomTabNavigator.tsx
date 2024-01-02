@@ -7,8 +7,9 @@ import { BottomTab } from './components';
 import { CargoListScreen } from 'screens/CargoListScreen';
 import { CreateOrderScreen } from 'screens/CreateOrderScreen';
 import { NomenclatureScreen } from 'screens/NomenclatureScreen';
+import { DriverListScreen } from 'screens/DriverListScreen';
 
-import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'assets/images';
+import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'src/assets/icons';
 
 const Tab = createBottomTabNavigator<MainBottomTabNavigatorParamList>();
 
@@ -25,7 +26,7 @@ export const MainBottomTabNavigator = () => {
   return (
     <Tab.Navigator
       tabBar={props => <BottomTab {...props} />}
-      initialRouteName={'AddOrderScreen'}
+      initialRouteName={'DriverListScreen'}
       screenOptions={customOptions}>
       <Tab.Screen
         name='CargoListScreen'
@@ -49,7 +50,7 @@ export const MainBottomTabNavigator = () => {
       />
       <Tab.Screen
         name='DriverListScreen'
-        component={MockScreen}
+        component={DriverListScreen}
         options={{
           tabBarLabel: t('DriverList'),
           tabBarIcon: ({ color, size }) => (

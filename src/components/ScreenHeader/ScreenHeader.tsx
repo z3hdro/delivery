@@ -4,7 +4,14 @@ import { View, Text } from 'react-native';
 import { useStyles } from './ScreenHeader.styles';
 import { Props } from './ScreenHeader.types';
 
-export const ScreenHeader: FC<Props> = ({ leftPart, title, rightPart, style }) => {
+export const ScreenHeader: FC<Props> = ({
+  leftPart,
+  title,
+  rightPart,
+  style,
+  titleStyle,
+  titleTextStyle
+}) => {
   const styles = useStyles();
 
   const renderLeftIcon = useCallback(() => {
@@ -27,8 +34,8 @@ export const ScreenHeader: FC<Props> = ({ leftPart, title, rightPart, style }) =
     <View style={[styles.container, style]}>
       {renderLeftIcon()}
       {title && (
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>
+        <View style={[styles.titleContainer, titleStyle]}>
+          <Text style={[styles.title, titleTextStyle]}>
             {title}
           </Text>
         </View>

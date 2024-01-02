@@ -23,18 +23,24 @@
       },
       "package": "com.z3hdro.cargodelivery"
     },
-    "experiments": {
-      "tsconfigPaths": true
-    },
     "plugins": [
       [
         "expo-location",
         {
-          "locationAlwaysPermission": "Allow delivery-app to use your location.",
+          "locationAlwaysPermission": "Allow delivery-app to use and track your location.",
           "isIosBackgroundLocationEnabled": true,
           "isAndroidBackgroundLocationEnabled": true
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you upload documents."
+        }
       ]
-    ]
+    ],
+    "experiments": {
+      "tsconfigPaths": true
+    }
   }
 }

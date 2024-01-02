@@ -3,7 +3,7 @@ import { Alert, Pressable, View } from 'react-native';
 
 import { useStyles } from './Screen.styles';
 import { Props } from './Screen.types';
-import { LogoIcon } from 'assets/images';
+import { LogoIcon } from 'src/assets/icons';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { useAppData } from 'providers/AppProvider';
 

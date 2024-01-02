@@ -5,7 +5,7 @@ import { useStyles } from './Accordion.styles';
 import { Props } from './Accordion.types';
 import { colors } from 'constants/colors';
 
-import { ArrowDownCircleIcon, ArrowUpCircleIcon } from 'assets/images';
+import { ArrowDownCircleIcon, ArrowUpCircleIcon } from 'src/assets/icons';
 
 export const Accordion: FC<Props> = ({
   label,

@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MainBottomTabNavigator } from './MainBottomTabNavigator';
 import { ViewOrderScreen } from 'screens/ViewOrderScreen';
 import { NomenclatureViewScreen } from 'screens/NomenclatureViewScreen';
+import { UserViewScreen } from 'screens/UserViewScreen';
 
 import { ManagerStackParamList } from 'types/navigation';
 
@@ -18,6 +19,7 @@ export const ManagerNavigator = () => {
       <Stack.Screen name='MainBottomTabNavigator' component={MainBottomTabNavigator} />
       <Stack.Screen name='ViewOrderScreen' component={ViewOrderScreen} />
       <Stack.Screen name='NomenclatureViewScreen' component={NomenclatureViewScreen} />
+      <Stack.Screen name='UserViewScreen' component={UserViewScreen} />
     </Stack.Navigator>
   );
 };

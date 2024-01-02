@@ -14,7 +14,7 @@ import { ORDER_STATUS } from 'constants/order';
 import { useStyles } from './OrderScreen.styles';
 import { ExpandMap } from './OrderScreen.types';
 
-import { BackIcon } from 'assets/images';
+import { BackIcon } from 'src/assets/icons';
 
 export const OrderScreen = () => {
   const { t } = useTranslation();

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from 'components/ScreenHeader';
 import { Screen } from 'components/Screen';
 import { useStyles } from './NomenclatureViewScreen.styles';
-import { BackIcon } from 'assets/images';
+import { BackIcon } from 'src/assets/icons';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import { NomenclatureMeasurePicker } from 'components/NomenclatureMeasurePicker';
 import { NomenclatureNamePicker } from 'components/NomenclatureNamePicker';
@@ -58,7 +58,10 @@ export const NomenclatureViewScreen = () => {
     <Screen
       style={styles.screen}
       header={
-        <ScreenHeader leftPart={renderLeftPart()}/>
+        <ScreenHeader
+          title={t('Nomenclature_view_header_title')}
+          leftPart={renderLeftPart()}
+        />
       }>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View>

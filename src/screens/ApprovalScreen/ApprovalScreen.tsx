@@ -7,7 +7,7 @@ import { Screen } from 'components/Screen';
 import { colors } from 'constants/colors';
 import { useStyles } from './ApprovalScreen.styles';
 
-import { WarningIcon } from 'assets/images';
+import { WarningIcon } from 'src/assets/icons';
 
 // TODO: remove later
 import { useDriverNavigator } from 'navigation/hooks';
