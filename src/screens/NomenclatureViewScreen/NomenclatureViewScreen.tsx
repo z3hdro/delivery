@@ -9,6 +9,7 @@ import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import { NomenclatureMeasurePicker } from 'components/NomenclatureMeasurePicker';
 import { NomenclatureNamePicker } from 'components/NomenclatureNamePicker';
 import { Button } from 'components/Button';
+import { Preloader } from 'components/Preloader';
 
 export const NomenclatureViewScreen = () => {
   const { t } = useTranslation();
@@ -46,7 +47,20 @@ export const NomenclatureViewScreen = () => {
     goBack();
   }, [goBack]);
 
-  const onSavePosition = useCallback(() => {
+  const onSavePosition = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(true);
+        }, 1500);
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
     console.log('save position');
   }, []);
 
@@ -63,6 +77,7 @@ export const NomenclatureViewScreen = () => {
           leftPart={renderLeftPart()}
         />
       }>
+      {isLoading && <Preloader style={styles.preloader} />}
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View>
           <Text style={styles.label}>

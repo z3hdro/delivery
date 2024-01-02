@@ -10,6 +10,14 @@ export const useStyles = () => {
     screen: {
       backgroundColor: colors.color6,
     },
+    preloader: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      zIndex: 10
+    },
     container: {
       marginTop: 26,
       flex: 1,
