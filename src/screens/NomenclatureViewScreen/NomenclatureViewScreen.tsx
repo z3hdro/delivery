@@ -3,13 +3,14 @@ import { Pressable, ScrollView, View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from 'components/ScreenHeader';
 import { Screen } from 'components/Screen';
-import { useStyles } from './NomenclatureViewScreen.styles';
-import { BackIcon } from 'src/assets/icons';
-import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import { NomenclatureMeasurePicker } from 'components/NomenclatureMeasurePicker';
 import { NomenclatureNamePicker } from 'components/NomenclatureNamePicker';
 import { Button } from 'components/Button';
 import { Preloader } from 'components/Preloader';
+import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
+import { useStyles } from './NomenclatureViewScreen.styles';
+
+import { BackIcon } from 'src/assets/icons';
 
 export const NomenclatureViewScreen = () => {
   const { t } = useTranslation();
