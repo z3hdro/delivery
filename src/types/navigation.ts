@@ -5,6 +5,7 @@ import { MockNomenclature } from 'mocks/mockNomenclature';
 import { MockDriver } from 'mocks/mockDrivers';
 import { USER } from 'constants/user';
 import { MockUser } from 'mocks/mockUsers';
+import { MockShippingPoint } from 'mocks/mockShippingPoints';
 
 export type LoginStackParamList = {
   LoginScreen: undefined;
@@ -41,5 +42,8 @@ export type ManagerStackParamList = {
   };
   NomenclatureViewScreen: {
     nomenclature: MockNomenclature | undefined
+  };
+  ShippingPointViewScreen: {
+    point: MockShippingPoint | undefined
   }
 }

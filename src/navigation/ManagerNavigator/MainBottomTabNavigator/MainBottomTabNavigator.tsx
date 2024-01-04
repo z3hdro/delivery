@@ -8,6 +8,7 @@ import { CargoListScreen } from 'screens/CargoListScreen';
 import { CreateOrderScreen } from 'screens/CreateOrderScreen';
 import { NomenclatureScreen } from 'screens/NomenclatureScreen';
 import { DriverListScreen } from 'screens/DriverListScreen';
+import { ShippingPointScreen } from 'screens/ShippingPointScreen';
 
 import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'src/assets/icons';
 
@@ -18,15 +19,13 @@ const customOptions = {
   animationTypeForReplace: 'push'
 };
 
-const MockScreen = () => <></>;
-
 export const MainBottomTabNavigator = () => {
   const { t } = useTranslation();
 
   return (
     <Tab.Navigator
       tabBar={props => <BottomTab {...props} />}
-      initialRouteName={'DriverListScreen'}
+      initialRouteName={'ShippingPointScreen'}
       screenOptions={customOptions}>
       <Tab.Screen
         name='CargoListScreen'
@@ -60,7 +59,7 @@ export const MainBottomTabNavigator = () => {
       />
       <Tab.Screen
         name='ShippingPointScreen'
-        component={MockScreen}
+        component={ShippingPointScreen}
         options={{
           tabBarLabel: t('ShippingPoints'),
           tabBarIcon: ({ color, size }) => (

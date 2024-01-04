@@ -10,3 +10,5 @@ export * from './NomenclatureScreen';
 export * from './NomenclatureViewScreen';
 export * from './DriverListScreen';
 export * from './UserViewScreen';
+export * from './ShippingPointScreen';
+export * from './ShippingPointViewScreen';

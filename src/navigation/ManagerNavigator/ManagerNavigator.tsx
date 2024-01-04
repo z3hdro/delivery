@@ -5,6 +5,7 @@ import { MainBottomTabNavigator } from './MainBottomTabNavigator';
 import { ViewOrderScreen } from 'screens/ViewOrderScreen';
 import { NomenclatureViewScreen } from 'screens/NomenclatureViewScreen';
 import { UserViewScreen } from 'screens/UserViewScreen';
+import { ShippingPointViewScreen } from 'screens/ShippingPointViewScreen';
 
 import { ManagerStackParamList } from 'types/navigation';
 
@@ -20,6 +21,7 @@ export const ManagerNavigator = () => {
       <Stack.Screen name='ViewOrderScreen' component={ViewOrderScreen} />
       <Stack.Screen name='NomenclatureViewScreen' component={NomenclatureViewScreen} />
       <Stack.Screen name='UserViewScreen' component={UserViewScreen} />
+      <Stack.Screen name='ShippingPointViewScreen' component={ShippingPointViewScreen} />
     </Stack.Navigator>
   );
 };
