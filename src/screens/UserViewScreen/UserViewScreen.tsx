@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, ScrollView, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
+
 import { ScreenHeader } from 'components/ScreenHeader';
 import { InfoSection } from 'components/InfoSection';
 import { Screen } from 'components/Screen';
@@ -9,6 +10,7 @@ import { RoundButton } from 'components/RoundButton';
 import { SelectedImage } from 'components/SelectedImage';
 import { Checkbox } from 'components/Checkbox';
 import { Button } from 'components/Button';
+import { Preloader } from 'components/Preloader';
 import { JobPositionPicker } from 'components/JobPositionPicker';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
@@ -26,11 +28,10 @@ import {
   PASSPORT_KEYS,
   PERSON_KEYS
 } from './UserViewScreen.consts';
+import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { Company, Passport, Person } from './UserViewScreen.types';
 
 import { BackIcon } from 'src/assets/icons';
-import { Preloader } from 'components/Preloader';
-
 
 export const UserViewScreen = () => {
   const { t } = useTranslation();
@@ -364,6 +365,7 @@ export const UserViewScreen = () => {
               onUpdate={(text: string) => {
                 updatePassportData(PASSPORT_KEYS.DATE_OF_ISSUE, text);
               }}
+              type={INFO_SECTION_TYPE.DATE_PICKER}
             />
             <InfoSection
               style={styles.rowItem}

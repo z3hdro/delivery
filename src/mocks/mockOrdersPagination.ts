@@ -34,8 +34,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 43.024616,
+        lon: 44.681771,
       }
     },
     destination: {
@@ -62,8 +62,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 46.347614,
+        lon: 48.030178,
       }
     },
     nomenclature: {
@@ -101,8 +101,8 @@ export const MOCK_ORDERS_PAGINATE = [
     netWeight: 8,
     truckVin: '999 999 99 99',
     geo: {
-      lat: 0,
-      lon: 0,
+      lat: 45.035172,
+      lon: 46.734330,
     }
   },
   {
@@ -140,8 +140,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 51.768205,
+        lon: 55.097000,
       }
     },
     destination: {
@@ -168,8 +168,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 53.195878,
+        lon: 50.100202,
       }
     },
     nomenclature: {
@@ -207,8 +207,8 @@ export const MOCK_ORDERS_PAGINATE = [
     netWeight: 11,
     truckVin: '999 999 99 99',
     geo: {
-      lat: 0,
-      lon: 0,
+      lat: 52.767314,
+      lon: 51.875298,
     }
   },
   {
@@ -246,8 +246,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 56.838011,
+        lon: 60.597474,
       }
     },
     destination: {
@@ -274,8 +274,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 55.641709,
+        lon: 37.672805,
       }
     },
     nomenclature: {
@@ -313,8 +313,8 @@ export const MOCK_ORDERS_PAGINATE = [
     netWeight: 17,
     truckVin: '999 999 99 99',
     geo: {
-      lat: 0,
-      lon: 0,
+      lat: 56.835659,
+      lon: 57.766989,
     }
   },
   {
@@ -352,8 +352,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 59.938784,
+        lon: 30.314997,
       }
     },
     destination: {
@@ -380,8 +380,8 @@ export const MOCK_ORDERS_PAGINATE = [
         }
       ],
       geo: {
-        lat: 0,
-        lon: 0,
+        lat: 54.782635,
+        lon: 32.045287,
       }
     },
     nomenclature: {
@@ -419,8 +419,8 @@ export const MOCK_ORDERS_PAGINATE = [
     netWeight: 30,
     truckVin: '999 999 99 99',
     geo: {
-      lat: 0,
-      lon: 0,
+      lat: 56.226612,
+      lon: 29.538961,
     }
   }
 ];

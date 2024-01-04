@@ -15,6 +15,25 @@ export const useStyles = () => {
       lineHeight: 14,
       letterSpacing: 0.2,
     },
+    valueContainer: {
+      width: '100%',
+      paddingVertical: 4,
+      height: 42,
+      paddingHorizontal: 16,
+      borderRadius: 4,
+      backgroundColor: colors.white,
+      justifyContent: 'center',
+    },
+    value: {
+      overflow: 'hidden',
+      fontFamily: 'Roboto',
+      fontStyle: 'normal',
+      fontWeight: '400',
+      fontSize: 16,
+      lineHeight: 18,
+      letterSpacing: 0.4,
+      color: colors.color2
+    },
     textInput: {
       paddingVertical: 4,
       height: 42,

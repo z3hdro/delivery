@@ -1,3 +1,5 @@
+export const DISPLAY_DATE_FORMAT = 'dd.MM.yyyy';
+
 export const EMPTY_PERSON = {
   phone: '',
   name: '',
@@ -27,7 +29,7 @@ export const EMPTY_PASSPORT = {
   series: '',
   number: '',
   authority: '',
-  dateOfIssue: '',
+  dateOfIssue: new Date().toISOString(),
   code: '',
 };
 

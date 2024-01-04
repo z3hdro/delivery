@@ -19,8 +19,6 @@ const customOptions: NativeStackNavigationOptions = {
 export const DriverNavigator = () => {
   const { isDriverApproved } = useAppData();
 
-  console.log('isDriverApproved: ', isDriverApproved);
-
   return (
     <Stack.Navigator
       initialRouteName={isDriverApproved ? 'OrderListScreen' : 'ApprovalScreen'}

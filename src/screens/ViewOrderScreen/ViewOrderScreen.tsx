@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
 import YaMap, { Marker } from 'react-native-yamap';
 
 import { Screen } from 'components/Screen';
@@ -11,10 +10,13 @@ import { InfoSection } from 'components/InfoSection';
 import { RoundButton } from 'components/RoundButton';
 import { Button } from 'components/Button';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
-import { getPrimaryButtonText } from './ViewOrderScreen.utils';
+import { createInitialState, getPrimaryButtonText } from './ViewOrderScreen.utils';
 import { useStyles } from './ViewOrderScreen.styles';
-import { DISPLAY_DATE_FORMAT } from './ViewOrderScreen.consts';
+import { ORDER_KEYS } from './ViewOrderScreen.consts';
 import { ORDER_LIST } from 'constants/order';
+import { INFO_SECTION_TYPE } from 'constants/infoSection';
+import { Order } from './ViewOrderScreen.types';
+
 import { ArrowBackIcon, BackIcon, DeliveryPointIcon, DeparturePointIcon, MapIcon, TrackIcon } from 'src/assets/icons';
 
 export const ViewOrderScreen = () => {
@@ -24,6 +26,7 @@ export const ViewOrderScreen = () => {
   const { goBack } = useManagerNavigator();
 
   const [displayMap, setDisplayMap] = useState<boolean>(false);
+  const [orderData, setOrderData] = useState<Order>(createInitialState(order));
 
   const mapRef = useRef<YaMap | null>(null);
 
@@ -36,16 +39,12 @@ export const ViewOrderScreen = () => {
   const buttonTitle = useMemo(() => getPrimaryButtonText(type), [type]);
 
   const driverName = useMemo(() =>
-    `${order.driver.surname} ${order.driver.name[0].toUpperCase()}.${order.driver.patronymic[0].toUpperCase()}.`,
-  [order]);
+    `${orderData.surname} ${orderData.name[0].toUpperCase()}.${orderData.patronymic[0].toUpperCase()}.`,
+  [orderData]);
 
-  const planDeparutureDate = useMemo(() =>
-    format(order.departureDatePlan, DISPLAY_DATE_FORMAT),
-  [order]);
-
-  const planDeliveryDate = useMemo(() =>
-    format(order.deliveryDatePlan, DISPLAY_DATE_FORMAT),
-  [order]);
+  const onUpdateOrder = useCallback((key: ORDER_KEYS, value: string) => {
+    setOrderData((prevState) => ({ ...prevState, [key]: value }));
+  }, []);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -114,31 +113,43 @@ export const ViewOrderScreen = () => {
               style={styles.section}
               label={t('ViewOrder_first_section')}
               value={driverName}
-              editable={false}
+              editable={type === ORDER_LIST.AVAILABLE}
+
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_second_section')}
               value={order.driver.phone}
-              editable={false}
+              editable={type === ORDER_LIST.AVAILABLE}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_third_section')}
-              value={planDeparutureDate}
-              editable={false}
+              value={orderData.departureDatePlan}
+              editable={type === ORDER_LIST.AVAILABLE}
+              type={INFO_SECTION_TYPE.DATE_PICKER}
+              onUpdate={(text: string) => {
+                onUpdateOrder(ORDER_KEYS.DEPARTURE_DATE_PLAN, text);
+              }}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_fourth_section')}
-              value={planDeliveryDate}
-              editable={false}
+              value={orderData.deliveryDatePlan}
+              editable={type === ORDER_LIST.AVAILABLE}
+              type={INFO_SECTION_TYPE.DATE_PICKER}
+              onUpdate={(text: string) => {
+                onUpdateOrder(ORDER_KEYS.DELIVERY_DATE_PLAN, text);
+              }}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_fifth_section')}
-              value={order.truckVin}
-              editable={false}
+              value={orderData.truckVin}
+              editable={type === ORDER_LIST.AVAILABLE}
+              onUpdate={(text: string) => {
+                onUpdateOrder(ORDER_KEYS.TRUCK_VIN, text);
+              }}
             />
           </>
         )}

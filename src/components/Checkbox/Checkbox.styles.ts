@@ -9,19 +9,11 @@ export const useStyles = () => {
       borderRadius: 4,
       borderWidth: 1,
       borderColor: colors.color5,
+      backgroundColor: 'transparent',
       paddingHorizontal: 16,
       flexDirection: 'row',
       alignItems: 'center',
       height: 42,
-
-      shadowColor: colors.black,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
     },
     text: {
       marginLeft: 10,

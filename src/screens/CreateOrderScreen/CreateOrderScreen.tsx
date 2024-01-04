@@ -13,6 +13,7 @@ import { RoundButton } from 'components/RoundButton';
 import { EMPTY_CARGO_DATA, INITIAL_CARGO_DATA } from './CreateOrderScreen.consts';
 import { CARGO_KEYS } from 'constants/order';
 import { colors } from 'constants/colors';
+import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { useStyles } from './CreateOrderScreen.styles';
 import { Cargo } from './CreateOrderScreen.types';
 
@@ -55,7 +56,6 @@ export const CreateOrderScreen = () => {
       const tempData =  [...prevState];
       const cargoItem = tempData[index];
       cargoItem.name = text;
-      console.log('tempData: ', tempData);
       return tempData;
     });
   }, []);
@@ -147,6 +147,7 @@ export const CreateOrderScreen = () => {
             style={styles.section}
             label={t('CreateOrder_sixth_section')}
             value={departureDatePlan}
+            type={INFO_SECTION_TYPE.DATE_PICKER}
             onUpdate={(text) => {
               setDepartureDatePlan(text);
             }}
@@ -155,6 +156,7 @@ export const CreateOrderScreen = () => {
             style={styles.section}
             label={t('CreateOrder_seventh_section')}
             value={deliveryDatePlan}
+            type={INFO_SECTION_TYPE.DATE_PICKER}
             onUpdate={(text) => {
               setDeliveryDatePlan(text);
             }}

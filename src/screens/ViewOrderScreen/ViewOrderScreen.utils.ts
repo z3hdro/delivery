@@ -1,4 +1,6 @@
 import { ORDER_LIST } from 'constants/order';
+import { MockOrder } from 'mocks/mockOrders';
+import { Order } from 'screens/ViewOrderScreen/ViewOrderScreen.types';
 
 export const getPrimaryButtonText = (type: ORDER_LIST): string => {
   switch (type) {
@@ -11,4 +13,30 @@ export const getPrimaryButtonText = (type: ORDER_LIST): string => {
     default:
       return 'ViewOrder_close_button';
   }
+};
+
+export const createInitialState = (order: MockOrder): Order => {
+  const {
+    id,
+    driver: {
+      name,
+      surname,
+      patronymic,
+      phone
+    },
+    departureDatePlan,
+    deliveryDatePlan,
+    truckVin
+  } = order;
+
+  return {
+    id,
+    name,
+    surname,
+    patronymic,
+    phone,
+    deliveryDatePlan,
+    departureDatePlan,
+    truckVin
+  };
 };

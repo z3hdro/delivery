@@ -25,7 +25,7 @@ export const MainBottomTabNavigator = () => {
   return (
     <Tab.Navigator
       tabBar={props => <BottomTab {...props} />}
-      initialRouteName={'ShippingPointScreen'}
+      initialRouteName={'CargoListScreen'}
       screenOptions={customOptions}>
       <Tab.Screen
         name='CargoListScreen'

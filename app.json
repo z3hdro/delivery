@@ -5,9 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./src/assets/images/app_icon.jpg",
+    "icon": "./src/assets/icons/app_icon.png",
     "splash": {
-      "image": "./src/assets/images/splash.jpg",
+      "image": "./src/assets/icons/splash.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#D50D00"
     },

@@ -15,11 +15,12 @@ export const useStyles = () => {
       flex: 1,
     },
     content: {
-      paddingBottom: bottom
+      paddingBottom: bottom || 16
     },
     map: {
       flex: 1,
       zIndex: 1,
+      minHeight: 300,
     },
     headerButton: {
       height: 40,
