@@ -1,5 +1,8 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
+#config
+secrets/
+
 # dependencies
 node_modules/
 
@@ -37,3 +40,4 @@ yarn-error.*
 package-lock.json
 
 .idea/
+
