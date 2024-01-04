@@ -32,7 +32,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 54.989347,
+        lon: 73.368221,
+      }
     },
     destination: {
       name: 'склад№3',
@@ -56,7 +60,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 56.139918,
+        lon: 47.247728,
+      }
     },
     nomenclature: {
       name: 'Лом 3А',
@@ -92,6 +100,10 @@ export const MOCK_ORDERS = [
     grossWeight: 10,
     netWeight: 8,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 57.124198,
+      lon: 65.461618,
+    }
   },
   {
     id: 2,
@@ -126,7 +138,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     destination: {
       name: 'склад№3',
@@ -150,7 +166,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     nomenclature: {
       name: 'Лом 5А',
@@ -186,6 +206,10 @@ export const MOCK_ORDERS = [
     grossWeight: 15,
     netWeight: 11,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 0,
+      lon: 0,
+    }
   },
   {
     id: 3,
@@ -220,7 +244,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     destination: {
       name: 'склад№6',
@@ -244,7 +272,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     nomenclature: {
       name: 'Лом 3А',
@@ -280,6 +312,10 @@ export const MOCK_ORDERS = [
     grossWeight: 22,
     netWeight: 17,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 0,
+      lon: 0,
+    }
   },
   {
     id: 4,
@@ -314,7 +350,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     destination: {
       name: 'склад№22',
@@ -338,7 +378,11 @@ export const MOCK_ORDERS = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     nomenclature: {
       name: 'Лом 1А',
@@ -374,6 +418,10 @@ export const MOCK_ORDERS = [
     grossWeight: 33,
     netWeight: 30,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 0,
+      lon: 0,
+    }
   }
 ];
 

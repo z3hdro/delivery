@@ -17,6 +17,10 @@ export const useStyles = () => {
     content: {
       paddingBottom: bottom
     },
+    map: {
+      flex: 1,
+      zIndex: 1,
+    },
     headerButton: {
       height: 40,
       width: 40,

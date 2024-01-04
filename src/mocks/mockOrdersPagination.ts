@@ -32,7 +32,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     destination: {
       name: 'склад№3',
@@ -56,7 +60,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     nomenclature: {
       name: 'Лом 1А',
@@ -92,6 +100,10 @@ export const MOCK_ORDERS_PAGINATE = [
     grossWeight: 10,
     netWeight: 8,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 0,
+      lon: 0,
+    }
   },
   {
     id: 6,
@@ -126,7 +138,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     destination: {
       name: 'склад№6',
@@ -150,7 +166,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     nomenclature: {
       name: 'Лом 55А',
@@ -186,6 +206,10 @@ export const MOCK_ORDERS_PAGINATE = [
     grossWeight: 15,
     netWeight: 11,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 0,
+      lon: 0,
+    }
   },
   {
     id: 7,
@@ -220,7 +244,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     destination: {
       name: 'склад№6',
@@ -244,7 +272,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     nomenclature: {
       name: 'Лом 21А',
@@ -280,6 +312,10 @@ export const MOCK_ORDERS_PAGINATE = [
     grossWeight: 22,
     netWeight: 17,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 0,
+      lon: 0,
+    }
   },
   {
     id: 8,
@@ -314,7 +350,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     destination: {
       name: 'мет.база1',
@@ -338,7 +378,11 @@ export const MOCK_ORDERS_PAGINATE = [
           email: '',
           telegram: ''
         }
-      ]
+      ],
+      geo: {
+        lat: 0,
+        lon: 0,
+      }
     },
     nomenclature: {
       name: 'Лом 10А',
@@ -374,5 +418,9 @@ export const MOCK_ORDERS_PAGINATE = [
     grossWeight: 33,
     netWeight: 30,
     truckVin: '999 999 99 99',
+    geo: {
+      lat: 0,
+      lon: 0,
+    }
   }
 ];

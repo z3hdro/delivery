@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import YaMap, { Marker } from 'react-native-yamap';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -14,7 +15,7 @@ import { getPrimaryButtonText } from './ViewOrderScreen.utils';
 import { useStyles } from './ViewOrderScreen.styles';
 import { DISPLAY_DATE_FORMAT } from './ViewOrderScreen.consts';
 import { ORDER_LIST } from 'constants/order';
-import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
+import { ArrowBackIcon, BackIcon, DeliveryPointIcon, DeparturePointIcon, MapIcon, TrackIcon } from 'src/assets/icons';
 
 export const ViewOrderScreen = () => {
   const { t } = useTranslation();
@@ -23,6 +24,14 @@ export const ViewOrderScreen = () => {
   const { goBack } = useManagerNavigator();
 
   const [displayMap, setDisplayMap] = useState<boolean>(false);
+
+  const mapRef = useRef<YaMap | null>(null);
+
+  useEffect(() => {
+    if (displayMap && mapRef.current) {
+      mapRef.current.fitAllMarkers();
+    }
+  }, [displayMap]);
 
   const buttonTitle = useMemo(() => getPrimaryButtonText(type), [type]);
 
@@ -82,7 +91,23 @@ export const ViewOrderScreen = () => {
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <OrderCard order={order} t={t} isManager />
         {displayMap ? (
-          <View style={{ height: 400, width: '100%', backgroundColor: 'yellow' }} />
+          <YaMap
+            ref={mapRef}
+            style={styles.map}
+          >
+            <Marker point={order.departure.geo} zIndex={10}>
+              <DeparturePointIcon height={24} width={20} />
+            </Marker>
+            <Marker point={order.destination.geo} zIndex={10}>
+              <DeliveryPointIcon height={24} width={20} />
+
+            </Marker>
+            {type === ORDER_LIST.IN_PROGRESS && (
+              <Marker point={order.geo} zIndex={10}>
+                <TrackIcon height={16} width={24} />
+              </Marker>
+            )}
+          </YaMap>
         ) : (
           <>
             <InfoSection

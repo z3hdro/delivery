@@ -18,3 +18,5 @@ export { default as ArrowBackIcon } from './arrow_back_icon.svg';
 export { default as CheckboxIcon } from './checkbox_icon.svg';
 export { default as CheckboxFilledIcon } from './checkbox_filled_icon.svg';
 export { default as XIcon } from './x_icon.svg';
+export { default as DeparturePointIcon } from './departure_point_icon.svg';
+export { default as DeliveryPointIcon } from './delivery_point_icon.svg';
