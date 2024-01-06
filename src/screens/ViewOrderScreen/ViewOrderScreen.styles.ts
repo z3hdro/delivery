@@ -20,7 +20,7 @@ export const useStyles = () => {
     map: {
       flex: 1,
       zIndex: 1,
-      minHeight: 300,
+      height: 320,
     },
     headerButton: {
       height: 40,

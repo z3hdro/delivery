@@ -30,12 +30,6 @@ export const ViewOrderScreen = () => {
 
   const mapRef = useRef<YaMap | null>(null);
 
-  useEffect(() => {
-    if (displayMap && mapRef.current) {
-      mapRef.current.fitAllMarkers();
-    }
-  }, [displayMap]);
-
   const buttonTitle = useMemo(() => getPrimaryButtonText(type), [type]);
 
   const driverName = useMemo(() =>
@@ -93,6 +87,11 @@ export const ViewOrderScreen = () => {
           <YaMap
             ref={mapRef}
             style={styles.map}
+            onMapLoaded={() => {
+              if (displayMap && mapRef.current) {
+                mapRef.current?.fitAllMarkers?.();
+              }
+            }}
           >
             <Marker point={order.departure.geo} zIndex={10}>
               <DeparturePointIcon height={24} width={20} />

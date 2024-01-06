@@ -1,5 +1,6 @@
 import { ExpoConfig, ConfigContext } from '@expo/config';
 import { withAppDelegate, type ConfigPlugin } from 'expo/config-plugins';
+import yandexConfig from './secrets/yandex_config.json';
 
 const VERSION = '1.0.0';
 const BUILD_NUMBER = 1;
@@ -20,7 +21,7 @@ const withYandexMaps: ConfigPlugin = (config) => {
     }
 
     const mapKitMethodInvocations = [
-      `[YMKMapKit setApiKey:@"${config.extra?.mapKitApiKey}"];`,
+      `[YMKMapKit setApiKey:@"${yandexConfig.API_KEY}"];`,
       '[YMKMapKit setLocale:@"ru_RU"];',
       '[YMKMapKit mapKit];',
     ]

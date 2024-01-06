@@ -27,6 +27,16 @@ export const OrderScreen = () => {
   const isWaitingApproval = useMemo(() => order.status === ORDER_STATUS.WAITING_APPROVAL, [order.status]);
   const isInProgress = useMemo(() => order.status === ORDER_STATUS.IN_PROGRESS, [order.status]);
 
+  const buttonStyle = useMemo(() => {
+    if (order.status === ORDER_STATUS.IN_PROGRESS) {
+      return styles.completeButton;
+    }
+    if (order.status === ORDER_STATUS.WAITING_APPROVAL) {
+      return styles.disabled;
+    }
+    return styles.button;
+  },[styles, order.status])
+
   const onPressMain = useCallback(() => {
     goBack();
   }, [goBack]);
@@ -108,7 +118,8 @@ export const OrderScreen = () => {
           content={renderDeliveryContent()}
         />
         <Button
-          style={isInProgress ? styles.completeButton : styles.button}
+          disabled={isWaitingApproval}
+          style={buttonStyle}
           textStyle={styles.buttonText}
           title={
             t(isInProgress

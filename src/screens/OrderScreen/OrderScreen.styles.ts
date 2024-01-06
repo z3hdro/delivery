@@ -40,6 +40,14 @@ export const useStyles = () => {
       paddingVertical: 9,
       paddingHorizontal: 16,
     },
+    disabled: {
+      marginTop: 24,
+      height: 50,
+      borderRadius: 50,
+      paddingVertical: 9,
+      paddingHorizontal: 16,
+      backgroundColor: colors.color5,
+    },
     buttonText: {
       letterSpacing: 1,
       textAlign: 'center'
