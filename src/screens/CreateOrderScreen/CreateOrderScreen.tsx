@@ -76,7 +76,7 @@ export const CreateOrderScreen = () => {
       style={styles.screen}
       header={
         <ScreenHeader
-          title={t('Nomenclature_header_title')}
+          title={t('CreateOrder_header_title')}
         />
       }>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -122,6 +122,7 @@ export const CreateOrderScreen = () => {
                   onUpdate={(text: string) => {
                     updateData(index, CARGO_KEYS.GROSS_WEIGHT, text);
                   }}
+                  keyboardType={'numeric'}
                 />
                 <InfoSection
                   style={styles.cargoWeight}
@@ -132,6 +133,7 @@ export const CreateOrderScreen = () => {
                   onUpdate={(text: string) => {
                     updateData(index, CARGO_KEYS.NET_WEIGHT, text);
                   }}
+                  keyboardType={'numeric'}
                 />
               </View>
             );

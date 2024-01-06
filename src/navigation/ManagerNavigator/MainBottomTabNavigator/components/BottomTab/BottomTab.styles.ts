@@ -24,7 +24,8 @@ export const createStyles = (bottom: number) => {
       fontStyle: 'normal',
       fontWeight: '400',
       fontSize: 8,
-      lineHeight: 10
+      lineHeight: 10,
+      textAlign: 'center',
     },
     labelFocused: {
       marginTop: 6,

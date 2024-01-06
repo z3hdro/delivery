@@ -1,4 +1,4 @@
-import { TextStyle, ViewStyle } from 'react-native';
+import { KeyboardTypeOptions, TextStyle, ViewStyle } from 'react-native';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
 
 export type Props = {
@@ -10,4 +10,5 @@ export type Props = {
   style?: ViewStyle;
   labelStyle?: TextStyle;
   type?: INFO_SECTION_TYPE;
+  keyboardType?: KeyboardTypeOptions;
 }

@@ -19,6 +19,7 @@
       "bundleIdentifier": "com.z3hdro.cargodelivery"
     },
     "android": {
+      "icon": "./src/assets/icons/adaptive_app_icon.png",
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },

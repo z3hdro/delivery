@@ -16,6 +16,7 @@ export const  InfoSection: FC<Props> = ({
   style,
   labelStyle,
   type = INFO_SECTION_TYPE.INPUT,
+  keyboardType,
 }) => {
   const styles = useStyles();
   const [inputValue, setInputValue] = useState<string>(value);
@@ -57,6 +58,7 @@ export const  InfoSection: FC<Props> = ({
           </TouchableOpacity>
         ) : (
           <TextInput
+            keyboardType={keyboardType}
             style={[styles.textInput, !editable && styles.displayText, textInputStyle]}
             value={inputValue}
             onChangeText={onChangeText}

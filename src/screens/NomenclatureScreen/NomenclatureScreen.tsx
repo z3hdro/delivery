@@ -57,7 +57,7 @@ export const NomenclatureScreen = () => {
       style={styles.screen}
       header={
         <ScreenHeader
-          title={t('CreateOrder_header_title')}
+          title={t('Nomenclature_header_title')}
         />
       }>
       <View style={styles.container}>

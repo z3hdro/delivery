@@ -211,6 +211,7 @@ export const UserViewScreen = () => {
             onUpdate={(text: string) => {
               updatePersonData(PERSON_KEYS.PERSON_INN, text);
             }}
+            keyboardType={'numeric'}
           />
 
           <Text style={[styles.label, styles.section]}>
@@ -259,6 +260,7 @@ export const UserViewScreen = () => {
                 onUpdate={(text: string) => {
                   updateCompanyData(COMPANY_KEYS.INN, text);
                 }}
+                keyboardType={'numeric'}
               />
               <InfoSection
                 style={styles.section}
@@ -268,6 +270,7 @@ export const UserViewScreen = () => {
                 onUpdate={(text: string) => {
                   updateCompanyData(COMPANY_KEYS.KPP, text);
                 }}
+                keyboardType={'numeric'}
               />
               <View style={styles.section}>
                 <Text style={styles.label}>
@@ -347,6 +350,7 @@ export const UserViewScreen = () => {
               onUpdate={(text: string) => {
                 updatePassportData(PASSPORT_KEYS.NUMBER, text);
               }}
+              keyboardType={'numeric'}
             />
           </View>
           <InfoSection
