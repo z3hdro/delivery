@@ -35,7 +35,7 @@ export const OrderScreen = () => {
       return styles.disabled;
     }
     return styles.button;
-  },[styles, order.status])
+  },[styles, order.status]);
 
   const onPressMain = useCallback(() => {
     goBack();
