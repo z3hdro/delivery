@@ -10,12 +10,10 @@ export const useStyles = () => {
     screen: {
       backgroundColor: colors.color6,
     },
-    list: {
-      paddingBottom: bottom
-    },
     container: {
       flex: 1,
-      backgroundColor: 'transparent'
+      backgroundColor: 'transparent',
+      paddingBottom: bottom
     },
     controlsContainer: {
       marginTop: 12,

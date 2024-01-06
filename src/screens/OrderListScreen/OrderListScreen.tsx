@@ -102,7 +102,6 @@ export const OrderListScreen = () => {
           <Preloader />
         ) : (
           <FlatList
-            style={styles.list}
             keyExtractor={item => item.id.toString()}
             data={data}
             renderItem={renderItem}
