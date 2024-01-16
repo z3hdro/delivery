@@ -44,6 +44,16 @@ export const useStyles = () => {
       lineHeight: 20,
       letterSpacing: 0.2,
     },
+    errorText: {
+      marginBottom: 8,
+      fontFamily: 'Roboto',
+      fontSize: 12,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 14,
+      letterSpacing: 0.2,
+      color: colors.red,
+    },
     linkContainer: {
       width: '100%',
       alignItems: 'flex-end'

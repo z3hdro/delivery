@@ -1,5 +1,6 @@
 export enum STORAGE_KEYS {
-  USER_ID = 'user_id',
-  IS_APPROVED = 'is_approved',
+  ACCESS_TOKEN = 'access_token',
+  REFRESH_TOKEN = 'refresh_token',
+  ROLE = 'role',
   NOTIFICATION_PERMISSION = 'notification_permission'
 }

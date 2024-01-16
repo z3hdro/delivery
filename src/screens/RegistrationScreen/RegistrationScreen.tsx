@@ -11,28 +11,44 @@ import { useAppData } from 'providers/AppProvider';
 
 import { useStyles } from './RegistrationScreen.styles';
 import { DRIVER_PASSWORD, DRIVER_PHONE } from 'mocks/mockUsers';
+import { networkService } from 'services/network';
+import { AxiosError } from 'axios';
 
 export const RegistrationScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { navigate } = useLoginNavigator();
-  const { setCurrentUser } = useAppData();
+  const { deviceToken, setPersonRole, setCurrentPerson } = useAppData();
 
   const [phone, setPhone] = useState<string>(DRIVER_PHONE);
   const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
 
-  // TODO: change when API will be done
   const onRegisterPress = useCallback(async () => {
     try {
       if (!phone.trim().length || !password.trim().length) {
         return;
       }
-      await appStorage.storeData(STORAGE_KEYS.USER_ID, phone);
-      setCurrentUser(phone);
+      const { accessToken, refreshToken, user } = await networkService.register({
+        phone: phone.replace('+', ''),
+        password,
+        fcmToken: deviceToken
+      });
+
+      networkService.setAuthHeader(accessToken);
+
+      await appStorage.storeData(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+      await appStorage.storeData(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      await appStorage.storeData(STORAGE_KEYS.ROLE, user.role);
+
+      setPersonRole(user.role);
+
+      const { person= null } = await networkService.getUserData();
+      setCurrentPerson(person);
     } catch (e) {
-      console.log(e);
+      const error = e as AxiosError;
+      console.log(error?.response?.data ?? error);
     }
-  }, [password, phone, setCurrentUser]);
+  }, [deviceToken, password, phone, setCurrentPerson, setPersonRole]);
 
   const onLoginPress = useCallback(() => {
     navigate('LoginScreen');

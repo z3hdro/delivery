@@ -1,5 +1,5 @@
 import { ExpoConfig, ConfigContext } from '@expo/config';
-import { withAppDelegate, type ConfigPlugin } from 'expo/config-plugins';
+import { withAppDelegate, ConfigPlugin } from 'expo/config-plugins';
 import yandexConfig from './secrets/yandex_config.json';
 
 const VERSION = '1.0.0';

@@ -1,13 +1,16 @@
 import { ReactNode } from 'react';
+import { Person } from 'types/user';
 
 export type Props = {
   children: ReactNode;
 }
 
 export type AppContext = {
-  userId: string | null;
-  isDriverApproved: boolean;
-  approveDriver: () => void;
-  setCurrentUser: (userId: string) => void;
-  removeCurrentUser: () => void;
+  isLoading: boolean;
+  person: Person | null;
+  userRole: string | null;
+  deviceToken: string;
+  setCurrentPerson: (person: Person | null) => void;
+  removeCurrentPerson: () => void;
+  setPersonRole: (role: string | null) => void;
 }

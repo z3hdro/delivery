@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "delivery-app",
-    "slug": "delivery-app",
+    "name": "Cargo Delivery",
+    "slug": "cargo-delivery",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./src/assets/icons/app_icon.png",
     "splash": {
-      "image": "./src/assets/icons/splash.jpg",
+      "image": "./src/assets/icons/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#D50D00"
     },
@@ -16,14 +16,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.z3hdro.cargodelivery"
+      "bundleIdentifier": "com.z3hdro.cargodelivery",
+      "googleServicesFile": "./secrets/GoogleService-Info.plist"
     },
     "android": {
       "icon": "./src/assets/icons/adaptive_app_icon.png",
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "com.z3hdro.cargodelivery"
+      "package": "com.z3hdro.cargodelivery",
+      "googleServicesFile": "./secrets/google-services.json"
     },
     "plugins": [
       [
@@ -38,6 +40,13 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you upload documents."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/assets/icons/app_icon.png",
+          "color": "#ffffff"
         }
       ]
     ],

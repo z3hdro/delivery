@@ -1,18 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from './appStorage.consts';
 
-const storeData = async (key: string, value: string) => {
+const storeData = async (key: STORAGE_KEYS, value: string) => {
   await AsyncStorage.setItem(key, value);
 };
 
-const removeData = async (key: string) => {
+const removeData = async (key: STORAGE_KEYS) => {
   await AsyncStorage.removeItem(key);
 };
 
-const removeMultipleData = async (keys: Array<string>) => {
+const removeMultipleData = async (keys: Array<STORAGE_KEYS>) => {
   await AsyncStorage.multiRemove(keys);
 };
 
-const getData = (key: string) => AsyncStorage.getItem(key);
+const getData = (key: STORAGE_KEYS) => AsyncStorage.getItem(key);
 
 export const appStorage = {
   storeData,

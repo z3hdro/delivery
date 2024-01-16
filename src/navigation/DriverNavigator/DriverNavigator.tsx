@@ -17,11 +17,11 @@ const customOptions: NativeStackNavigationOptions = {
 };
 
 export const DriverNavigator = () => {
-  const { isDriverApproved } = useAppData();
+  const { person } = useAppData();
 
   return (
     <Stack.Navigator
-      initialRouteName={isDriverApproved ? 'OrderListScreen' : 'ApprovalScreen'}
+      initialRouteName={person?.user.approved ? 'OrderListScreen' : 'ApprovalScreen'}
       screenOptions={customOptions}>
       <Stack.Screen name='OrderListScreen' component={OrderListScreen} />
       <Stack.Screen name='ApprovalScreen' component={ApprovalScreen} />

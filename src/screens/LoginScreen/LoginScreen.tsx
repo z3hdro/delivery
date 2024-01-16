@@ -1,42 +1,63 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { AxiosError } from 'axios';
 
+import { networkService } from 'services/network';
+import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { Screen } from 'components/Screen';
 import { LinkButton } from 'components/LinkButton';
 import { Button } from 'components/Button';
 import { useLoginNavigator } from 'navigation/hooks';
 import { useStyles } from './LoginScreen.styles';
-import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { useAppData } from 'providers/AppProvider';
-import { DRIVER_PASSWORD, MANAGER_PHONE } from 'mocks/mockUsers';
+import { MANAGER_PASSWORD, MANAGER_PHONE } from 'mocks/mockUsers';
+
 
 export const LoginScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { navigate } = useLoginNavigator();
-  const { setCurrentUser } = useAppData();
+  const { deviceToken, setCurrentPerson, setPersonRole } = useAppData();
 
   // TODO: change when API will be done
   const [phone, setPhone] = useState<string>(MANAGER_PHONE);
-  const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
+  const [password, setPassword] = useState<string>(MANAGER_PASSWORD);
+  const [errorText, setErrorText] = useState<string>('');
 
   const onForgotPassword = useCallback(() => {
     console.log('forgot password');
   }, []);
 
-  // TODO: change when API will be done
   const onLoginPress = useCallback(async () => {
     try {
       if (!phone.trim().length || !password.trim().length) {
         return;
       }
-      await appStorage.storeData(STORAGE_KEYS.USER_ID, phone);
-      setCurrentUser(phone);
+      const { accessToken, refreshToken, user } = await networkService.login({
+        phone: phone.replace('+', ''),
+        password,
+        fcmToken: deviceToken
+      });
+
+      networkService.setAuthHeader(accessToken);
+
+      await appStorage.storeData(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+      await appStorage.storeData(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      await appStorage.storeData(STORAGE_KEYS.ROLE, user.role);
+
+      setPersonRole(user.role);
+
+      const { person= null } = await networkService.getUserData();
+      setCurrentPerson(person);
     } catch (e) {
-      console.log(e);
+      const error = e as AxiosError;
+      if (error?.response?.status === 401) {
+        setErrorText(t('Login_bottom_unauthorized_user'));
+      }
+      console.log(error?.response?.data);
     }
-  }, [password, phone, setCurrentUser]);
+  }, [deviceToken, password, phone, setCurrentPerson, setPersonRole, t]);
 
   const onRegisterPress = useCallback(() => {
     navigate('RegistrationScreen');
@@ -73,6 +94,11 @@ export const LoginScreen = () => {
           placeholder={t('Login_password_input_placeholder')}
           secureTextEntry
         />
+        {errorText && (
+          <Text style={styles.errorText}>
+            {errorText}
+          </Text>
+        )}
         <View style={styles.linkContainer}>
           <LinkButton title={t('Login_forgot_password_button')} onPress={onForgotPassword} />
         </View>
