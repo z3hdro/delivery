@@ -12,3 +12,4 @@ export * from './DriverListScreen';
 export * from './UserViewScreen';
 export * from './ShippingPointScreen';
 export * from './ShippingPointViewScreen';
+export * from './ForgotPasswordScreen';

@@ -6,4 +6,5 @@ export type Props = {
   disabled?: boolean
   style?: ViewStyle
   textStyle?: TextStyle
+  hasShadows?: boolean
 }

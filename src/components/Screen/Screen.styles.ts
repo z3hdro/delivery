@@ -16,7 +16,13 @@ export const useStyles = () => {
     },
     logo: {
       top: top ? 0 : 16,
-      alignItems: 'center'
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    logout: {
+      padding: 6,
+      position: 'absolute',
+      right: 12,
     },
     bottom: {
       bottom: bottom + 12,

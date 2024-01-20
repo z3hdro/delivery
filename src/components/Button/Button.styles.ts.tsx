@@ -11,7 +11,8 @@ export const useStyles = () => {
       backgroundColor: colors.red,
       justifyContent: 'center',
       alignItems: 'center',
-
+    },
+    shadows: {
       shadowColor: colors.black,
       shadowOffset: {
         width: 0,

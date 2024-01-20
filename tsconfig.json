@@ -36,6 +36,9 @@
       ],
       "mocks/*": [
         "./src/mocks/*"
+      ],
+      "utils/*": [
+        "./src/utils/*"
       ]
     }
   }

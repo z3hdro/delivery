@@ -1,18 +1,19 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, View } from 'react-native';
+import { FlatList, Linking, Text, View } from 'react-native';
+import Modal from 'react-native-modal';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
-import { RoundButton } from 'components/RoundButton';
 import { Preloader } from 'src/components/Preloader';
 import { OrderCard } from 'components/OrderCard';
+import { Button } from 'components/Button';
+import { LinkButton } from 'components/LinkButton';
 import { useDriverNavigator } from 'navigation/hooks';
-
+import { INSTRUCTION_LINK } from 'constants/geolocation';
 import { useStyles } from './OrderListScreen.styles';
 import { MOCK_ORDERS, MockOrder } from 'mocks/mockOrders';
-
-import { MapIcon } from 'src/assets/icons';
+import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 
 export const OrderListScreen = () => {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ export const OrderListScreen = () => {
   // TODO: replace by real data structure
   const [data, setData] = useState<MockOrder[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [displayModal, setDisplayModal] = useState<boolean>(false);
 
   useEffect(() => {
     void (async () => {
@@ -40,10 +42,21 @@ export const OrderListScreen = () => {
     })();
   }, []);
 
-  // TODO: add after connecting the map and when design will be ready
-  const showOnMap = useCallback(() => {
-    navigate('DriverMap');
-  }, [navigate]);
+  const onOpenLink = useCallback(async (url: string) => {
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+      // by some browser in the mobile
+      await Linking.openURL(url);
+    } else {
+      console.error(`Don't know how to open this URL: ${url}`);
+    }
+  }, []);
+
+  const onCloseModal = useCallback(() => {
+    setDisplayModal(false);
+  }, []);
 
   // TODO: uncomment when sorting and filtering will be applied
   // const openFilters = useCallback(() => {
@@ -65,7 +78,13 @@ export const OrderListScreen = () => {
   //   );
   // }, [openFilters, styles]);
 
-  const onOpenOrder = useCallback((order: MockOrder) => {
+  const onOpenOrder = useCallback(async (order: MockOrder) => {
+    const geolocationEnabled = await appStorage.getData(STORAGE_KEYS.NOTIFICATION_PERMISSION);
+    if (!geolocationEnabled) {
+      setDisplayModal(true);
+      return;
+    }
+
     navigate('OrderScreen', { order });
   }, [navigate]);
 
@@ -82,22 +101,35 @@ export const OrderListScreen = () => {
           // rightPart={renderFilter()}
         />
       }>
-      <View style={styles.container}>
-        <View style={styles.controlsContainer}>
-          <RoundButton
-            disabled
-            title={t('Orders_check_map_label')}
-            onPress={showOnMap}
-            leftIcon={<MapIcon height={12} width={14} />}
-          />
-          {/*<RoundButton*/}
-          {/*  disabled*/}
-          {/*  title={t('Orders_sort_label')}*/}
-          {/*  onPress={sortOrderList}*/}
-          {/*  rightIcon={<TransferIcon height={12} width={12} />}*/}
-          {/*  style={styles.sortButton}*/}
-          {/*/>*/}
+      <Modal
+        isVisible={displayModal}
+        swipeDirection={['up', 'down']}
+        onSwipeComplete={onCloseModal}
+        style={styles.modal}
+      >
+        <View style={styles.centeredView}>
+          <View>
+            <Text style={styles.modalText}>
+              {t('Geolocation_modal_description')}
+            </Text>
+          </View>
+          <View style={styles.modalControlButtons}>
+            <Button
+              style={styles.primaryButton}
+              textStyle={styles.primaryButtonText}
+              title={t('Geolocation_modal_confirm_button')}
+              onPress={() => onOpenLink(INSTRUCTION_LINK)}
+              disabled={isLoading}
+            />
+            <LinkButton
+              customTextStyle={styles.secondaryButton}
+              onPress={onCloseModal}
+              title={t('Geolocation_modal_cancel_button')}
+            />
+          </View>
         </View>
+      </Modal>
+      <View style={styles.container}>
         {isLoading ? (
           <Preloader />
         ) : (

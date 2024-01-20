@@ -3,11 +3,16 @@ import { TouchableOpacity, Text } from 'react-native';
 import { useStyles } from './LinkButton.styles';
 import { Props } from './LinkButton.types';
 
-export const LinkButton: FC<Props> = ({ onPress, title, customTextStyle }) => {
+export const LinkButton: FC<Props> = ({
+  onPress,
+  title,
+  customTextStyle,
+  disabled = false
+}) => {
   const styles = useStyles();
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity disabled={disabled} onPress={onPress}>
       <Text style={[styles.link, customTextStyle]}>
         {title}
       </Text>

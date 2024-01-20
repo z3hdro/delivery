@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
@@ -11,7 +11,7 @@ import { Button } from 'components/Button';
 import { useLoginNavigator } from 'navigation/hooks';
 import { useStyles } from './LoginScreen.styles';
 import { useAppData } from 'providers/AppProvider';
-import { MANAGER_PASSWORD, MANAGER_PHONE } from 'mocks/mockUsers';
+import { DRIVER_PASSWORD, DRIVER_PHONE, MANAGER_PASSWORD, MANAGER_PHONE } from 'mocks/mockUsers';
 
 
 export const LoginScreen = () => {
@@ -21,13 +21,13 @@ export const LoginScreen = () => {
   const { deviceToken, setCurrentPerson, setPersonRole } = useAppData();
 
   // TODO: change when API will be done
-  const [phone, setPhone] = useState<string>(MANAGER_PHONE);
-  const [password, setPassword] = useState<string>(MANAGER_PASSWORD);
+  const [phone, setPhone] = useState<string>(DRIVER_PHONE);
+  const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
   const [errorText, setErrorText] = useState<string>('');
 
   const onForgotPassword = useCallback(() => {
-    console.log('forgot password');
-  }, []);
+    navigate('ForgotPasswordScreen');
+  }, [navigate]);
 
   const onLoginPress = useCallback(async () => {
     try {
@@ -73,12 +73,22 @@ export const LoginScreen = () => {
   };
 
   return (
-    <Screen style={styles.screen} bottomContent={renderBottomContent()}>
+    <Screen
+      style={styles.screen}
+      bottomContent={renderBottomContent()}
+      hideLogout
+    >
       <View style={styles.container}>
         <View style={styles.labelContainer}>
-          <Text style={styles.label}>
-            {t('Login_label')}
-          </Text>
+          <Pressable onPress={() => {
+            // TODO: remove it later
+            setPhone((prevState) => prevState === DRIVER_PHONE ? MANAGER_PHONE : DRIVER_PHONE);
+            setPassword((prevState) => prevState === DRIVER_PASSWORD ? MANAGER_PASSWORD : DRIVER_PASSWORD);
+          }}>
+            <Text style={styles.label}>
+              {t('Login_label')}
+            </Text>
+          </Pressable>
         </View>
         <TextInput
           value={phone}
@@ -102,7 +112,7 @@ export const LoginScreen = () => {
         <View style={styles.linkContainer}>
           <LinkButton title={t('Login_forgot_password_button')} onPress={onForgotPassword} />
         </View>
-        <Button onPress={onLoginPress} title={t('Login_button')} style={styles.button} />
+        <Button hasShadows onPress={onLoginPress} title={t('Login_button')} style={styles.button} />
       </View>
     </Screen>
   );

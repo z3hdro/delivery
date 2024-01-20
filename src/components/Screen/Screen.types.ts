@@ -6,4 +6,5 @@ export type Props = {
   header?: ReactNode
   bottomContent?: ReactNode
   style?: ViewStyle
+  hideLogout?: boolean
 }

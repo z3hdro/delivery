@@ -10,6 +10,7 @@ import { MockShippingPoint } from 'mocks/mockShippingPoints';
 export type LoginStackParamList = {
   LoginScreen: undefined;
   RegistrationScreen: undefined;
+  ForgotPasswordScreen: undefined;
 }
 
 export type DriverStackParamList = {

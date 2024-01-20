@@ -1,0 +1,1 @@
+export const INSTRUCTION_LINK = 'https://yandex.ru/support/common/browsers-settings/geolocation.html';

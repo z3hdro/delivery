@@ -9,12 +9,13 @@ export const Button: FC<Props> = ({
   disabled = false,
   style,
   textStyle,
+  hasShadows = false,
 }) => {
   const styles = useStyles();
 
   return (
     <TouchableOpacity
-      style={[styles.container, style]}
+      style={[styles.container, hasShadows && styles.shadows, style]}
       disabled={disabled}
       onPress={onPress}
     >

@@ -15,6 +15,7 @@ import { useStyles } from './OrderScreen.styles';
 import { ExpandMap } from './OrderScreen.types';
 
 import { BackIcon } from 'src/assets/icons';
+import { Preloader } from 'components/Preloader';
 
 export const OrderScreen = () => {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ export const OrderScreen = () => {
   const styles = useStyles();
 
   const [expanded, setExpanded] = useState<ExpandMap>(INITIAL_STATE);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const isWaitingApproval = useMemo(() => order.status === ORDER_STATUS.WAITING_APPROVAL, [order.status]);
   const isInProgress = useMemo(() => order.status === ORDER_STATUS.IN_PROGRESS, [order.status]);
@@ -37,9 +39,30 @@ export const OrderScreen = () => {
     return styles.button;
   },[styles, order.status]);
 
+  const [secondaryButton, secondaryButtonText] = useMemo(() => {
+    if (order.status === ORDER_STATUS.IN_PROGRESS) {
+      return [styles.declineButtonDisabled, styles.declineButtonTextDisabled];
+    }
+    if (order.status === ORDER_STATUS.WAITING_APPROVAL) {
+      return [styles.declineButton, styles.declineButtonText];
+    }
+    return [styles.declineButton, styles.declineButtonText];
+  },[styles, order.status]);
+
+  // TODO: replace by API
   const onPressMain = useCallback(() => {
     goBack();
   }, [goBack]);
+
+  const onDecline = useCallback(() => {
+    try {
+      setIsLoading(true);
+    } catch (e) {
+      console.log('OrderScreen ondecline e: ', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -96,6 +119,7 @@ export const OrderScreen = () => {
           leftPart={renderLeftPart()}
         />
       }>
+      {isLoading && <Preloader style={styles.preloader} />}
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <OrderCard order={order} isDriver t={t} detailedView />
         <Accordion
@@ -127,6 +151,13 @@ export const OrderScreen = () => {
               : 'Order_begin_order_button')
           }
           onPress={onPressMain}
+        />
+        <Button
+          disabled={isInProgress}
+          style={secondaryButton}
+          textStyle={secondaryButtonText}
+          title={t('Order_decline_button')}
+          onPress={onDecline}
         />
       </ScrollView>
     </Screen>

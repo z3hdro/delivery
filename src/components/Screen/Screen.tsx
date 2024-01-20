@@ -1,45 +1,41 @@
 import React, { FC, useCallback } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
 import { useStyles } from './Screen.styles';
 import { Props } from './Screen.types';
-import { LogoIcon } from 'src/assets/icons';
+import { LogoIcon, LogoutIcon } from 'src/assets/icons';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { useAppData } from 'providers/AppProvider';
 
-export const Screen: FC<Props> = ({ children, header, bottomContent, style }) => {
+export const Screen: FC<Props> = ({
+  children,
+  header,
+  bottomContent,
+  style,
+  hideLogout = false
+}) => {
   const styles = useStyles();
-  const { removeCurrentUser } = useAppData();
+  const { removeCurrentPerson } = useAppData();
 
   // TODO: remove logout later and pressable
   const onLogout = useCallback(async () => {
-    await appStorage.removeData(STORAGE_KEYS.USER_ID);
-    await appStorage.removeData(STORAGE_KEYS.IS_APPROVED);
-    removeCurrentUser();
-  }, [removeCurrentUser]);
-
-  // TODO: remove logout later and pressable
-  const onDisplayAlert = useCallback(() => {
-    Alert.alert(
-      'Выйти из аккаунта', 
-      'тестовый процесс logout', 
-      [
-        {
-          text: 'Cancel'
-        },
-        { 
-          text: 'Logout',
-          onPress: onLogout
-        }
-      ]);
-  }, [onLogout]);
+    await appStorage.removeData(STORAGE_KEYS.ACCESS_TOKEN);
+    await appStorage.removeData(STORAGE_KEYS.REFRESH_TOKEN);
+    await appStorage.removeData(STORAGE_KEYS.ROLE);
+    removeCurrentPerson();
+  }, [removeCurrentPerson]);
 
   return (
     <View style={[styles.container, style]}>
       <View style={styles.logo}>
-        <Pressable onPress={onDisplayAlert}>
+        <View>
           <LogoIcon height={32} width={98} />
-        </Pressable>
+        </View>
+        {!hideLogout && (
+          <TouchableOpacity style={styles.logout} onPress={onLogout}>
+            <LogoutIcon height={15} width={15} />
+          </TouchableOpacity>
+        )}
       </View>
       {header}
       {children}

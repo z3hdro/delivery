@@ -8,6 +8,7 @@ import { registerForPushNotificationsAsync } from 'providers/AppProvider/App.uti
 import { APP_CONTEXT } from './App.consts';
 import { Person } from 'types/user';
 import { Props } from './App.types';
+import { AxiosError } from 'axios';
 
 Notifications.setNotificationHandler({
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -23,6 +24,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [deviceToken, setDeviceToken] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [geolocation, setGeolocation] = useState<boolean>(false);
 
   useEffect(() => {
     void (async () => {
@@ -37,14 +39,24 @@ export const AppProvider: FC<Props> = ({ children }) => {
           setUserRole(role);
         }
 
+        const accessToken = await appStorage.getData(STORAGE_KEYS.ACCESS_TOKEN);
         const refreshToken = await appStorage.getData(STORAGE_KEYS.REFRESH_TOKEN);
+
+        if (accessToken) {
+          networkService.setAuthHeader(accessToken);
+        }
 
         if (refreshToken) {
           const { person } = await networkService.getUserData();
           setPerson(person);
         }
       } catch (e) {
-        console.log(e);
+        const error = e as AxiosError;
+        if (error?.response?.status === 401) {
+          await appStorage.removeData(STORAGE_KEYS.ACCESS_TOKEN);
+          await appStorage.removeData(STORAGE_KEYS.REFRESH_TOKEN);
+        }
+        console.log('app provider error: ', error?.response?.data || e);
       } finally {
         await SplashScreen.hideAsync();
         setIsLoading(false);
@@ -64,6 +76,10 @@ export const AppProvider: FC<Props> = ({ children }) => {
     setUserRole(role);
   }, []);
 
+  const setGeolocationStatus = useCallback((status: boolean) => {
+    setGeolocation(status);
+  }, []);
+
   const value = useMemo(() => ({
     isLoading,
     person,
@@ -73,13 +89,15 @@ export const AppProvider: FC<Props> = ({ children }) => {
     removeCurrentPerson,
     setPersonRole,
   }), [
+    geolocation,
     deviceToken,
     isLoading,
     person,
     removeCurrentPerson,
     setCurrentPerson,
     setPersonRole,
-    userRole
+    userRole,
+    setGeolocationStatus,
   ]);
 
   return (

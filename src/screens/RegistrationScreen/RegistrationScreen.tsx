@@ -68,7 +68,7 @@ export const RegistrationScreen = () => {
   };
 
   return (
-    <Screen style={styles.screen} bottomContent={renderBottomContent()}>
+    <Screen style={styles.screen} bottomContent={renderBottomContent()} hideLogout>
       <View style={styles.container}>
         <View style={styles.labelContainer}>
           <Text style={styles.label}>
@@ -89,7 +89,7 @@ export const RegistrationScreen = () => {
           placeholder={t('Registration_password_input_placeholder')}
           secureTextEntry
         />
-        <Button onPress={onRegisterPress} title={t('Registration_button')} style={styles.button} />
+        <Button hasShadows onPress={onRegisterPress} title={t('Registration_button')} style={styles.button} />
       </View>
     </Screen>
   );
