@@ -11,9 +11,13 @@ export const LocationWrapper: FC<Props> = ({ children }) => {
 
   const checkNotificationStatus = useCallback(async () => {
     const { status: foregroundStatus } = await Location.getForegroundPermissionsAsync();
-    const { status: backgroundStatus } = await Location.getBackgroundPermissionsAsync();
+    // TODO: background location implementation
+    // const { status: backgroundStatus } = await Location.getBackgroundPermissionsAsync();
 
-    if (foregroundStatus === 'granted' && backgroundStatus === 'granted') {
+    console.log('foregroundStatus k1: ', foregroundStatus);
+    // console.log('backgroundStatus k2: ', backgroundStatus);
+
+    if (foregroundStatus === 'granted') {
       await appStorage.storeData(STORAGE_KEYS.NOTIFICATION_PERMISSION, 'true');
 
       const location = await Location.getCurrentPositionAsync({});
@@ -35,14 +39,15 @@ export const LocationWrapper: FC<Props> = ({ children }) => {
         return;
       }
 
-      const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-      console.log('backgroundStatus: ', backgroundStatus);
-
-      if (backgroundStatus !== 'granted') {
-        hasAskedPermission.current = true;
-        await appStorage.removeData(STORAGE_KEYS.NOTIFICATION_PERMISSION);
-        return;
-      }
+      // TODO: background location implementation
+      // const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+      // console.log('backgroundStatus: ', backgroundStatus);
+      //
+      // if (backgroundStatus !== 'granted') {
+      //   hasAskedPermission.current = true;
+      //   await appStorage.removeData(STORAGE_KEYS.NOTIFICATION_PERMISSION);
+      //   return;
+      // }
 
       await appStorage.storeData(STORAGE_KEYS.NOTIFICATION_PERMISSION, 'true');
 

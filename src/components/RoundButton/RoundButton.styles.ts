@@ -13,7 +13,7 @@ export const useStyles = () => {
       alignItems: 'center',
       paddingHorizontal: 20,
       paddingVertical: 8,
-      borderWidth: 0.5,
+      borderWidth: 1,
       borderColor: colors.color5,
     },
     text: {

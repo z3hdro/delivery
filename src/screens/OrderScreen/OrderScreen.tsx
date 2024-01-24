@@ -8,14 +8,21 @@ import { OrderCard } from 'components/OrderCard';
 import { Accordion } from 'components/Accordion';
 import { OrderInfo } from 'components/OrderInfo';
 import { Button } from 'components/Button';
+import { Preloader } from 'components/Preloader';
+import { RoundButton } from 'components/RoundButton';
+import { Map } from 'components/Map';
 import { useDriverNavigator, useDriverRoute } from 'navigation/hooks';
+import { formatAddress } from 'utils/address';
 import { EXPAND_MAP, INITIAL_STATE } from './OrderScreen.consts';
 import { ORDER_STATUS } from 'constants/order';
+import { LOGISTIC_POINT } from 'constants/map';
 import { useStyles } from './OrderScreen.styles';
+import { Address } from 'types/address';
+import { MapPointInfo } from 'types/infoModal';
 import { ExpandMap } from './OrderScreen.types';
 
-import { BackIcon } from 'src/assets/icons';
-import { Preloader } from 'components/Preloader';
+import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
+import { InfoModal } from 'components/InfoModal';
 
 export const OrderScreen = () => {
   const { t } = useTranslation();
@@ -25,6 +32,8 @@ export const OrderScreen = () => {
 
   const [expanded, setExpanded] = useState<ExpandMap>(INITIAL_STATE);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [displayMap, setDisplayMap] = useState<boolean>(false);
+  const [mapPointInfo, setMapPointInfo] = useState<MapPointInfo | null>(null);
 
   const isWaitingApproval = useMemo(() => order.status === ORDER_STATUS.WAITING_APPROVAL, [order.status]);
   const isInProgress = useMemo(() => order.status === ORDER_STATUS.IN_PROGRESS, [order.status]);
@@ -48,21 +57,6 @@ export const OrderScreen = () => {
     }
     return [styles.declineButton, styles.declineButtonText];
   },[styles, order.status]);
-
-  // TODO: replace by API
-  const onPressMain = useCallback(() => {
-    goBack();
-  }, [goBack]);
-
-  const onDecline = useCallback(() => {
-    try {
-      setIsLoading(true);
-    } catch (e) {
-      console.log('OrderScreen ondecline e: ', e);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -103,11 +97,46 @@ export const OrderScreen = () => {
     );
   }, [order, styles]);
 
+  // TODO: replace by API
+  const onPressMain = useCallback(() => {
+    goBack();
+  }, [goBack]);
+
+  const onDecline = useCallback(() => {
+    try {
+      setIsLoading(true);
+    } catch (e) {
+      console.log('OrderScreen ondecline e: ', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const onToggleMap = useCallback(() => {
+    setDisplayMap(prevState => !prevState);
+  }, []);
+
   const onPress = useCallback((key: EXPAND_MAP, value: boolean) => {
     setExpanded((prevState) => ({
       ...prevState,
       [key]: value
     }));
+  }, []);
+
+  // TODO: change later
+  const onInfoPress = useCallback((type: LOGISTIC_POINT, address: Address) => {
+    const data: MapPointInfo = {
+      nomenclatureName: 'Лом 3А',
+      type,
+      address: formatAddress(address),
+      planDate: '09.10.2023'
+    };
+
+    setMapPointInfo(data);
+  }, []);
+
+  const onCloseModal = useCallback(() => {
+    setMapPointInfo(null);
   }, []);
 
   return (
@@ -120,6 +149,9 @@ export const OrderScreen = () => {
         />
       }>
       {isLoading && <Preloader style={styles.preloader} />}
+      {!!mapPointInfo && (
+        <InfoModal mapPointInfo={mapPointInfo} onCloseModal={onCloseModal} />
+      )}
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <OrderCard order={order} isDriver t={t} detailedView />
         <Accordion
@@ -141,6 +173,23 @@ export const OrderScreen = () => {
           }}
           content={renderDeliveryContent()}
         />
+        {displayMap && (
+          <Map
+            displayMap={displayMap}
+            departure={{ ...order.departure.address, geo: order.departure.geo }}
+            destination={{ ...order.destination.address, geo: order.destination.geo }}
+            onInfoPress={onInfoPress}
+          />
+        )}
+        <View style={styles.mapButtonContainer}>
+          <RoundButton
+            style={styles.mapButton}
+            leftIcon={displayMap ? <ArrowBackIcon height={12} width={14} /> : <MapIcon height={12} width={14} />}
+            title={t(displayMap ? 'Order_hide_map_button' : 'Order_show_map_button')}
+            onPress={onToggleMap}
+          />
+        </View>
+
         <Button
           disabled={isWaitingApproval}
           style={buttonStyle}

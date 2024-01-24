@@ -24,7 +24,7 @@ export const useStyles = () => {
     content: {
       paddingTop: 24,
       backgroundColor: 'transparent',
-      paddingBottom: bottom
+      paddingBottom: bottom || 16
     },
     headerButton: {
       height: 40,
@@ -36,7 +36,7 @@ export const useStyles = () => {
       alignItems: 'center'
     },
     delivery: {
-      marginTop: 8,
+      marginVertical: 8,
     },
     infoBlock: {
       marginTop: 18,
@@ -98,6 +98,14 @@ export const useStyles = () => {
     declineButtonTextDisabled: {
       letterSpacing: 1,
       color: colors.white
-    }
+    },
+    mapButtonContainer: {
+      marginVertical: 28,
+      alignItems: 'flex-end'
+    },
+    mapButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 14
+    },
   }), [bottom]);
 };

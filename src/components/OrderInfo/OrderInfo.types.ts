@@ -1,15 +1,5 @@
 import { ViewStyle } from 'react-native';
-
-export type Address = {
-  name: string;
-  country: string;
-  city: string;
-  street: string;
-  house: string;
-  building: string;
-  floor: string;
-  postcode: string;
-}
+import { Address } from 'types/address';
 
 export type Contact = {
   name: string;

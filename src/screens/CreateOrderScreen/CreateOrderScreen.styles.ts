@@ -8,11 +8,11 @@ export const useStyles = () => {
 
   return useMemo(() => StyleSheet.create({
     screen: {
-      backgroundColor: colors.color6,
+      backgroundColor: colors.color6
     },
     container: {
       marginTop: 26,
-      flex: 1,
+      flex: 1
     },
     content: {
       backgroundColor: 'transparent',
@@ -27,44 +27,45 @@ export const useStyles = () => {
       fontWeight: '400',
       fontSize: 12,
       lineHeight: 14,
-      letterSpacing: 0.2,
+      letterSpacing: 0.2
     },
     section: {
-      marginTop: 8,
+      marginTop: 8
     },
     cargoRow: {
       marginTop: 8,
       columnGap: 8,
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     cargoPicker: {
       flexBasis: 'auto',
-      flexGrow: 1,
+      flexGrow: 1
     },
     cargoWeight: {
       minWidth: 70,
       flex: 1,
       flexBasis: 'auto',
-      flexGrow: 0,
+      flexGrow: 0
     },
     weightStyle: {
-      maxWidth: 70,
+      maxWidth: 70
     },
     weightTextStyle: {
-      marginLeft: 0,
+      marginLeft: 0
     },
     addCargoContainer: {
       marginTop: 16,
-      alignItems: 'flex-end',
+      marginBottom: 8,
+      alignItems: 'flex-end'
     },
     primaryButton: {
       marginTop: 24,
-      borderRadius: 50,
+      borderRadius: 50
     },
     primaryButtonText: {
       fontFamily: 'Roboto-Bold',
-      letterSpacing: 1,
+      letterSpacing: 1
     },
   }), [bottom]);
 };

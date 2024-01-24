@@ -10,7 +10,7 @@ export const MOCK_ORDERS = [
         street: 'Ленина',
         house: '45',
         building: '99',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [
@@ -47,7 +47,7 @@ export const MOCK_ORDERS = [
         street: 'Мира',
         house: '33',
         building: '69',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [
@@ -116,7 +116,7 @@ export const MOCK_ORDERS = [
         street: 'Ленина',
         house: '45',
         building: '14',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [
@@ -153,7 +153,7 @@ export const MOCK_ORDERS = [
         street: 'Мира',
         house: '33',
         building: '5',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [
@@ -222,7 +222,7 @@ export const MOCK_ORDERS = [
         street: 'Ленина',
         house: '45',
         building: '10',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [
@@ -259,7 +259,7 @@ export const MOCK_ORDERS = [
         street: 'Мира',
         house: '33',
         building: '104a',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [
@@ -328,7 +328,7 @@ export const MOCK_ORDERS = [
         street: 'Кошкина',
         house: '62',
         building: '10',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [
@@ -365,7 +365,7 @@ export const MOCK_ORDERS = [
         street: 'Мира',
         house: '5',
         building: '104a',
-        floor: '',
+        floor: 0,
         postcode: ''
       },
       contacts: [

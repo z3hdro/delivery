@@ -8,11 +8,11 @@ export const useStyles = () => {
 
   return useMemo(() => StyleSheet.create({
     screen: {
-      backgroundColor: colors.color6,
+      backgroundColor: colors.color6
     },
     container: {
       marginTop: 28,
-      flex: 1,
+      flex: 1
     },
     content: {
       paddingBottom: bottom || 16
@@ -20,7 +20,7 @@ export const useStyles = () => {
     map: {
       flex: 1,
       zIndex: 1,
-      height: 320,
+      height: 320
     },
     headerButton: {
       height: 40,
@@ -29,7 +29,7 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: colors.color5,
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     section: {
       marginTop: 8,
@@ -40,30 +40,31 @@ export const useStyles = () => {
     },
     mapButton: {
       paddingVertical: 8,
-      paddingHorizontal: 14,
+      paddingHorizontal: 14
     },
     primaryButton: {
       borderRadius: 50,
+      backgroundColor: 'transparent'
     },
     primaryButtonText: {
       fontFamily: 'Roboto-Bold',
-      letterSpacing: 1,
+      letterSpacing: 1
     },
     secondaryButtonContainer: {
       marginTop: 16,
     },
     secondaryButton: {
-      borderRadius: 50,
-      backgroundColor: colors.color2,
-      width: 'auto',
       flex: 1,
+      width: 'auto',
+      borderRadius: 50,
+      backgroundColor: colors.color2
     },
     buttonsContainer: {
       width: '100%',
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      columnGap: 8,
+      columnGap: 8
     }
   }), [bottom]);
 };

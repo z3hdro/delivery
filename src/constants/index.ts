@@ -4,3 +4,4 @@ export * from './order';
 export * from './user';
 export * from './infoSection';
 export * from './geolocation';
+export * from './map';

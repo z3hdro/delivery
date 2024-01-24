@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import YaMap, { Marker } from 'react-native-yamap';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -9,15 +8,20 @@ import { OrderCard } from 'components/OrderCard';
 import { InfoSection } from 'components/InfoSection';
 import { RoundButton } from 'components/RoundButton';
 import { Button } from 'components/Button';
+import { Map } from 'components/Map';
+import { InfoModal } from 'components/InfoModal';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
+import { formatAddress } from 'utils/address';
 import { createInitialState, getPrimaryButtonText } from './ViewOrderScreen.utils';
 import { useStyles } from './ViewOrderScreen.styles';
 import { ORDER_KEYS } from './ViewOrderScreen.consts';
 import { ORDER_LIST } from 'constants/order';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
-import { Order } from './ViewOrderScreen.types';
+import { LOGISTIC_POINT } from 'constants/map';
+import { MapPointInfo, Order } from './ViewOrderScreen.types';
+import { Address } from 'types/address';
 
-import { ArrowBackIcon, BackIcon, DeliveryPointIcon, DeparturePointIcon, MapIcon, TrackIcon } from 'src/assets/icons';
+import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
 
 export const ViewOrderScreen = () => {
   const { t } = useTranslation();
@@ -27,8 +31,7 @@ export const ViewOrderScreen = () => {
 
   const [displayMap, setDisplayMap] = useState<boolean>(false);
   const [orderData, setOrderData] = useState<Order>(createInitialState(order));
-
-  const mapRef = useRef<YaMap | null>(null);
+  const [mapPointInfo, setMapPointInfo] = useState<MapPointInfo | null>(null);
 
   const buttonTitle = useMemo(() => getPrimaryButtonText(type), [type]);
 
@@ -72,6 +75,22 @@ export const ViewOrderScreen = () => {
     console.log('onDelete');
   }, []);
 
+  // TODO: change later
+  const onInfoPress = useCallback((type: LOGISTIC_POINT, address: Address) => {
+    const data: MapPointInfo = {
+      nomenclatureName: 'Лом 3А',
+      type,
+      address: formatAddress(address),
+      planDate: '09.10.2023'
+    };
+
+    setMapPointInfo(data);
+  }, []);
+
+  const onCloseModal = useCallback(() => {
+    setMapPointInfo(null);
+  }, []);
+
   return (
     <Screen
       style={styles.screen}
@@ -81,31 +100,20 @@ export const ViewOrderScreen = () => {
           leftPart={renderLeftPart()}
         />
       }>
+      {!!mapPointInfo && (
+        <InfoModal mapPointInfo={mapPointInfo} onCloseModal={onCloseModal} />
+      )}
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <OrderCard order={order} t={t} isManager />
         {displayMap ? (
-          <YaMap
-            ref={mapRef}
-            style={styles.map}
-            onMapLoaded={() => {
-              if (displayMap && mapRef.current) {
-                mapRef.current?.fitAllMarkers?.();
-              }
-            }}
-          >
-            <Marker point={order.departure.geo} zIndex={10}>
-              <DeparturePointIcon height={24} width={20} />
-            </Marker>
-            <Marker point={order.destination.geo} zIndex={10}>
-              <DeliveryPointIcon height={24} width={20} />
-
-            </Marker>
-            {type === ORDER_LIST.IN_PROGRESS && (
-              <Marker point={order.geo} zIndex={10}>
-                <TrackIcon height={16} width={24} />
-              </Marker>
-            )}
-          </YaMap>
+          <Map
+            displayMap={displayMap}
+            departure={{ ...order.departure.address, geo: order.departure.geo }}
+            destination={{ ...order.destination.address, geo: order.destination.geo }}
+            onInfoPress={onInfoPress}
+            track={order.geo}
+            displayTrack={type === ORDER_LIST.IN_PROGRESS}
+          />
         ) : (
           <>
             <InfoSection

@@ -2,3 +2,8 @@ export * from './colors';
 export * from './navigation';
 export * from './picker';
 export * from './user';
+export * from './order';
+export * from './geolocation';
+export * from './address';
+export * from './nomenclature';
+export * from './infoModal';

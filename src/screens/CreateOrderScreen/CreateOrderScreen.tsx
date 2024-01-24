@@ -10,12 +10,18 @@ import { DeliveryPointPicker } from 'components/DeliveryPointPicker';
 import { Button } from 'components/Button';
 import { CargoPicker } from 'components/CargoPicker';
 import { RoundButton } from 'components/RoundButton';
-import { EMPTY_CARGO_DATA, INITIAL_CARGO_DATA } from './CreateOrderScreen.consts';
+import { Checkbox } from 'components/Checkbox';
+import {
+  EMPTY_CARGO_DATA,
+  INITIAL_CARGO_DATA,
+  INITIAL_ORDER_DATA,
+  PRICE_OPTION
+} from './CreateOrderScreen.consts';
 import { CARGO_KEYS } from 'constants/order';
 import { colors } from 'constants/colors';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { useStyles } from './CreateOrderScreen.styles';
-import { Cargo } from './CreateOrderScreen.types';
+import { Cargo, OrderData } from './CreateOrderScreen.types';
 
 import { PlusIcon } from 'src/assets/icons';
 
@@ -23,12 +29,14 @@ export const CreateOrderScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
 
+  const [orderData, setOrderData] = useState<OrderData>(INITIAL_ORDER_DATA);
   const [departure, setDeparture] = useState<string | null>(null);
   const [delivery, setDelivery] = useState<string | null>(null);
   const [departureDatePlan, setDepartureDatePlan] = useState<string>('');
   const [deliveryDatePlan, setDeliveryDatePlan] = useState<string>('');
   const [cargoData, setCargoData] = useState<Cargo[]>(INITIAL_CARGO_DATA);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [priceOption, setPriceOption] = useState<PRICE_OPTION>(PRICE_OPTION.FULL);
 
   const onAddCargo = useCallback(() => {
     setCargoData((prevState) => ([...prevState, { ...EMPTY_CARGO_DATA }]));
@@ -145,9 +153,41 @@ export const CreateOrderScreen = () => {
               onPress={onAddCargo}
             />
           </View>
+          <Checkbox
+            style={styles.section}
+            label={t('CreateOrder_price_first_option')}
+            value={priceOption === PRICE_OPTION.FULL}
+            onPress={() => {
+              setPriceOption(PRICE_OPTION.FULL);
+            }}
+          />
+          <Checkbox
+            style={styles.section}
+            label={t('CreateOrder_price_second_option')}
+            value={priceOption === PRICE_OPTION.PARTIAL}
+            onPress={() => {
+              setPriceOption(PRICE_OPTION.PARTIAL);
+            }}
+          />
           <InfoSection
             style={styles.section}
             label={t('CreateOrder_sixth_section')}
+            value={departureDatePlan}
+            onUpdate={(text) => {
+              setDepartureDatePlan(text);
+            }}
+          />
+          <InfoSection
+            style={styles.section}
+            label={t('CreateOrder_seventh_section')}
+            value={departureDatePlan}
+            onUpdate={(text) => {
+              setDepartureDatePlan(text);
+            }}
+          />
+          <InfoSection
+            style={styles.section}
+            label={t('CreateOrder_eight_section')}
             value={departureDatePlan}
             type={INFO_SECTION_TYPE.DATE_PICKER}
             onUpdate={(text) => {
@@ -156,7 +196,7 @@ export const CreateOrderScreen = () => {
           />
           <InfoSection
             style={styles.section}
-            label={t('CreateOrder_seventh_section')}
+            label={t('CreateOrder_ninth_section')}
             value={deliveryDatePlan}
             type={INFO_SECTION_TYPE.DATE_PICKER}
             onUpdate={(text) => {

@@ -21,3 +21,5 @@ export * from './UserCard';
 export * from './DriverCard';
 export * from './Checkbox';
 export * from './SelectedImage';
+export * from './Map';
+export * from './InfoModal';
