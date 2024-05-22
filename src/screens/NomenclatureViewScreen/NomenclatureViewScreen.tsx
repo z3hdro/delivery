@@ -1,27 +1,30 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, View, Text } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from 'components/ScreenHeader';
 import { Screen } from 'components/Screen';
-import { NomenclatureMeasurePicker } from 'components/NomenclatureMeasurePicker';
-import { NomenclatureNamePicker } from 'components/NomenclatureNamePicker';
 import { Button } from 'components/Button';
+import { InfoSection } from 'components/InfoSection';
 import { Preloader } from 'components/Preloader';
+import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
+import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { useStyles } from './NomenclatureViewScreen.styles';
+import { Measure } from 'types/measure';
 
 import { BackIcon } from 'src/assets/icons';
 
 export const NomenclatureViewScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
-  const { goBack } = useManagerNavigator();
-  const { params: { nomenclature } } = useManagerRoute<'NomenclatureViewScreen'>();
+  const { navigate, goBack } = useManagerNavigator();
+  const { params: { nomenclature, onUpdate } } = useManagerRoute<'NomenclatureViewScreen'>();
 
   const isEdit = useMemo(() => !!nomenclature, [nomenclature]);
+  console.log('isEdit: ', isEdit);
 
-  const [name, setName] = useState<string | null>(nomenclature?.name ?? null);
-  const [measure, setMeasure] = useState<string | null>(nomenclature?.measureId.toString() ?? null);
+  const [name, setName] = useState<string>(nomenclature?.name || '');
+  const [measure, setMeasure] = useState<Measure | null>(nomenclature?.measure || null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const renderLeftPart = useCallback(() => {
@@ -35,39 +38,63 @@ export const NomenclatureViewScreen = () => {
     );
   }, [goBack, styles]);
 
-  const onChangeName = useCallback((text: string | null) => {
-    setName(text);
-  }, []);
+  const onAddPosition = useCallback(async () => {
+    try {
+      setIsLoading(true);
 
-  const onChangeMeasure = useCallback((text: string | null) => {
-    setMeasure(text);
-  }, []);
+      if (!name.trim().length || !measure) {
+        return;
+      }
 
-  const onAddPosition = useCallback(() => {
-    console.log('add position');
-    goBack();
-  }, [goBack]);
+      await networkService.addNomenclature({
+        name,
+        measureId: measure.id
+      });
+      onUpdate();
+      goBack();
+    } catch (e) {
+      console.log('adding nomenclature error: ', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [goBack, measure, name, onUpdate]);
 
   const onSavePosition = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(true);
-        }, 1500);
-      });
+      if (!name.trim().length || !measure || !nomenclature) {
+        return;
+      }
+
+      const data = {
+        id: nomenclature.id,
+        name,
+        measureId: measure.id
+      };
+
+      await networkService.updateNomenclature(nomenclature.id, data);
+      onUpdate();
+      goBack();
     } catch (e) {
-      console.log(e);
+      console.log('update nomenclature error: ', e);
     } finally {
       setIsLoading(false);
     }
-    console.log('save position');
-  }, []);
+  }, [goBack, measure, name, nomenclature, onUpdate]);
 
+  // TODO: add DELETE request for nomenclature
   const onDeletePosition = useCallback(() => {
-    console.log('delete position');
-  }, []);
+    goBack();
+  }, [goBack]);
+
+  const onNavigate = useCallback(() => {
+    navigate('SelectMeasureScreen', {
+      onSelect: (item: Measure) => {
+        setMeasure(item);
+      }
+    });
+  }, [navigate]);
 
   return (
     <Screen
@@ -80,18 +107,20 @@ export const NomenclatureViewScreen = () => {
       }>
       {isLoading && <Preloader style={styles.preloader} />}
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View>
-          <Text style={styles.label}>
-            {t('Nomenclature_add_first_section')}
-          </Text>
-          <NomenclatureNamePicker value={name} onChangeValue={onChangeName} />
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.label}>
-            {t('Nomenclature_add_second_section')}
-          </Text>
-          <NomenclatureMeasurePicker value={measure} onChangeValue={onChangeMeasure} />
-        </View>
+        <InfoSection
+          label={t('Nomenclature_add_first_section')}
+          value={name}
+          onUpdate={(text) => {
+            setName(text);
+          }}
+        />
+        <InfoSection
+          style={styles.section}
+          label={t('Nomenclature_add_second_section')}
+          value={measure?.name || ''}
+          onNavigate={onNavigate}
+          type={INFO_SECTION_TYPE.SCREEN}
+        />
 
         <Button
           style={styles.primaryButton}

@@ -4,6 +4,7 @@ export type Props = {
   firstLabel: string
   firstSubtitle: string;
   secondLabel: string
-  secondSubtitle: string;
+  thirdLabel: string;
+  thirdSubtitle: string;
   style?: ViewStyle
 }

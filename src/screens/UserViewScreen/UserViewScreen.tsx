@@ -12,11 +12,13 @@ import { Checkbox } from 'components/Checkbox';
 import { Button } from 'components/Button';
 import { Preloader } from 'components/Preloader';
 import { JobPositionPicker } from 'components/JobPositionPicker';
+import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
   createCompanyInitialState,
   createPassportInitialState,
-  createPersonInitialState
+  createPersonInitialState, selectCompanyType,
+  selectEmploymentType
 } from './UserViewScreen.utils';
 import { useStyles } from './UserViewScreen.styles';
 import {
@@ -29,23 +31,25 @@ import {
   PERSON_KEYS
 } from './UserViewScreen.consts';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
-import { Company, Passport, Person } from './UserViewScreen.types';
+import { CompanyData, ImageFile, PassportData, PersonData } from './UserViewScreen.types';
+import { Option } from 'types/picker';
 
 import { BackIcon } from 'src/assets/icons';
+import { AxiosError } from 'axios';
 
 export const UserViewScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { goBack } = useManagerNavigator();
-  const { params: { user, driver, type } } = useManagerRoute<'UserViewScreen'>();
+  const { params: { user, driver, type, onUpdate } } = useManagerRoute<'UserViewScreen'>();
 
-  const [personData, setPersonData] = useState<Person>(
+  const [personData, setPersonData] = useState<PersonData>(
     createPersonInitialState(type, driver, user)
   );
-  const [passportData, setPassportData] = useState<Passport>(
+  const [passportData, setPassportData] = useState<PassportData>(
     createPassportInitialState(type, driver, user)
   );
-  const [companyData, setCompanyData] = useState<Company>(
+  const [companyData, setCompanyData] = useState<CompanyData>(
     createCompanyInitialState(type, driver, user)
   );
   const [images, setImages] = useState<string[]>([]);
@@ -114,31 +118,93 @@ export const UserViewScreen = () => {
     );
   }, []);
 
-  const onChangeJobPosition = useCallback((text: string | null) => {
-    setPersonData(prevState => ({ ...prevState, jobPosition: text ?? '' }));
+  const onChangeJobPosition = useCallback((item: Option | null) => {
+    setPersonData(prevState => ({ ...prevState, jobPosition: item }));
   }, []);
 
   const onSaveUserData = useCallback(async () => {
     try {
       setIsLoading(true);
 
+      if (isLoading) {
+        return;
+      }
+
       console.log('personData: ', personData);
       console.log('companyData: ', companyData);
       console.log('passportData: ', passportData);
       console.log('images: ', images);
 
-      // TODO: replace by API
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(true);
-        }, 1500);
+      const files: ImageFile[] = [];
+
+      if (images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          const response = await fetch(image);
+          const blob = await response.blob();
+          const filename = image.split('/').pop();
+          const file: ImageFile = {
+            uri: image,
+            name: filename,
+            type: blob.type
+          };
+          files.push(file);
+        }
+      }
+
+      const driverInfo: any = {
+        userId: personData.id,
+        name: personData.name,
+        surname: personData.surname,
+        patronymic: personData.patronymic,
+        inn: personData.inn,
+        employmentType: selectEmploymentType(personData),
+        contragentName: companyData.name,
+        contragentINN: companyData.inn,
+        kpp: companyData.kpp,
+        companyType: selectCompanyType(companyData),
+        jobPositionId: personData.jobPosition?.value,
+        email: personData.email,
+        telegram: personData.telegram,
+        passportSeries: passportData.series,
+        passportNumber: passportData.number,
+        passportIssuedBy: passportData.authority,
+        passportIssueDate: passportData.date_of_issue,
+        passportDepartmentCode: passportData.department_code,
+        photos: [...files],
+      };
+
+      const formData = new FormData();
+
+      // Append each field to the form data
+      Object.entries(driverInfo).forEach(([key, value]) => {
+        // If the value is an array (photos), append each file individually
+        if (key === 'photos' && Array.isArray(value)) {
+          (value as File[]).forEach((file: File) => {
+            formData.append('photos', file, file?.name || '');
+          });
+        } else if (value) {
+          formData.append(key, String(value));
+        }
       });
+
+      console.log('formData: ', formData);
+      await networkService.confirmDriver(formData);
+
+      onUpdate();
+      goBack();
     } catch (e) {
-      console.log(e);
+      if (e instanceof AxiosError) {
+        console.log('e.code: ', e?.code);
+        console.log('e.message: ', e?.message);
+        console.log('e.message: ', e?.status);
+        console.log('e.message: ', e?.request);
+      }
+      console.log('error on confirm driver: ', e);
     } finally {
       setIsLoading(false);
     }
-  }, [companyData, images, passportData, personData]);
+  }, [companyData, images, passportData, personData, goBack, isLoading, onUpdate]);
 
   const onCancel = useCallback(() => {
     goBack();
@@ -207,9 +273,9 @@ export const UserViewScreen = () => {
           <InfoSection
             style={styles.section}
             label={t('UserView_driver_fourth_label')}
-            value={personData.personInn}
+            value={personData.inn ?? ''}
             onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.PERSON_INN, text);
+              updatePersonData(PERSON_KEYS.INN, text);
             }}
             keyboardType={'numeric'}
           />
@@ -219,7 +285,7 @@ export const UserViewScreen = () => {
           </Text>
           <Checkbox
             label={t('UserView_driver_checkbox_first_label')}
-            value={personData.selfEmployed}
+            value={personData.self_employed}
             onPress={() => {
               onToggleEmployment(EMPLOYMENT.SELF_EMPLOYED);
             }}
@@ -294,7 +360,7 @@ export const UserViewScreen = () => {
                 <Checkbox
                   style={styles.section}
                   label={t('UserView_company_checkbox_third_label')}
-                  value={companyData.transportCompany}
+                  value={companyData.transport_company}
                   onPress={() => {
                     onToggleCompanyType(COMPANY_TYPE.TRANSPORT_COMPANY);
                   }}
@@ -317,7 +383,7 @@ export const UserViewScreen = () => {
           <InfoSection
             style={styles.section}
             label={t('UserView_contact_first_label')}
-            value={personData.email}
+            value={personData.email ?? ''}
             onUpdate={(text: string) => {
               updatePersonData(PERSON_KEYS.EMAIL, text);
             }}
@@ -325,7 +391,7 @@ export const UserViewScreen = () => {
           <InfoSection
             style={styles.section}
             label={t('UserView_contact_second_label')}
-            value={personData.telegram}
+            value={personData.telegram ?? ''}
             onUpdate={(text: string) => {
               updatePersonData(PERSON_KEYS.TELEGRAM, text);
             }}
@@ -365,18 +431,19 @@ export const UserViewScreen = () => {
             <InfoSection
               style={styles.rowItem}
               label={t('UserView_passport_fourth_label')}
-              value={passportData.dateOfIssue}
+              value={passportData.date_of_issue}
               onUpdate={(text: string) => {
                 updatePassportData(PASSPORT_KEYS.DATE_OF_ISSUE, text);
               }}
               type={INFO_SECTION_TYPE.DATE_PICKER}
+              minimumDate={undefined}
             />
             <InfoSection
               style={styles.rowItem}
               label={t('UserView_passport_fifth_label')}
-              value={passportData.code}
+              value={passportData.department_code}
               onUpdate={(text: string) => {
-                updatePassportData(PASSPORT_KEYS.CODE, text);
+                updatePassportData(PASSPORT_KEYS.DEPARTMENT_CODE, text);
               }}
             />
           </View>

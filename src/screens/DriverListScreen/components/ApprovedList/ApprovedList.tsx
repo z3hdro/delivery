@@ -1,67 +1,71 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Preloader } from 'components/Preloader';
 import { DriverCard } from 'components/DriverCard';
+import { networkService } from 'services/network';
 import { useManagerNavigator } from 'navigation/hooks';
 import { useStyles } from './ApprovedList.styles';
 import { USER } from 'constants/user';
-import { MOCK_DRIVERS, MockDriver } from 'mocks/mockDrivers';
+import { MEASURE_LIMIT } from 'constants/limit';
+import { ApprovedDriver } from 'types/user';
 
 export const ApprovedList = () => {
   const { t } = useTranslation();
   const { navigate } = useManagerNavigator();
   const styles = useStyles();
 
-  const [data, setData] = useState<MockDriver[]>([]);
-  // const [page, setPage] = useState<number>(0);
+  const [data, setData] = useState<ApprovedDriver[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [offset, setOffset] = useState<number>(0);
+  const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
+
+  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+
+  const fetchLogisticPoints = useCallback(async (offset: number) => {
+    try {
+      setIsLoading(true);
+      const { users } = await networkService.getApprovedDrivers(offset);
+      if (users?.length) {
+        setData((prevState) => offset === 0 ? users : ([...prevState, ...users]));
+        setOffset((prevState) => prevState + 1);
+      }
+    } catch (e) {
+      console.log('getAllLogisticPoint error: ', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     void (async () => {
-      try {
-        // TODO: replace by API
-        const result: MockDriver[] = await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(MOCK_DRIVERS);
-          }, 1000);
-        });
-        setData(result);
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setIsLoading(false);
+      if (shouldRefresh) {
+        await fetchLogisticPoints(0);
       }
+      setShouldRefresh(false);
     })();
-  }, []);
+  }, [fetchLogisticPoints, shouldRefresh]);
 
-  // TODO: replace by API
-  // const fetchMoreData = useCallback(async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     const result: MockOrder[] = await new Promise((resolve) => {
-  //       setTimeout(() => {
-  //         resolve(MOCK_ORDERS_PAGINATE);
-  //       }, 1000);
-  //     });
-  //
-  //     if (result.length) {
-  //       setData(prevState => ([...prevState, ...result]));
-  //       // setPage(prevState => prevState + 1);
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, []);
+  const onEndReached = useCallback(async () => {
+    if (isLimitReached) {
+      return;
+    } else {
+      await fetchLogisticPoints(offset);
+    }
+  }, [fetchLogisticPoints, isLimitReached, offset]);
 
-  const onDriverPress = useCallback( (driver: MockDriver) => {
-    navigate('UserViewScreen', { driver, type: USER.APPROVED });
+  const onDriverPress = useCallback( (driver: ApprovedDriver) => {
+    navigate('UserViewScreen', {
+      driver,
+      type: USER.APPROVED,
+      onUpdate: () => {
+        setShouldRefresh(true);
+      }
+    });
   }, [navigate]);
 
-  const renderItem = useCallback(({ item }: { item: MockDriver}) => (
+  const renderItem = useCallback(({ item }: { item: ApprovedDriver}) => (
     <DriverCard driver={item} t={t} onPress={() => onDriverPress(item)} />
   ), [onDriverPress, t]);
 
@@ -71,11 +75,11 @@ export const ApprovedList = () => {
       {isLoading && <Preloader style={styles.preloader} />}
       <FlatList
         style={styles.list}
-        keyExtractor={item => item.userId.toString()}
+        keyExtractor={item => item.id.toString()}
         data={data}
         renderItem={renderItem}
-        // onEndReachedThreshold={0.2}
-        // onEndReached={fetchMoreData}
+        onEndReachedThreshold={0.5}
+        onEndReached={onEndReached}
       />
     </>
   );

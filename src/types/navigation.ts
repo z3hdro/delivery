@@ -1,11 +1,11 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
-import { MockOrder } from 'mocks/mockOrders';
 import { ORDER_LIST } from 'constants/order';
-import { MockNomenclature } from 'mocks/mockNomenclature';
-import { MockDriver } from 'mocks/mockDrivers';
 import { USER } from 'constants/user';
-import { MockUser } from 'mocks/mockUsers';
-import { MockShippingPoint } from 'mocks/mockShippingPoints';
+import { Nomenclature } from 'types/nomenclature';
+import { Measure } from 'types/measure';
+import { Order } from 'types/order';
+import { LogisticPoint } from 'services/network/types';
+import { ApprovedDriver, UnapprovedDriver } from 'types/user';
 
 export type LoginStackParamList = {
   LoginScreen: undefined;
@@ -17,10 +17,13 @@ export type DriverStackParamList = {
   ApprovalScreen: undefined;
   OrderListScreen: undefined;
   OrderScreen: {
-    order: MockOrder
+    order: Order
+    onUpdate: () => void
   };
   DriverMap: undefined;
 }
+
+export type DriverRoute = keyof DriverStackParamList | undefined
 
 export type MainBottomTabNavigatorParamList = {
   CargoListScreen: undefined;
@@ -33,18 +36,31 @@ export type MainBottomTabNavigatorParamList = {
 export type ManagerStackParamList = {
   MainBottomTabNavigator: NavigatorScreenParams<MainBottomTabNavigatorParamList>;
   ViewOrderScreen: {
-    order: MockOrder
+    order: Order
     type: ORDER_LIST
+    onUpdate: () => void
   };
   UserViewScreen: {
     type: USER
-    user?: MockUser
-    driver?: MockDriver
+    onUpdate: () => void
+    user?: UnapprovedDriver
+    driver?: ApprovedDriver
   };
   NomenclatureViewScreen: {
-    nomenclature: MockNomenclature | undefined
+    nomenclature: Nomenclature | undefined
+    onUpdate: () => void
   };
   ShippingPointViewScreen: {
-    point: MockShippingPoint | undefined
-  }
+    point: LogisticPoint | undefined
+    onUpdate: () => void
+  },
+  SelectMeasureScreen: {
+    onSelect: (item: Measure) => void
+  },
+  SelectCargoScreen: {
+    onSelect: (item: Nomenclature) => void
+  },
+  SelectLogisticPointScreen: {
+    onSelect: (item: LogisticPoint) => void
+  },
 }

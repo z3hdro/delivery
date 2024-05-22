@@ -1,11 +1,13 @@
 import React, { FC, useCallback } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
+import { useAppData } from 'providers/AppProvider';
+import { networkService } from 'services/network';
+import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { useStyles } from './Screen.styles';
 import { Props } from './Screen.types';
+
 import { LogoIcon, LogoutIcon } from 'src/assets/icons';
-import { appStorage, STORAGE_KEYS } from 'services/appStorage';
-import { useAppData } from 'providers/AppProvider';
 
 export const Screen: FC<Props> = ({
   children,
@@ -15,15 +17,18 @@ export const Screen: FC<Props> = ({
   hideLogout = false
 }) => {
   const styles = useStyles();
-  const { removeCurrentPerson } = useAppData();
+  const { removeCurrentPerson, setDriverOrder, setPersonRole } = useAppData();
 
   // TODO: remove logout later and pressable
   const onLogout = useCallback(async () => {
+    await networkService.logout();
     await appStorage.removeData(STORAGE_KEYS.ACCESS_TOKEN);
     await appStorage.removeData(STORAGE_KEYS.REFRESH_TOKEN);
     await appStorage.removeData(STORAGE_KEYS.ROLE);
     removeCurrentPerson();
-  }, [removeCurrentPerson]);
+    setDriverOrder(null);
+    setPersonRole(null);
+  }, [removeCurrentPerson, setDriverOrder, setPersonRole]);
 
   return (
     <View style={[styles.container, style]}>

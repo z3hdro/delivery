@@ -122,6 +122,64 @@ export const useStyles = () => {
     },
     deleteButtonText: {
       marginLeft: 4,
-    }
+    },
+    geoSearchButton: {
+      marginTop: 16,
+      backgroundColor: colors.red,
+      borderColor: colors.red,
+    },
+    geoSearchButtonText: {
+      color: colors.white
+    },
+    mapContainer: {
+      marginTop: 16,
+      position: 'relative'
+    },
+    geoLabel: {
+      marginLeft: 14,
+      marginBottom: 2,
+      color: colors.color7,
+      fontFamily: 'Roboto',
+      fontStyle: 'normal',
+      fontWeight: '400',
+      fontSize: 12,
+      lineHeight: 14,
+      letterSpacing: 0.2,
+    },
+    geoInput: {
+      paddingVertical: 4,
+      height: 42,
+      paddingHorizontal: 16,
+      borderRadius: 4,
+      backgroundColor: colors.color6,
+      overflow: 'hidden',
+      fontFamily: 'Roboto',
+      fontStyle: 'normal',
+      fontWeight: '400',
+      fontSize: 16,
+      lineHeight: 18,
+      letterSpacing: 0.4,
+      color: colors.color2
+    },
+    geoPosition: {
+      top: 16,
+      left: 8,
+      right: 8,
+      backgroundColor: colors.white,
+      padding: 8,
+      position: 'absolute',
+      zIndex: 99,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+    geoField: {
+      width: '45%'
+    },
+    map: {
+      flex: 1,
+      zIndex: 1,
+      height: 320
+    },
   }), [bottom]);
 };

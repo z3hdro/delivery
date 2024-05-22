@@ -44,7 +44,7 @@ export const useStyles = () => {
     },
     primaryButton: {
       borderRadius: 50,
-      backgroundColor: 'transparent'
+      backgroundColor: colors.red,
     },
     primaryButtonText: {
       fontFamily: 'Roboto-Bold',

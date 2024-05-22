@@ -1,15 +1,18 @@
+import { CompanyData, Passport, PersonData } from './UserViewScreen.types';
+
 export const DISPLAY_DATE_FORMAT = 'dd.MM.yyyy';
 
-export const EMPTY_PERSON = {
+export const EMPTY_PERSON: PersonData = {
+  id: 0,
   phone: '',
   name: '',
   surname: '',
   patronymic: '',
-  personInn: '',
-  selfEmployed: false,
+  inn: '',
+  self_employed: false,
   individual: false,
   company: false,
-  jobPosition: '',
+  jobPosition: null,
   email: '',
   telegram: '',
 };
@@ -19,35 +22,35 @@ export enum PERSON_KEYS {
   NAME = 'name',
   SURNAME = 'surname',
   PATRONYMIC = 'patronymic',
-  PERSON_INN = 'personInn',
-  JOB_POSITION = 'jobPosition',
+  INN = 'inn',
+  jobPosition = 'jobPosition',
   EMAIL = 'email',
   TELEGRAM = 'telegram',
 }
 
-export const EMPTY_PASSPORT = {
+export const EMPTY_PASSPORT: Passport = {
   series: '',
   number: '',
   authority: '',
-  dateOfIssue: new Date().toISOString(),
-  code: '',
+  date_of_issue: new Date().toISOString(),
+  department_code: '',
 };
 
 export enum PASSPORT_KEYS {
   SERIES = 'series',
   NUMBER = 'number',
   AUTHORITY = 'authority',
-  DATE_OF_ISSUE = 'dateOfIssue',
-  CODE = 'code',
+  DATE_OF_ISSUE = 'date_of_issue',
+  DEPARTMENT_CODE = 'department_code',
 }
 
-export const EMPTY_COMPANY = {
+export const EMPTY_COMPANY: CompanyData = {
   name: '',
   inn: '',
   kpp: '',
   supplier: false,
   buyer: false,
-  transportCompany: false,
+  transport_company: false,
 };
 
 export enum COMPANY_KEYS {
@@ -57,7 +60,7 @@ export enum COMPANY_KEYS {
 }
 
 export enum EMPLOYMENT {
-  SELF_EMPLOYED = 'selfEmployed',
+  SELF_EMPLOYED = 'self_employed',
   INDIVIDUAL = 'individual',
   COMPANY = 'company',
 }
@@ -67,7 +70,7 @@ export const EMPLOYMENT_VALUES = Object.values(EMPLOYMENT);
 export enum COMPANY_TYPE {
   SUPPLIER = 'supplier',
   BUYER = 'buyer',
-  TRANSPORT_COMPANY = 'transportCompany',
+  TRANSPORT_COMPANY = 'transport_company',
 }
 
 export const COMPANY_TYPE_VALUES = Object.values(COMPANY_TYPE);

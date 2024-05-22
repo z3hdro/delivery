@@ -1,5 +1,6 @@
 import { ViewStyle } from 'react-native';
 import { Address } from 'types/address';
+import { OrderContact } from 'types/order';
 
 export type Contact = {
   name: string;
@@ -14,7 +15,7 @@ export type Contact = {
 export type Props = {
   address: Address,
   planDate: string,
-  contacts: Contact[]
+  contacts: OrderContact[]
   isDeparture?: boolean;
   style?: ViewStyle;
 }

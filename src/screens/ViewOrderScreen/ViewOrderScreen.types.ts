@@ -1,6 +1,6 @@
 import { LOGISTIC_POINT } from 'constants/map';
 
-export type Order = {
+export type ViewOrder = {
   id: number
   name: string
   surname: string

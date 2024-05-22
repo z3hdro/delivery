@@ -1,6 +1,6 @@
 import { ORDER_LIST } from 'constants/order';
-import { MockOrder } from 'mocks/mockOrders';
-import { Order } from 'screens/ViewOrderScreen/ViewOrderScreen.types';
+import { Order } from 'types/order';
+import { ViewOrder } from './ViewOrderScreen.types';
 
 export const getPrimaryButtonText = (type: ORDER_LIST): string => {
   switch (type) {
@@ -15,28 +15,22 @@ export const getPrimaryButtonText = (type: ORDER_LIST): string => {
   }
 };
 
-export const createInitialState = (order: MockOrder): Order => {
+export const createInitialState = (order: Order): ViewOrder => {
   const {
     id,
-    driver: {
-      name,
-      surname,
-      patronymic,
-      phone
-    },
-    departureDatePlan,
-    deliveryDatePlan,
-    truckVin
+    delivery_date_plan,
+    departure_date_plan,
+    truck
   } = order;
 
   return {
     id,
-    name,
-    surname,
-    patronymic,
-    phone,
-    deliveryDatePlan,
-    departureDatePlan,
-    truckVin
+    name: order.driver?.name ?? '',
+    surname: order.driver?.surname ?? '',
+    patronymic: order.driver?.patronymic ?? '',
+    phone: order.driver?.user?.phone ?? '',
+    deliveryDatePlan: delivery_date_plan,
+    departureDatePlan: departure_date_plan,
+    truckVin: truck ? truck.vin : String('')
   };
 };

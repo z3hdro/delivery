@@ -1,5 +1,7 @@
+import { Measure } from 'types/measure';
+
 export type Nomenclature = {
   id: number
   name: string
-  measureId: number
+  measure: Measure
 }

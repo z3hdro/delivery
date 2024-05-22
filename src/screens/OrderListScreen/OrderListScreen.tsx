@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Linking, Text, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -12,35 +12,75 @@ import { LinkButton } from 'components/LinkButton';
 import { useDriverNavigator } from 'navigation/hooks';
 import { INSTRUCTION_LINK } from 'constants/geolocation';
 import { useStyles } from './OrderListScreen.styles';
-import { MOCK_ORDERS, MockOrder } from 'mocks/mockOrders';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
+import { useAppData } from 'providers/AppProvider';
+import { networkService } from 'services/network';
+import { MEASURE_LIMIT } from 'constants/limit';
+import { Order } from 'types/order';
 
 export const OrderListScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
+  const { currentOrder } = useAppData();
   const { navigate } = useDriverNavigator();
 
-  // TODO: replace by real data structure
-  const [data, setData] = useState<MockOrder[]>([]);
+
+  const [data, setData] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [displayModal, setDisplayModal] = useState<boolean>(false);
+  const [offset, setOffset] = useState<number>(0);
+  const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
+
+  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+
+  const fetchData = useCallback(async (offset: number) => {
+    try {
+      setIsLoading(true);
+      const { orders } = await networkService.getAvailableOrders(offset);
+      if (orders.length) {
+        setData((prevState) => offset === 0 ? orders : ([...prevState, ...orders]));
+        setOffset((prevState) => prevState + 1);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     void (async () => {
-      try {
-        // TODO: replace by API
-        const result: MockOrder[] = await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(MOCK_ORDERS);
-          }, 1500);
+      if (currentOrder) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+        console.log('p1');
+        navigate('OrderScreen', {
+          order: currentOrder,
+          onUpdate: () => {
+            setShouldRefresh(true);
+          }
         });
-        setData(result);
-        setIsLoading(false);
-      } catch (e) {
-        console.log(e);
       }
+      setIsInitialLoading(false);
     })();
-  }, []);
+  }, [currentOrder, navigate]);
+
+  useEffect(() => {
+    void (async () => {
+      if (shouldRefresh) {
+        await fetchData(0);
+      }
+      setShouldRefresh(false);
+    })();
+  }, [fetchData, shouldRefresh]);
+
+  const onEndReached = useCallback(async () => {
+    if (isLimitReached) {
+      return;
+    } else {
+      await fetchData(offset);
+    }
+  }, [fetchData, isLimitReached, offset]);
 
   const onOpenLink = useCallback(async (url: string) => {
     const supported = await Linking.canOpenURL(url);
@@ -78,17 +118,22 @@ export const OrderListScreen = () => {
   //   );
   // }, [openFilters, styles]);
 
-  const onOpenOrder = useCallback(async (order: MockOrder) => {
+  const onOpenOrder = useCallback(async (order: Order) => {
     const geolocationEnabled = await appStorage.getData(STORAGE_KEYS.NOTIFICATION_PERMISSION);
     if (!geolocationEnabled) {
       setDisplayModal(true);
       return;
     }
 
-    navigate('OrderScreen', { order });
+    navigate('OrderScreen', {
+      order,
+      onUpdate: () => {
+        setShouldRefresh(true);
+      }
+    });
   }, [navigate]);
 
-  const renderItem = useCallback(({ item }: { item: MockOrder}) => (
+  const renderItem = useCallback(({ item }: { item: Order}) => (
     <OrderCard order={item} isDriver t={t} onPress={onOpenOrder} />
   ), [onOpenOrder, t]);
 
@@ -130,13 +175,15 @@ export const OrderListScreen = () => {
         </View>
       </Modal>
       <View style={styles.container}>
-        {isLoading ? (
+        {(isLoading || isInitialLoading) ? (
           <Preloader />
         ) : (
           <FlatList
             keyExtractor={item => item.id.toString()}
             data={data}
             renderItem={renderItem}
+            onEndReachedThreshold={0.5}
+            onEndReached={onEndReached}
           />
         )}
       </View>

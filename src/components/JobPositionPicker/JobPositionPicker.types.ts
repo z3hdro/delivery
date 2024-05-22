@@ -1,7 +1,8 @@
 import { ViewStyle } from 'react-native';
+import { Option } from 'types/picker';
 
 export type Props = {
-  value: string | null;
-  onChangeValue: (text: string | null) => void;
+  value: Option | null;
+  onChangeValue: (item: Option) => void;
   style?: ViewStyle;
 }

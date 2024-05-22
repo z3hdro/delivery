@@ -4,12 +4,9 @@ import { ApprovalScreen } from 'screens/ApprovalScreen';
 import { OrderListScreen } from 'screens/OrderListScreen';
 import { OrderScreen } from 'screens/OrderScreen';
 import { useAppData } from 'providers/AppProvider';
-
 import { DriverStackParamList } from 'types/navigation';
 
 const Stack = createNativeStackNavigator<DriverStackParamList>();
-
-const MockScreen = () => <></>;
 
 const customOptions: NativeStackNavigationOptions = {
   headerShown: false,
@@ -21,12 +18,11 @@ export const DriverNavigator = () => {
 
   return (
     <Stack.Navigator
-      // initialRouteName={person?.user.approved ? 'OrderListScreen' : 'ApprovalScreen'}
+      initialRouteName={person?.user.approved ? 'OrderListScreen' : 'ApprovalScreen'}
       screenOptions={customOptions}>
       <Stack.Screen name='OrderListScreen' component={OrderListScreen} />
       <Stack.Screen name='ApprovalScreen' component={ApprovalScreen} />
       <Stack.Screen name='OrderScreen' component={OrderScreen} />
-      <Stack.Screen name='DriverMap' component={MockScreen} />
     </Stack.Navigator>
   );
 };

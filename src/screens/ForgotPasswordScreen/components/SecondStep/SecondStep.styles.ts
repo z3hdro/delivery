@@ -26,11 +26,12 @@ export const useStyles = () => {
     cellContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      width: 50,
+      width: 60,
       height: 60,
       borderRadius: 5,
-      borderWidth: 2,
-      borderColor: colors.color5,
+      // borderWidth: 2,
+      // borderColor: colors.color5,
+      backgroundColor: colors.color6,
     },
     cell: {
       fontFamily: 'Roboto-Bold',

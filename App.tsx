@@ -5,15 +5,17 @@ import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import YaMap, { Geocoder } from 'react-native-yamap';
+
 import { RootNavigator } from 'navigation/RootNavigator';
 import { AppProvider } from 'providers/AppProvider';
 import { LocationWrapper } from 'wrapper/LocationWrapper';
 import yandexConfig from './secrets/yandex_config.json';
 
 import 'localization/i18n.config';
-import YaMap from 'react-native-yamap';
 
 void YaMap.init(yandexConfig.API_KEY);
+void Geocoder.init(yandexConfig.GEOCODER_API_KEY);
 
 const App = () => {
   const [fontsLoaded, fontError] = useFonts({

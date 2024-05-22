@@ -38,15 +38,15 @@ export const RegistrationScreen = () => {
 
       await appStorage.storeData(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
       await appStorage.storeData(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-      await appStorage.storeData(STORAGE_KEYS.ROLE, user.role);
+      await appStorage.storeData(STORAGE_KEYS.ROLE, user.role.name);
 
-      setPersonRole(user.role);
+      setPersonRole(user.role.name);
 
       const { person= null } = await networkService.getUserData();
       setCurrentPerson(person);
     } catch (e) {
       const error = e as AxiosError;
-      console.log(error?.response?.data ?? error);
+      console.log('registration screen error: ', error?.response?.data ?? error);
     }
   }, [deviceToken, password, phone, setCurrentPerson, setPersonRole]);
 

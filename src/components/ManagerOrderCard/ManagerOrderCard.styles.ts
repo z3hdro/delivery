@@ -29,6 +29,9 @@ export const useStyles = () => {
       justifyContent: 'space-between',
       alignItems: 'center'
     },
+    cell: {
+      width: '33%',
+    },
     infoLabel: {
       color: colors.color7,
       fontFamily: 'Roboto',

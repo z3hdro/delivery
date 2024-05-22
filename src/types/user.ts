@@ -1,23 +1,55 @@
-export type User = {
+import { Job } from 'types/jobs';
+
+export type Role = {
+  id: number
+  name: string
+}
+
+export type UserFull = {
+  id: number
   phone: string
-  role: string
+  role_id: number
   approved: boolean
+  responsible_user: number | null,
+  createdAt: string
+  updatedAt: string
+  role: Role
+}
+
+export type User = UserFull & {
+  password: string
+  refresh_token: string
+  fcm_token: string | null,
 }
 
 export type UserPerson = {
   id: number
   phone: string
   approved: boolean
+  role: Role
 }
 
 export type Contragent = {
-  id: 0,
+  id: 0
   name: string
   inn: string
   kpp: string
   supplier: boolean
   buyer: boolean
   transport_company: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type Passport = {
+  id: number
+  series: number
+  number: number
+  authority: string
+  date_of_issue: string
+  department_code: string
+  createdAt: string
+  updatedAt: string
 }
 
 export type PersonJobPosition = {
@@ -26,35 +58,44 @@ export type PersonJobPosition = {
 }
 
 export type Person = {
+  id: number
+  user_id: number
   user: UserPerson
   contragent: Contragent
   jobPosition: PersonJobPosition
+
 }
 
 export type ApprovedDriver = {
   id: number
+  user_id: number
   name: string
   surname: string
   patronymic: string
-  inn: string
+  job_position_id: number | null
+  inn: string | null
+  passport_id: number
   self_employed: boolean
   individual: boolean
   company: boolean
-  email: string
-  telegram: string
-  user_id: number,
-  job_position_id: number,
-  passport_id: number,
-  contragent_id: number
+  contragent_id: number | null
+  email: string | null
+  telegram: string | null
+  createdAt: string
+  updatedAt: string
+  user: UserFull
+  contragent: Contragent | null,
+  jobPosition: Job | null,
+  passport: Passport | null
 }
 
 export type UnapprovedDriver = {
   id: number
   phone: string
-  password: string
   role_id: number
   approved: boolean
-  responsible_user: number
-  refresh_token: string
-  fcm_token: string
+  responsible_user: number | null
+  createdAt: string
+  updatedAt: string
+  role: Role
 }

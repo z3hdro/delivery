@@ -6,6 +6,9 @@ import { ViewOrderScreen } from 'screens/ViewOrderScreen';
 import { NomenclatureViewScreen } from 'screens/NomenclatureViewScreen';
 import { UserViewScreen } from 'screens/UserViewScreen';
 import { ShippingPointViewScreen } from 'screens/ShippingPointViewScreen';
+import { SelectMeasureScreen } from 'screens/SelectMeasureScreen';
+import { SelectCargoScreen } from 'screens/SelectCargoScreen';
+import { SelectLogisticPointScreen } from 'screens/SelectLogisticPointScreen';
 
 import { ManagerStackParamList } from 'types/navigation';
 
@@ -22,6 +25,9 @@ export const ManagerNavigator = () => {
       <Stack.Screen name='NomenclatureViewScreen' component={NomenclatureViewScreen} />
       <Stack.Screen name='UserViewScreen' component={UserViewScreen} />
       <Stack.Screen name='ShippingPointViewScreen' component={ShippingPointViewScreen} />
+      <Stack.Screen name='SelectMeasureScreen' component={SelectMeasureScreen} />
+      <Stack.Screen name='SelectCargoScreen' component={SelectCargoScreen} />
+      <Stack.Screen name='SelectLogisticPointScreen' component={SelectLogisticPointScreen} />
     </Stack.Navigator>
   );
 };

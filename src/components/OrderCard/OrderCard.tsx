@@ -1,14 +1,18 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { View, Text } from 'react-native';
 import { OrderCardLabel } from 'components/OrderCardLabel';
 import { RoundButton } from 'components/RoundButton';
+import { OrderDriverView } from 'components/OrderDriverView';
 import { selectStatusLabel } from './OrderCard.utils';
+import { getCostType } from 'utils/costType';
 import { ICON_WIDTH } from './OrderCard.consts';
 import { ORDER_STATUS } from 'constants/order';
 import { useStyles } from './OrderCard.styles';
 import { Props } from './OrderCard.types';
 
 import { PathIcon, TrackIcon } from 'src/assets/icons';
+import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
+import { getWeightLabel } from 'utils/getWeightLabel';
 
 export const OrderCard: FC<Props> = ({
   order,
@@ -22,13 +26,25 @@ export const OrderCard: FC<Props> = ({
 
   const statusLabel = selectStatusLabel(order.status);
 
+  const [nomenclatureLabel, totalGrossWeight, totalNetWeight] = useMemo(() => {
+    if (order.nomenclatures) {
+      const label = getNomenclatureLabel(order.nomenclatures);
+      const grossLabel = getWeightLabel(order.nomenclatures, 'gross_weight');
+      const netLabel = getWeightLabel(order.nomenclatures, 'net_weight');
+
+      return [label, grossLabel, netLabel];
+    }
+    return ['', '', ''];
+  }, [order.nomenclatures]);
+
   return (
     <View style={styles.container}>
       <OrderCardLabel
         firstLabel={t('Orders_item_source')}
-        firstSubtitle={order.departure.address.city}
-        secondLabel={t('Orders_item_destination')}
-        secondSubtitle={order.destination.address.city}
+        firstSubtitle={order.departure.Address.City.name}
+        secondLabel={getCostType(order.cost_type)}
+        thirdLabel={t('Orders_item_destination')}
+        thirdSubtitle={order.destination.Address.City.name}
       />
       <View style={styles.iconContainer}>
         <View style={styles.track}>
@@ -36,15 +52,25 @@ export const OrderCard: FC<Props> = ({
         </View>
         <PathIcon width={ICON_WIDTH} height={12} />
       </View>
-      <Text style={styles.nomenclature}>
-        {order.nomenclature.name}
-      </Text>
+      {order.nomenclatures?.length && (
+        <Text style={styles.nomenclature}>
+          {nomenclatureLabel}
+        </Text>
+      )}
+      {isDriver && (
+        <OrderDriverView
+          firstLabel={`${order.price_non_cash} р.`}
+          secondLabel={getCostType(order.cost_type)}
+          thirdLabel={`${order.price_cash} р.`}
+        />
+      )}
       {isManager && (
         <OrderCardLabel
           firstLabel={t('Order_gross_weight')}
-          firstSubtitle={`${order.grossWeight} ${order.nomenclature.measureName}.`}
-          secondLabel={t('Order_net_weight')}
-          secondSubtitle={`${order.netWeight} ${order.nomenclature.measureName}.`}
+          firstSubtitle={totalGrossWeight}
+          secondLabel={getCostType(order.cost_type)}
+          thirdLabel={t('Order_net_weight')}
+          thirdSubtitle={totalNetWeight}
         />
       )}
       {detailedView && (
@@ -53,7 +79,7 @@ export const OrderCard: FC<Props> = ({
             {t('Order_status')}
           </Text>
           <Text style={[styles.statusText,
-            order.status === ORDER_STATUS.WAITING_APPROVAL && styles.statusApprovalText]}>
+            order.status === ORDER_STATUS.CREATED && styles.statusApprovalText]}>
             {t(statusLabel)}
           </Text>
         </>

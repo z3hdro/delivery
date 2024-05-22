@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Text, View } from 'react-native';
 
 import { RoundButton } from 'components/RoundButton';
+import { formatPhoneNumber } from 'utils/phone';
 import { useStyles } from './UserCard.styles';
 import { Props } from './UserCard.types';
 
@@ -18,7 +19,7 @@ export const UserCard: FC<Props> = ({
         {t('DriverList_waiting_approval_first_label')}
       </Text>
       <Text style={styles.value}>
-        {user.phone}
+        {formatPhoneNumber(user.phone)}
       </Text>
       <RoundButton
         style={styles.button}

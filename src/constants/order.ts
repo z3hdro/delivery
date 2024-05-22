@@ -1,7 +1,10 @@
 export enum ORDER_STATUS {
-  WAITING_APPROVAL,
-  APPROVED,
-  IN_PROGRESS
+  CREATED = 'created',
+  CONFIRMATION = 'confirmation',
+  LOADING = 'loading',
+  DEPARTED = 'departed',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
 }
 
 export enum ORDER_LIST {
@@ -14,4 +17,16 @@ export enum CARGO_KEYS {
   NAME = 'name',
   GROSS_WEIGHT = 'grossWeight',
   NET_WEIGHT = 'netWeight',
+}
+
+export enum ORDER_TAB_STATUS {
+  ALL = 'all',
+  CONFIRMATION = 'confirmation',
+  IN_WORK = 'inwork',
+  AVAILABLE = 'available'
+}
+
+export enum COST_TYPE {
+  TON =  'ton',
+  ROUTE = 'route'
 }

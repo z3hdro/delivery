@@ -11,4 +11,6 @@ export type Props = {
   labelStyle?: TextStyle;
   type?: INFO_SECTION_TYPE;
   keyboardType?: KeyboardTypeOptions;
+  minimumDate?: Date;
+  onNavigate?: () => void;
 }

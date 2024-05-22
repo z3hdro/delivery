@@ -18,9 +18,8 @@ export const LoginScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { navigate } = useLoginNavigator();
-  const { deviceToken, setCurrentPerson, setPersonRole } = useAppData();
+  const { deviceToken, setCurrentPerson, setDriverOrder, setPersonRole } = useAppData();
 
-  // TODO: change when API will be done
   const [phone, setPhone] = useState<string>(DRIVER_PHONE);
   const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
   const [errorText, setErrorText] = useState<string>('');
@@ -44,12 +43,23 @@ export const LoginScreen = () => {
 
       await appStorage.storeData(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
       await appStorage.storeData(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-      await appStorage.storeData(STORAGE_KEYS.ROLE, user.role);
+      await appStorage.storeData(STORAGE_KEYS.ROLE, user.role.name);
 
-      setPersonRole(user.role);
+      setPersonRole(user.role.name);
 
       const { person= null } = await networkService.getUserData();
       setCurrentPerson(person);
+      if (person?.user.role.name === 'driver') {
+        try {
+          const { order } = await networkService.getCurrentOrder();
+          setDriverOrder(order);
+        } catch (e) {
+          const error = e as AxiosError;
+          if (error?.response?.status === 404) {
+            setDriverOrder(null);
+          }
+        }
+      }
     } catch (e) {
       const error = e as AxiosError;
       if (error?.response?.status === 401) {

@@ -1,5 +1,41 @@
-import { EMPTY_COMPANY, EMPTY_PASSPORT, EMPTY_PERSON } from './UserViewScreen.consts';
+import { Option } from 'types/picker';
 
-export type Person = typeof EMPTY_PERSON;
-export type Passport = typeof EMPTY_PASSPORT & { photo: string[] }
-export type Company = typeof EMPTY_COMPANY
+export type ImageFile = {
+  uri: string
+  name?: string
+  type: string
+}
+
+export type PersonData = {
+  id: number
+  phone: string
+  name: string
+  surname: string
+  patronymic: string
+  inn: string | null
+  self_employed: boolean
+  individual: boolean
+  company: boolean
+  jobPosition: Option | null
+  email: string | null
+  telegram: string | null
+}
+
+export type Passport = {
+  series: string
+  number: string
+  authority: string
+  date_of_issue: string
+  department_code: string
+}
+
+export type PassportData = Passport & { photo: string[] }
+
+export type CompanyData = {
+  name: string
+  inn: string
+  kpp: string
+  supplier: boolean
+  buyer: boolean
+  transport_company: boolean
+}

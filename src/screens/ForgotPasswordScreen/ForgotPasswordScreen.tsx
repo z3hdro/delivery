@@ -3,20 +3,22 @@ import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useLoginNavigator } from 'navigation/hooks';
+import { networkService } from 'services/network';
 import { Screen } from 'components/Screen';
-import { NUMBER_OF_CELLS } from './ForgotPasswordScreen.consts';
-import { useStyles } from './ForgotPasswordScreen.styles';
 import { Preloader } from 'components/Preloader';
 import { FirstStep, SecondStep, ThirdStep } from './components';
+import { NUMBER_OF_CELLS } from './ForgotPasswordScreen.consts';
+import { useStyles } from './ForgotPasswordScreen.styles';
 
 export const ForgotPasswordScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { goBack } = useLoginNavigator();
 
-  // TODO: change when API will be done
+  // TODO: should we display errors ?
   const [step, setStep] = useState<number>(1);
   const [userPhone, setUserPhone] = useState<string>('');
+  const [userCode, setUserCode] = useState<string>('');
   // const [errorText, setErrorText] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -27,11 +29,8 @@ export const ForgotPasswordScreen = () => {
         return;
       }
 
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(true);
-        }, 1000);
-      });
+      await networkService.recover(phone);
+
       setStep(2);
       setUserPhone(phone);
     } catch (e) {
@@ -52,16 +51,13 @@ export const ForgotPasswordScreen = () => {
     try {
       setIsLoading(true);
 
-      if (code.length !== NUMBER_OF_CELLS) {
+      if (!userPhone.trim().length || code.length !== NUMBER_OF_CELLS) {
         return;
       }
 
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(true);
-        }, 1000);
-      });
+      await networkService.checkcode({ phone: userPhone, code });
       setStep(3);
+      setUserCode(code);
 
     } catch (e) {
       console.log('onSendConfirmCode error: ', e);
@@ -69,7 +65,7 @@ export const ForgotPasswordScreen = () => {
       setIsLoading(false);
 
     }
-  }, []);
+  }, [userPhone]);
 
   const restorePassword = useCallback(async (password: string, confirmPassword: string) => {
     try {
@@ -79,6 +75,11 @@ export const ForgotPasswordScreen = () => {
         return;
       }
 
+      await networkService.resetPassword({
+        phone: userPhone,
+        code: userCode,
+        password,
+      });
       await new Promise((resolve) => {
         setTimeout(() => {
           resolve(true);
@@ -93,7 +94,7 @@ export const ForgotPasswordScreen = () => {
       setIsLoading(false);
 
     }
-  }, [goBack]);
+  }, [userPhone, userCode, goBack]);
 
   const renderContent = useCallback(() => {
     if (step === 1) {

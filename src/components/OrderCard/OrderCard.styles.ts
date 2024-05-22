@@ -31,13 +31,15 @@ export const useStyles = () => {
       marginBottom: -6
     },
     nomenclature: {
-      marginTop: 8,
+      maxWidth: '90%',
+      marginVertical: 8,
       color: colors.color2,
       fontFamily: 'Roboto-Bold',
       fontSize: 18,
       fontStyle: 'normal',
       fontWeight: '600',
       lineHeight: 26,
+      textAlign: 'center',
     },
     statusLabel: {
       marginTop: 14,

@@ -1,4 +1,3 @@
-
 import { StyleSheet } from 'react-native';
 import { colors } from 'constants/colors';
 
@@ -10,7 +9,10 @@ export const useStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between'
     },
-    cityLabel: {
+    cell: {
+      flexGrow: 1,
+    },
+    price: {
       color: colors.color7,
       fontFamily: 'Roboto',
       fontSize: 10,
@@ -30,6 +32,19 @@ export const useStyles = () => {
     },
     rightCityDescription: {
       alignItems: 'flex-end'
+    },
+    route: {
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    routeLabel: {
+      color: colors.color2,
+      fontFamily: 'Roboto',
+      fontSize: 12,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 14,
+      letterSpacing: 0.2,
     },
   });
 };

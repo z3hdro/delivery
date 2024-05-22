@@ -1,11 +1,12 @@
-import React, { FC, useCallback, useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { DeviceEventEmitter, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { format } from 'date-fns';
 import { useStyles } from './InfoSection.styles';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { DISPLAY_DATE_FORMAT } from './InfoSection.consts';
 import { Props } from './InfoSection.types';
 import DatePicker from 'react-native-date-picker';
+import { EMIT_EVENTS } from 'constants/emitEvents';
 
 export const  InfoSection: FC<Props> = ({
   label,
@@ -17,10 +18,22 @@ export const  InfoSection: FC<Props> = ({
   labelStyle,
   type = INFO_SECTION_TYPE.INPUT,
   keyboardType,
+  minimumDate = new Date(),
+  onNavigate,
 }) => {
   const styles = useStyles();
   const [inputValue, setInputValue] = useState<string>(value);
   const [open, setOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(EMIT_EVENTS.RESET_SECTION, () => {
+      setInputValue('');
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const onTogglePicker = useCallback(() => {
     setOpen(prevState => !prevState);
@@ -39,32 +52,52 @@ export const  InfoSection: FC<Props> = ({
 
   const onUpdateDate = useCallback((date: Date) => {
     if (onUpdate) {
-      onUpdate(date.toISOString());
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+      onUpdate(selectedDate.toISOString());
     }
     onClosePicker();
   }, [onClosePicker, onUpdate]);
-  
+
+  const renderContent = () => {
+    if (type === INFO_SECTION_TYPE.DATE_PICKER) {
+      return (
+        <TouchableOpacity style={styles.valueContainer} onPress={onTogglePicker}>
+          <Text style={styles.value}>
+            {value ? format(value, DISPLAY_DATE_FORMAT) : ''}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    if (type === INFO_SECTION_TYPE.SCREEN) {
+      return (
+        <TouchableOpacity style={styles.valueContainer} onPress={onNavigate}>
+          <Text style={styles.value}>
+            {value ?? ''}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <TextInput
+        keyboardType={keyboardType}
+        style={[styles.textInput, !editable && styles.displayText, textInputStyle]}
+        value={inputValue}
+        onChangeText={onChangeText}
+        editable={editable}
+      />
+    );
+  };
+
   return (
     <>
       <View style={style}>
         <Text style={[styles.label, labelStyle]}>
           {label}
         </Text>
-        {type === INFO_SECTION_TYPE.DATE_PICKER ? (
-          <TouchableOpacity style={styles.valueContainer} onPress={onTogglePicker}>
-            <Text style={styles.value}>
-              {value ? format(value, DISPLAY_DATE_FORMAT) : ''}
-            </Text>
-          </TouchableOpacity>
-        ) : (
-          <TextInput
-            keyboardType={keyboardType}
-            style={[styles.textInput, !editable && styles.displayText, textInputStyle]}
-            value={inputValue}
-            onChangeText={onChangeText}
-            editable={editable}
-          />
-        )}
+        {renderContent()}
       </View>
 
       {type === INFO_SECTION_TYPE.DATE_PICKER && (
@@ -72,13 +105,12 @@ export const  InfoSection: FC<Props> = ({
           modal
           mode={'date'}
           open={open}
-          minimumDate={new Date()}
+          minimumDate={minimumDate}
           date={value ? new Date(value) : new Date()}
           onConfirm={onUpdateDate}
           onCancel={onClosePicker}
         />
       )}
     </>
-
   );
 };

@@ -1,8 +1,11 @@
-import { MockShippingPoint } from 'mocks/mockShippingPoints';
-import { EMPTY_ADDRESS, EMPTY_CONTACT } from './ShippingPointViewScreen.consts';
-import { Address, Contact, ExpandedMap } from './ShippingPointViewScreen.types';
+import { parseGeo } from 'utils/geo';
+import { EMPTY_ADDRESS } from './ShippingPointViewScreen.consts';
+import { EMPTY_CONTACT } from 'constants/contact';
+import { AddressView, ContactView, ExpandedMap } from './ShippingPointViewScreen.types';
+import { LogisticPoint } from 'services/network/types';
+import { GeoPosition } from 'types/geolocation';
 
-export const createInitialExpandMap = (point?: MockShippingPoint): ExpandedMap => {
+export const createInitialExpandMap = (point?: LogisticPoint): ExpandedMap => {
   if (!point) {
     return { 0: false } as ExpandedMap;
   }
@@ -10,50 +13,56 @@ export const createInitialExpandMap = (point?: MockShippingPoint): ExpandedMap =
   return Object.fromEntries(point.contacts.map((_, index) => ([index, false])));
 };
 
-export const createInitialAddressData = (point?: MockShippingPoint): Address => {
+export const createInitialAddressData = (point?: LogisticPoint): AddressView => {
   if (!point) {
     return { ...EMPTY_ADDRESS };
   }
 
   const {
-    country,
-    city,
-    street,
+    City: {
+      name: city
+    },
+    Street: {
+      name: street
+    },
+    name,
     house,
     building,
     floor,
     postcode,
-    apartment,
-    description,
-  } = point.address;
+    apartment = '',
+    description = '',
+  } = point.Address;
 
   return {
-    country,
-    city,
+    name,
+    city: priceLabel,
     street,
     house,
     building,
     floor,
-    postcode,
     apartment,
+    postcode,
     description
   };
 };
 
-export const createInitialContactData = (point?: MockShippingPoint): Contact[] => {
+export const createInitialContactData = (point?: LogisticPoint): ContactView[] => {
   if (!point) {
     return [{ ...EMPTY_CONTACT }];
   }
 
   return point.contacts.map(({
-    name,
-    surname,
-    patronymic,
-    jobTitle,
-    phone,
-    email,
-    telegram,
-    description
+    contact: {
+      name,
+      surname,
+      patronymic,
+      jobTitle,
+      phone,
+      email = '',
+      telegram= '',
+      description = ''
+    }
   }) => ({
     name,
     surname,
@@ -64,4 +73,12 @@ export const createInitialContactData = (point?: MockShippingPoint): Contact[] =
     telegram,
     description
   }));
+};
+
+export const createInitialGeoData = (point?: LogisticPoint): GeoPosition => {
+  if (!point || !point.geo) {
+    return { lat: 0, lon: 0 };
+  }
+
+  return parseGeo(point.geo);
 };

@@ -1,68 +1,71 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { ManagerOrderCard } from 'components/ManagerOrderCard';
 import { Preloader } from 'components/Preloader';
+import { networkService } from 'services/network';
 import { useManagerNavigator } from 'navigation/hooks';
 import { useStyles } from './WaitingApprovalList.styles';
-import { ORDER_LIST } from 'constants/order';
-import { MOCK_ORDERS, MockOrder } from 'mocks/mockOrders';
-import { MOCK_ORDERS_PAGINATE } from 'mocks/mockOrdersPagination';
+import { ORDER_LIST, ORDER_TAB_STATUS } from 'constants/order';
+import { MEASURE_LIMIT } from 'constants/limit';
+import { Order } from 'types/order';
 
 export const WaitingApprovalList = () => {
   const { t } = useTranslation();
   const { navigate } = useManagerNavigator();
   const styles = useStyles();
 
-  const [data, setData] = useState<MockOrder[]>([]);
-  // const [page, setPage] = useState<number>(0);
+  const [data, setData] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [offset, setOffset] = useState<number>(0);
+  const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
-  useEffect(() => {
-    void (async () => {
-      try {
-        // TODO: replace by API
-        const result: MockOrder[] = await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(MOCK_ORDERS);
-          }, 1000);
-        });
-        setData(result);
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, []);
+  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
 
-  // TODO: replace by API
-  const fetchMoreData = useCallback(async () => {
+  const fetchData = useCallback(async (offset: number) => {
     try {
       setIsLoading(true);
-      const result: MockOrder[] = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(MOCK_ORDERS_PAGINATE);
-        }, 1000);
-      });
-
-      if (result.length) {
-        setData(prevState => ([...prevState, ...result]));
-        // setPage(prevState => prevState + 1);
+      const { orders } = await networkService.getAllOrders(offset, ORDER_TAB_STATUS.CONFIRMATION);
+      if (Array.isArray(orders)) {
+        setData((prevState) => offset === 0 ? orders : ([...prevState, ...orders]));
+        setOffset((prevState) => prevState + 1);
       }
     } catch (e) {
-      console.log(e);
+      console.log('waiting approval list e: ', e);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const onApprovePress = useCallback( (order: MockOrder) => {
-    navigate('ViewOrderScreen', { order, type: ORDER_LIST.WAITING_APPROVAL });
+  useEffect(() => {
+    void (async () => {
+      if (shouldRefresh) {
+        await fetchData(0);
+      }
+      setShouldRefresh(false);
+    })();
+  }, [fetchData, shouldRefresh]);
+
+  const onEndReached = useCallback(async () => {
+    if (isLimitReached) {
+      return;
+    } else {
+      await fetchData(offset);
+    }
+  }, [fetchData, isLimitReached, offset]);
+
+  const onApprovePress = useCallback( (order: Order) => {
+    navigate('ViewOrderScreen', {
+      order, type:
+      ORDER_LIST.WAITING_APPROVAL,
+      onUpdate: () => {
+        setShouldRefresh(true);
+      }
+    });
   }, [navigate]);
 
-  const renderItem = useCallback(({ item }: { item: MockOrder}) => (
+  const renderItem = useCallback(({ item }: { item: Order}) => (
     <ManagerOrderCard
       order={item}
       buttonTitle={t('CargoList_waiting_approval_button')}
@@ -80,8 +83,8 @@ export const WaitingApprovalList = () => {
         keyExtractor={item => item.id.toString()}
         data={data}
         renderItem={renderItem}
-        onEndReachedThreshold={0.2}
-        onEndReached={fetchMoreData}
+        onEndReachedThreshold={0.5}
+        onEndReached={onEndReached}
       />
     </>
   );

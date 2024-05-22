@@ -67,5 +67,8 @@ export const useStyles = () => {
       fontFamily: 'Roboto-Bold',
       letterSpacing: 1
     },
+    deleteButton: {
+      paddingTop: 16,
+    }
   }), [bottom]);
 };

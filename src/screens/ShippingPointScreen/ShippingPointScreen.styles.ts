@@ -79,6 +79,19 @@ export const useStyles = () => {
     },
     section: {
       marginTop: 8,
+    },
+    emptyBox: {
+      marginTop: 32,
+      flex: 1,
+      alignItems: 'center',
+    },
+    emptyText: {
+      color: colors.color2,
+      fontFamily: 'Roboto',
+      fontStyle: 'normal',
+      fontWeight: '400',
+      fontSize: 14,
+      lineHeight: 16,
     }
   }), [bottom]);
 };

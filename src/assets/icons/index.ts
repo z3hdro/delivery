@@ -21,3 +21,4 @@ export { default as XIcon } from './x_icon.svg';
 export { default as DeparturePointIcon } from './departure_point_icon.svg';
 export { default as DeliveryPointIcon } from './delivery_point_icon.svg';
 export { default as LogoutIcon } from './logout_icon.svg';
+export { default as AddressMarkerIcon } from './address_marker_icon.svg';

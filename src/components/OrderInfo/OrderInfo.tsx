@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 
-import { generateLabel } from './OrderInfo.utils';
+import { formatAddress } from 'utils/address';
 import { PLAN_DATE_FORMAT } from './OrderInfo.consts';
 import { useStyles } from './OrderInfo.styles';
 import { Props } from './OrderInfo.types';
@@ -18,7 +18,7 @@ export const OrderInfo: FC<Props> = ({
   const { t } = useTranslation();
   const styles = useStyles();
 
-  const addressLabel = useMemo(() => generateLabel(address), [address]);
+  const addressLabel = useMemo(() => formatAddress(address), [address]);
 
   return (
     <View style={[styles.container, style]}>
@@ -46,7 +46,7 @@ export const OrderInfo: FC<Props> = ({
             {t('Order_delivery_contacts')}
           </Text>
           {contacts.map((contact) => {
-            const fullName = `${contact.surname} ${contact.name} ${contact.partonymic}`;
+            const fullName = `${contact.surname} ${contact.name} ${contact.patronymic}`;
 
             return (
               <View key={`${contact.phone}_${fullName}`} style={styles.contactItem}>

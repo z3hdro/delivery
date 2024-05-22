@@ -5,3 +5,7 @@ export * from './user';
 export * from './infoSection';
 export * from './geolocation';
 export * from './map';
+export * from './limit';
+export * from './contact';
+export * from './emitEvents';
+export * from './weight';

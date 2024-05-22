@@ -1,46 +1,61 @@
 import React, { useCallback, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { ScreenHeader } from 'components/ScreenHeader';
 import { Screen } from 'components/Screen';
 import { InfoSection } from 'components/InfoSection';
-import { DeparturePointPicker } from 'components/DeparturePointPicker';
-import { DeliveryPointPicker } from 'components/DeliveryPointPicker';
 import { Button } from 'components/Button';
-import { CargoPicker } from 'components/CargoPicker';
 import { RoundButton } from 'components/RoundButton';
 import { Checkbox } from 'components/Checkbox';
-import {
-  EMPTY_CARGO_DATA,
-  INITIAL_CARGO_DATA,
-  INITIAL_ORDER_DATA,
-  PRICE_OPTION
-} from './CreateOrderScreen.consts';
-import { CARGO_KEYS } from 'constants/order';
+import { useManagerNavigator } from 'navigation/hooks';
+import { EMPTY_CARGO_DATA, INITIAL_CARGO_DATA } from './CreateOrderScreen.consts';
+import { CARGO_KEYS, COST_TYPE } from 'constants/order';
 import { colors } from 'constants/colors';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { useStyles } from './CreateOrderScreen.styles';
-import { Cargo, OrderData } from './CreateOrderScreen.types';
+import { Cargo, LogisticPointView } from './CreateOrderScreen.types';
+import { Nomenclature } from 'types/nomenclature';
 
-import { PlusIcon } from 'src/assets/icons';
+import { PlusIcon, XIcon } from 'src/assets/icons';
+import { networkService } from 'services/network';
+import { LogisticPoint } from 'services/network/types';
+import { AxiosError } from 'axios';
+import { EMIT_EVENTS } from 'constants/emitEvents';
 
 export const CreateOrderScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
+  const { navigate } = useManagerNavigator();
 
-  const [orderData, setOrderData] = useState<OrderData>(INITIAL_ORDER_DATA);
-  const [departure, setDeparture] = useState<string | null>(null);
-  const [delivery, setDelivery] = useState<string | null>(null);
+  const [departure, setDeparture] = useState<LogisticPointView | null>(null);
+  const [delivery, setDelivery] = useState<LogisticPointView | null>(null);
   const [departureDatePlan, setDepartureDatePlan] = useState<string>('');
   const [deliveryDatePlan, setDeliveryDatePlan] = useState<string>('');
   const [cargoData, setCargoData] = useState<Cargo[]>(INITIAL_CARGO_DATA);
+  const [costType, setCostType] = useState<COST_TYPE>(COST_TYPE.ROUTE);
+  const [cashPrice, setCashPrice] = useState<string>('');
+  const [cashlessPrice, setCashlessPrice] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [priceOption, setPriceOption] = useState<PRICE_OPTION>(PRICE_OPTION.FULL);
 
   const onAddCargo = useCallback(() => {
     setCargoData((prevState) => ([...prevState, { ...EMPTY_CARGO_DATA }]));
   }, []);
+
+  const resetForm = useCallback(() => {
+    setDeparture(null);
+    setDelivery(null);
+    setDeliveryDatePlan('');
+    setDepartureDatePlan('');
+    setCostType(COST_TYPE.ROUTE);
+    setCargoData(INITIAL_CARGO_DATA);
+
+    DeviceEventEmitter.emit(EMIT_EVENTS.RESET_SECTION);
+  }, []);
+
+  console.log('cargoData: ', cargoData);
+  console.log('cashPrice: ', cashPrice);
+  console.log('cashlessPrice: ', cashlessPrice);
 
   const updateData = useCallback((index: number, key: CARGO_KEYS, value: string | null) => {
     setCargoData((prevState) => {
@@ -51,33 +66,98 @@ export const CreateOrderScreen = () => {
     });
   }, []);
 
-  const onChangeDeparture = useCallback((text: string | null) => {
-    setDeparture(text);
+  const onDeleteCargo = useCallback((selectedIndex: number) => {
+    setCargoData((prevState) =>
+      prevState.filter((_, index) => index !== selectedIndex)
+    );
   }, []);
 
-  const onChangeDelivery = useCallback((text: string | null) => {
-    setDelivery(text);
-  }, []);
-
-  const onChangeCargo = useCallback((index: number, text: string | null) => {
-    setCargoData((prevState) => {
-      const tempData =  [...prevState];
-      const cargoItem = tempData[index];
-      cargoItem.name = text;
-      return tempData;
+  const onNavigateCargo = useCallback((index: number) => {
+    navigate('SelectCargoScreen', {
+      onSelect: (item: Nomenclature) => {
+        setCargoData((prevState) => {
+          const tempData =  [...prevState];
+          const cargoItem = tempData[index];
+          cargoItem.name = item.name;
+          cargoItem.id = item.id;
+          return tempData;
+        });
+      }
     });
-  }, []);
+  }, [navigate]);
 
-  const onCreateOrder = useCallback(() => {
+  const onNavigateDeparture = useCallback(() => {
+    navigate('SelectLogisticPointScreen', {
+      onSelect: (item: LogisticPoint) => {
+        setDeparture({
+          id: item.id,
+          name: item.name
+        });
+      }
+    });
+  }, [navigate]);
+
+  const onNavigateDelivery = useCallback(() => {
+    navigate('SelectLogisticPointScreen', {
+      onSelect: (item: LogisticPoint) => {
+        setDelivery({
+          id: item.id,
+          name: item.name
+        });
+      }
+    });
+  }, [navigate]);
+
+  const onCreateOrder = async () => {
     try {
       setIsLoading(true);
+
+      if (
+        !departure?.id
+        || !delivery?.id
+        || !cashPrice.trim().length
+        || !cashlessPrice.trim().length
+        || !departureDatePlan
+        || !deliveryDatePlan
+        || !cargoData.every(({ id }) => !!id)
+        || !cargoData.length
+      ) {
+        Alert.alert(t('CreateOrder_error_title'), t('CreateOrder_error_message'));
+        return;
+      }
+
+      console.log('cargoData: ', cargoData);
+      const payload = {
+        departureId: departure.id,
+        destinationId: delivery.id,
+        costType,
+        priceNonCash: +cashlessPrice,
+        priceCash: +cashPrice,
+        plannedLoadingDate: departureDatePlan,
+        plannedDeliveryDate: deliveryDatePlan,
+        nomenclatures: cargoData
+          .map(({ id, grossWeight, netWeight }) =>
+            ({ id, grossWeight: +grossWeight, netWeight: +netWeight })
+          ),
+      };
+
+      console.log('payload: ', payload);
+
+      await networkService.addOrder(payload);
+
+      resetForm();
+
       return;
     } catch (e) {
-      console.log(e);
+      if (e instanceof AxiosError) {
+        console.log('e message: ', e?.message);
+        console.log('e status: ', e?.code);
+      }
+      console.log('onCreateOrder error', e);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   return (
     <Screen
@@ -88,39 +168,30 @@ export const CreateOrderScreen = () => {
         />
       }>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View>
-          <Text style={styles.label}>
-            {t('CreateOrder_first_section')}
-          </Text>
-          <DeparturePointPicker
-            value={departure}
-            onChangeValue={onChangeDeparture}
-          />
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.label}>
-            {t('CreateOrder_second_section')}
-          </Text>
-          <DeliveryPointPicker
-            value={delivery}
-            onChangeValue={onChangeDelivery}
-          />
-        </View>
+        <InfoSection
+          label={t('CreateOrder_first_section')}
+          value={departure?.name || ''}
+          onNavigate={onNavigateDeparture}
+          type={INFO_SECTION_TYPE.SCREEN}
+        />
+        <InfoSection
+          style={styles.section}
+          label={t('CreateOrder_second_section')}
+          value={delivery?.name || ''}
+          onNavigate={onNavigateDelivery}
+          type={INFO_SECTION_TYPE.SCREEN}
+        />
         <View style={styles.section}>
           {cargoData.map((cargo, index) => {
             return (
               <View key={`${index}_${cargo.name}`} style={styles.cargoRow}>
-                <View style={styles.cargoPicker}>
-                  <Text style={styles.label}>
-                    {t('CreateOrder_third_section')}
-                  </Text>
-                  <CargoPicker
-                    value={cargoData[index].name}
-                    onChangeValue={(text) => {
-                      onChangeCargo(index, text);
-                    }}
-                  />
-                </View>
+                <InfoSection
+                  style={styles.cargoPicker}
+                  label={t('CreateOrder_third_section')}
+                  value={cargoData[index].name || ''}
+                  onNavigate={() => onNavigateCargo(index)}
+                  type={INFO_SECTION_TYPE.SCREEN}
+                />
                 <InfoSection
                   style={styles.cargoWeight}
                   textInputStyle={styles.weightStyle}
@@ -143,6 +214,11 @@ export const CreateOrderScreen = () => {
                   }}
                   keyboardType={'numeric'}
                 />
+                <Pressable onPress={() => onDeleteCargo(index)}>
+                  <View style={styles.deleteButton}>
+                    <XIcon height={24} width={24} color={colors.color2} />
+                  </View>
+                </Pressable>
               </View>
             );
           })}
@@ -156,33 +232,35 @@ export const CreateOrderScreen = () => {
           <Checkbox
             style={styles.section}
             label={t('CreateOrder_price_first_option')}
-            value={priceOption === PRICE_OPTION.FULL}
+            value={costType === COST_TYPE.ROUTE}
             onPress={() => {
-              setPriceOption(PRICE_OPTION.FULL);
+              setCostType(COST_TYPE.ROUTE);
             }}
           />
           <Checkbox
             style={styles.section}
             label={t('CreateOrder_price_second_option')}
-            value={priceOption === PRICE_OPTION.PARTIAL}
+            value={costType === COST_TYPE.TON}
             onPress={() => {
-              setPriceOption(PRICE_OPTION.PARTIAL);
+              setCostType(COST_TYPE.TON);
             }}
           />
           <InfoSection
             style={styles.section}
             label={t('CreateOrder_sixth_section')}
-            value={departureDatePlan}
+            value={cashPrice}
+            keyboardType={'numeric'}
             onUpdate={(text) => {
-              setDepartureDatePlan(text);
+              setCashPrice(text);
             }}
           />
           <InfoSection
             style={styles.section}
             label={t('CreateOrder_seventh_section')}
-            value={departureDatePlan}
+            value={cashlessPrice}
+            keyboardType={'numeric'}
             onUpdate={(text) => {
-              setDepartureDatePlan(text);
+              setCashlessPrice(text);
             }}
           />
           <InfoSection

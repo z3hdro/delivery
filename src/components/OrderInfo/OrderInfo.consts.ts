@@ -1,1 +1,1 @@
-export const PLAN_DATE_FORMAT = 'dd.MM.yyyy в HH:mm';
+export const PLAN_DATE_FORMAT = 'dd.MM.yyyy';

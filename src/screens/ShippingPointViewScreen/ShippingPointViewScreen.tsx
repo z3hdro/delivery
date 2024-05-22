@@ -1,6 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import YaMap, { Geocoder, Marker } from 'react-native-yamap';
+
 import { ScreenHeader } from 'components/ScreenHeader';
 import { Preloader } from 'components/Preloader';
 import { Screen } from 'components/Screen';
@@ -8,30 +10,33 @@ import { InfoSection } from 'components/InfoSection';
 import { Button } from 'components/Button';
 import { RoundButton } from 'components/RoundButton';
 import { Accordion } from 'components/Accordion';
+import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
   createInitialAddressData,
   createInitialContactData,
-  createInitialExpandMap
+  createInitialExpandMap,
+  createInitialGeoData
 } from './ShippingPointViewScreen.utils';
 import { useStyles } from './ShippingPointViewScreen.styles';
 import { colors } from 'constants/colors';
+import { EMPTY_CONTACT } from 'constants/contact';
 import {
-  Address,
-  AddressKeys,
-  Contact,
-  ContactKeys,
+  AddressKeys, AddressView,
+  ContactKeys, ContactView,
   ExpandedMap
 } from './ShippingPointViewScreen.types';
+import { GeoPosition } from 'types/geolocation';
 
-import { BackIcon, PlusIcon, XIcon } from 'src/assets/icons';
-import { EMPTY_CONTACT } from 'screens/ShippingPointViewScreen/ShippingPointViewScreen.consts';
+import { AddressMarkerIcon, BackIcon, PlusIcon, XIcon } from 'src/assets/icons';
 
 export const ShippingPointViewScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { goBack } = useManagerNavigator();
-  const { params: { point } } = useManagerRoute<'ShippingPointViewScreen'>();
+  const { params: { point, onUpdate } } = useManagerRoute<'ShippingPointViewScreen'>();
+
+  console.log('point: ', JSON.stringify(point));
 
   const isEdit = useMemo(() => !!point, [point]);
 
@@ -41,15 +46,66 @@ export const ShippingPointViewScreen = () => {
   const [expandedContacts, setExpandedContacts] = useState<ExpandedMap>(
     createInitialExpandMap(point)
   );
-  const [addressData, setAddressData] = useState<Address>(
+  const [addressData, setAddressData] = useState<AddressView>(
     createInitialAddressData(point)
   );
-  const [contactData, setContactData] = useState<Contact[]>(
+  const [contactData, setContactData] = useState<ContactView[]>(
     createInitialContactData(point)
   );
-  const [contacts, setContacts] = useState<Contact[]>(
-    createInitialContactData(point)
-  );
+  const [geoPosition, setGeoPosition] = useState<GeoPosition>(createInitialGeoData(point));
+  const [isCanCancelContentTouches, setCanCancelContentTouches] = useState<boolean>(true);
+
+  const mapRef = useRef<YaMap | null>(null);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      console.log('geoPosition: ', geoPosition);
+      if (geoPosition.lat && geoPosition.lon) {
+        mapRef.current?.fitMarkers?.([geoPosition]);
+      } else {
+        mapRef.current?.fitAllMarkers?.();
+      }
+    }
+    // eslint-disable-next-line
+  }, [JSON.stringify(geoPosition)]);
+
+  const getGeoForAddress = useCallback(async (address: AddressView) => {
+    try {
+      let searchAddress = '';
+
+      if (addressData.name) {
+        searchAddress += `${addressData.name}`;
+      }
+
+      if (addressData.city) {
+        searchAddress += `${searchAddress.length ? ', ' : ''}` + address.city;
+      }
+
+      if (address.street) {
+        searchAddress += `${searchAddress.length ? ', ' : ''}` + address.street;
+      }
+
+      if (address.house) {
+        searchAddress += `${searchAddress.length ? ', ' : ''}` + address.house;
+      }
+
+      if (address.building) {
+        searchAddress += `${searchAddress.length ? ', ' : ''}` + address.building;
+      }
+
+      console.log('searchAddress: ', searchAddress);
+
+      const result = await Geocoder.addressToGeo(searchAddress);
+
+      if (result) {
+        setGeoPosition(result);
+      }
+      console.log('result of Geocoder: ', result);
+    } catch (e) {
+      console.log('error while Searching geo: ', e);
+    }
+    // eslint-disable-next-line
+  }, [JSON.stringify(addressData)]);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -81,9 +137,6 @@ export const ShippingPointViewScreen = () => {
 
   const onAddContact = useCallback(() => {
     setExpandedContacts((prevState) => ({ ...prevState, [contactData.length]: false }));
-    setContacts(
-      (prevState) => ([...prevState, { ...EMPTY_CONTACT }])
-    );
     setContactData(
       (prevState) => ([...prevState, { ...EMPTY_CONTACT }])
     );
@@ -99,9 +152,6 @@ export const ShippingPointViewScreen = () => {
       });
       return updatedMap;
     });
-    setContacts(
-      (prevState) => prevState.filter((_, index) => selectedIndex !== index)
-    );
     setContactData(
       (prevState) => prevState.filter((_, index) => selectedIndex !== index)
     );
@@ -111,51 +161,206 @@ export const ShippingPointViewScreen = () => {
     setExpandedContacts((prevState) => ({ ...prevState, [index]: value }));
   }, []);
 
-  const onSaveShippingPoint = useCallback(async () => {
+  const addLogisticPoint = useCallback(async (address: AddressView, contacts: ContactView[], geoData: GeoPosition) => {
     try {
       setIsLoading(true);
 
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(true);
-        }, 1500);
-      });
+      const addressPayload = {
+        name: address.name,
+        city: address.city,
+        street: address.street,
+        house: address.house,
+        building: address.building,
+        floor: +address.floor,
+        postcode: address.postcode,
+        description: address.description,
+      };
+
+      const { address: { id: addressId } } = await networkService.addAddress(addressPayload);
+      console.log('contacts: ', contacts);
+      const contactResult = await Promise.all(contacts.map((contact) => networkService.addContact(contact)));
+
+      if (addressId && contactResult.every(({ contact }) => !!contact.id)) {
+        await networkService.addLogisticPoint({
+          name,
+          addressId,
+          contacts: contactResult.map(({ contact }) => contact.id),
+          geo: geoData
+        });
+      }
+
+      onUpdate();
+      goBack();
     } catch (e) {
-      console.log(e);
+      console.log('adding shipping point error: ', e);
     } finally {
       setIsLoading(false);
     }
-    console.log('save position');
-  }, []);
+  }, [goBack, name, onUpdate]);
+
+  const updateLogisticPoint = useCallback(
+    async (address: AddressView, contacts: ContactView[], geoData: GeoPosition) => {
+      try {
+        setIsLoading(true);
+
+        console.log('contacts: ', contacts);
+
+        if (!point) {
+          return;
+        }
+
+        const addressPayload = {
+          name: address.name,
+          city: address.city,
+          street: address.street,
+          house: address.house,
+          building: address.building,
+          floor: +address.floor,
+          postcode: address.postcode,
+          description: address.description
+        };
+
+        const contactIds = point.contacts.map(({ contact_id }) => contact_id);
+
+        console.log('contactIds: ', contactIds);
+
+        const { id: addressId } = await networkService.updateAddress(addressPayload, point.Address.id);
+        const contactResult = await Promise.all(
+          contacts.map((contact, index) => {
+            console.log('contact: ', contact);
+            console.log('contactIds[index]: ', contactIds[index]);
+            return networkService.updateContact(contact, contactIds[index]);
+          })
+        );
+
+        console.log('contactResult: ', contactResult);
+
+        if (addressId && contactResult.every(({ id }) => !!id)) {
+          await networkService.updateLogisticPoint({
+            name,
+            addressId,
+            contacts: contactResult.map(({ id }) => id),
+            geo: geoData
+          }, point.id);
+        }
+
+        onUpdate();
+        goBack();
+      } catch (e) {
+        console.log('updating shipping point error: ', e);
+      } finally {
+        setIsLoading(false);
+      }
+    }, [goBack, name, onUpdate, point]);
 
   const onDeleteShippingPoint = useCallback(() => {
     console.log('delete position');
   }, []);
 
+  const onUpdateGeoInput = useCallback((text: string , key: string) => {
+    const updatedText = text.replace(/,/g, '');
+    setGeoPosition((prevState) => ({ ...prevState, [key]: +updatedText }));
+  }, []);
+
+  const onTouchStart = useCallback(() => {
+    setCanCancelContentTouches(false);
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    setCanCancelContentTouches(true);
+  }, []);
+
+  const onPress = isEdit ? updateLogisticPoint : addLogisticPoint;
+
   const renderAddressContent = useCallback(() => {
     const fields = Object.entries(addressData);
 
     return (
-      <View style={styles.addressBlock}>
-        {fields.map(([key, value], index) => {
-          return (
-            <InfoSection
-              key={`address_${key}`}
-              style={index > 0 ? styles.block : undefined}
-              textInputStyle={styles.addressTextInput}
-              label={t(`ShippingPointView_address_label_${index + 1}`)}
-              value={value}
-              onUpdate={(text) => {
-                onAddressUpdate(key as AddressKeys, text);
-              }}
-            />
-          );
-        })}
-      </View>
-    );
-  }, [addressData, onAddressUpdate, styles, t]);
+      <>
+        <View style={styles.addressBlock}>
+          {fields.map(([key, value], index) => {
+            return (
+              <InfoSection
+                key={`address_${key}`}
+                style={index > 0 ? styles.block : undefined}
+                textInputStyle={styles.addressTextInput}
+                label={t(`ShippingPointView_address_label_${index + 1}`)}
+                value={value}
+                onUpdate={(text) => {
+                  onAddressUpdate(key as AddressKeys, text);
+                }}
+              />
+            );
+          })}
+        </View>
 
-  const renderContactContent = useCallback((contact: Contact, innerIndex: number) => {
+        <RoundButton
+          style={styles.geoSearchButton}
+          textStyle={styles.geoSearchButtonText}
+          title={t('ShippingPointView_find_geo')}
+          onPress={() => getGeoForAddress(addressData)}
+        />
+
+        <View
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          style={styles.mapContainer}>
+
+          <View style={styles.geoPosition}>
+            <View style={styles.geoField}>
+              <Text style={styles.geoLabel}>
+                {t('Geo_lat')}
+              </Text>
+              <TextInput
+                keyboardType={'numeric'}
+                style={styles.geoInput}
+                value={String(geoPosition.lat)}
+                onChangeText={(text) => onUpdateGeoInput(text, 'lat')}
+              />
+            </View>
+
+            <View style={styles.geoField}>
+              <Text style={styles.geoLabel}>
+                {t('Geo_lon')}
+              </Text>
+              <TextInput
+                keyboardType={'numeric'}
+                style={styles.geoInput}
+                value={String(geoPosition.lon)}
+                onChangeText={(text) => onUpdateGeoInput(text, 'lon')}
+              />
+            </View>
+          </View>
+
+          <YaMap
+            ref={mapRef}
+            style={styles.map}
+            onMapLoaded={() => {
+              if (mapRef.current) {
+                mapRef.current?.fitAllMarkers?.();
+              }
+            }}
+          >
+            <Marker point={geoPosition} zIndex={10}>
+              <AddressMarkerIcon height={37} width={26} />
+            </Marker>
+          </YaMap>
+        </View>
+      </>
+    );
+  }, [
+    addressData,
+    styles,
+    t,
+    onTouchStart,
+    onTouchEnd,
+    geoPosition,
+    onAddressUpdate,
+    getGeoForAddress,
+    onUpdateGeoInput
+  ]);
+
+  const renderContactContent = useCallback((contact: ContactView, innerIndex: number) => {
     const fields = Object.entries(contact);
 
     return (
@@ -200,7 +405,12 @@ export const ShippingPointViewScreen = () => {
         />
       }>
       {isLoading && <Preloader style={styles.preloader} />}
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        canCancelContentTouches={isCanCancelContentTouches}
+        scrollEnabled={isCanCancelContentTouches}
+      >
         <View style={styles.section}>
           <InfoSection
             labelStyle={styles.nameLabel}
@@ -221,8 +431,8 @@ export const ShippingPointViewScreen = () => {
           content={renderAddressContent()}
         />
 
-        {!!contacts.length && contacts.map((_, index) => {
-          const selectedContact = contactData[index];
+        {!!contactData.length && contactData.map((contact, index) => {
+          // const selectedContact = contactData[index];
 
           return (
             <Accordion
@@ -233,7 +443,7 @@ export const ShippingPointViewScreen = () => {
               onPress={(value) => {
                 onExpandContact(index, value);
               }}
-              content={renderContactContent(selectedContact, index)}
+              content={renderContactContent(contact, index)}
             />
           );
         })}
@@ -250,7 +460,7 @@ export const ShippingPointViewScreen = () => {
           style={styles.primaryButton}
           textStyle={styles.primaryButtonText}
           title={t('ShippingPointView_save_button')}
-          onPress={onSaveShippingPoint}
+          onPress={() => onPress(addressData, contactData, geoPosition)}
           disabled={isLoading}
         />
         {isEdit && (

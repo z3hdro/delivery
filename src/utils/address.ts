@@ -2,19 +2,19 @@ import { Address } from 'types/address';
 
 export const formatAddress = (address: Address): string => {
   const {
-    city,
-    street,
+    City,
+    Street,
     house,
     building,
     name,
   } = address;
 
-  let result = city;
+  let result = City.name ?? '';
 
-  if (street) {
-    result += `, ${street}`;
+  if (Street?.name) {
+    result += `, ${Street.name}`;
   }
-  
+
   if (house) {
     result += `, ${house}`;
   }

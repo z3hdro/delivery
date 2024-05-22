@@ -31,7 +31,9 @@
       [
         "expo-location",
         {
+          "locationAlwaysAndWhenInUsePermission": "Allow delivery-app to use and track your location.",
           "locationAlwaysPermission": "Allow delivery-app to use and track your location.",
+          "locationWhenInUsePermission": "Allow delivery-app to use and track your location.",
           "isIosBackgroundLocationEnabled": true,
           "isAndroidBackgroundLocationEnabled": true
         }

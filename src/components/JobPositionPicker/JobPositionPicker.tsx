@@ -1,16 +1,11 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
 
+import { networkService } from 'services/network';
 import { useStyles } from './JobPositionPicker.styles';
 import { LABEL_FIELD, VALUE_FIELD } from './JobPositionPicker.consts';
 import { Props } from './JobPositionPicker.types';
 import { Option } from 'types/picker';
-
-const MOCK_DATA: Option[] = [
-  { label: 'Водитель', value: 'водитель' },
-  { label: 'Складщик', value: 'складщик' },
-  { label: 'Офис менеджер', value: 'офис менеджер' }
-];
 
 export const JobPositionPicker: FC<Props> = ({
   value,
@@ -19,12 +14,28 @@ export const JobPositionPicker: FC<Props> = ({
 }) => {
   const styles = useStyles();
 
-  const [selectedValue, setSelectedValue] = useState<string | null>(value ?? null);
-  const [data, setData] = useState<Option[]>(MOCK_DATA);
+  const [selectedValue, setSelectedValue] = useState<Option | null>(value ?? null);
+  const [data, setData] = useState<Option[]>([]);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const { jobs } = await networkService.getAllJobs();
+        if (jobs?.length) {
+          setData(jobs.map(({ id, name }) => ({
+            label: name,
+            value: id
+          })));
+        }
+      } catch (e) {
+        console.log('JobPositionPicker error: ', e);
+      }
+    })();
+  }, []);
 
   const onChange = useCallback((item: Option) => {
-    setSelectedValue(item.value);
-    onChangeValue(item.value);
+    setSelectedValue(item);
+    onChangeValue(item);
   }, [onChangeValue]);
 
   return (
@@ -37,7 +48,7 @@ export const JobPositionPicker: FC<Props> = ({
       onChange={onChange}
       labelField={LABEL_FIELD}
       valueField={VALUE_FIELD}
-      maxHeight={300}
+      maxHeight={400}
     />
   );
 };

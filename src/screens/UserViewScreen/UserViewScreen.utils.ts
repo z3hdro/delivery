@@ -1,21 +1,29 @@
 import { MockUser } from 'mocks/mockUsers';
 import { USER } from 'constants/user';
 import { MockDriver } from 'mocks/mockDrivers';
-import { Company, Passport, Person } from './UserViewScreen.types';
-import { EMPTY_COMPANY, EMPTY_PASSPORT, EMPTY_PERSON } from './UserViewScreen.consts';
+import { CompanyData, PassportData, PersonData } from './UserViewScreen.types';
+import {
+  COMPANY_TYPE,
+  EMPLOYMENT,
+  EMPTY_COMPANY,
+  EMPTY_PASSPORT,
+  EMPTY_PERSON,
+  PERSON_KEYS
+} from './UserViewScreen.consts';
+import { ApprovedDriver, UnapprovedDriver } from 'types/user';
 
-export const createPersonInitialState = (type: USER, driver?: MockDriver, user?: MockUser): Person => {
+export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): PersonData => {
   if (type === USER.WAITING_APPROVAL && user) {
-    return {  ...EMPTY_PERSON, phone: user.phone };
+    return {  ...EMPTY_PERSON, id: user.id, phone: user.phone };
   }
   if (type === USER.APPROVED && driver) {
     const {
-      phone,
+      user,
       name,
       surname,
       patronymic,
-      personInn,
-      selfEmployed,
+      inn,
+      self_employed,
       individual,
       company,
       jobPosition,
@@ -24,15 +32,19 @@ export const createPersonInitialState = (type: USER, driver?: MockDriver, user?:
     } = driver;
 
     return {
-      phone,
+      id: user.id,
+      phone: user.phone,
       name,
       surname,
       patronymic,
-      personInn,
-      selfEmployed,
+      inn,
+      self_employed,
       individual,
       company,
-      jobPosition,
+      jobPosition: jobPosition ? {
+        label: jobPosition?.name,
+        value: jobPosition?.id,
+      } : null,
       email,
       telegram,
     };
@@ -40,35 +52,38 @@ export const createPersonInitialState = (type: USER, driver?: MockDriver, user?:
   return { ...EMPTY_PERSON };
 };
 
-export const createPassportInitialState = (type: USER, driver?: MockDriver, user?: MockUser): Passport => {
+export const createPassportInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): PassportData => {
   if (type === USER.WAITING_APPROVAL && user) {
     return {  ...EMPTY_PASSPORT, photo: []};
   }
   if (type === USER.APPROVED && driver) {
     const {
-      passport: {
-        series,
-        number,
-        dateOfIssue,
-        authority,
-        code,
-        photo
-      }
+      passport
     } = driver;
 
-    return {
-      series,
-      number,
-      dateOfIssue,
-      authority,
-      code,
-      photo: [...photo]
-    };
+    if (passport) {
+      const {
+        series,
+        number,
+        date_of_issue,
+        authority,
+        department_code
+      } = passport
+
+      return {
+        series: String(series),
+        number: String(number),
+        date_of_issue,
+        authority,
+        department_code,
+        photo: []
+      };
+    }
   }
   return { ...EMPTY_PASSPORT, photo: []};
 };
 
-export const createCompanyInitialState = (type: USER, driver?: MockDriver, user?: MockUser): Company => {
+export const createCompanyInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): CompanyData => {
   if (type === USER.WAITING_APPROVAL && user) {
     return {  ...EMPTY_COMPANY };
   }
@@ -80,7 +95,7 @@ export const createCompanyInitialState = (type: USER, driver?: MockDriver, user?
         kpp,
         supplier,
         buyer,
-        transportCompany
+        transport_company
       }
     } = driver;
 
@@ -90,8 +105,34 @@ export const createCompanyInitialState = (type: USER, driver?: MockDriver, user?
       kpp,
       supplier,
       buyer,
-      transportCompany
+      transport_company
     };
   }
   return { ...EMPTY_COMPANY };
 };
+
+export const selectEmploymentType = (personData: PersonData): string => {
+  if (personData.self_employed) {
+    return EMPLOYMENT.SELF_EMPLOYED
+  }
+  if (personData.individual) {
+    return EMPLOYMENT.INDIVIDUAL
+  }
+  if (personData.company) {
+    return EMPLOYMENT.COMPANY
+  }
+  return ''
+}
+
+export const selectCompanyType = (companyData: CompanyData): string => {
+  if (companyData.buyer) {
+    return COMPANY_TYPE.BUYER
+  }
+  if (companyData.supplier) {
+    return COMPANY_TYPE.SUPPLIER
+  }
+  if (companyData.transport_company) {
+    return COMPANY_TYPE.TRANSPORT_COMPANY
+  }
+  return ''
+}

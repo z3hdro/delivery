@@ -1,10 +1,10 @@
-import { MockOrder } from 'mocks/mockOrders';
 import { TFunction } from 'i18next';
+import { Order } from 'types/order';
 
 export type Props = {
-  order: MockOrder;
+  order: Order;
   t: TFunction;
-  onPress?: (order: MockOrder) => void;
+  onPress?: (order: Order) => void;
   isDriver?: boolean;
   isManager?: boolean;
   detailedView?: boolean;

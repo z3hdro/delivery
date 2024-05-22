@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, TouchableOpacity, View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -8,47 +8,77 @@ import { Preloader } from 'components/Preloader';
 import { colors } from 'constants/colors';
 import { useManagerNavigator } from 'navigation/hooks';
 import { useStyles } from './NomenclatureScreen.styles';
-import { MOCK_NOMENCLATURE, MockNomenclature } from 'mocks/mockNomenclature';
 
 import { PlusIcon } from 'src/assets/icons';
+import { networkService } from 'services/network';
+import { MEASURE_LIMIT } from 'constants/limit';
+import { Nomenclature } from 'types/nomenclature';
 
 export const NomenclatureScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { navigate } = useManagerNavigator();
 
-  const [data, setData] = useState<MockNomenclature[]>([]);
+  const [data, setData] = useState<Nomenclature[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
+  const [offset, setOffset] = useState<number>(0);
+
+  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+
+  const fetchNomenclatures = useCallback(async (offset: number) => {
+    try {
+      setIsLoading(true);
+      const result = await networkService.getNomenclatures(offset);
+      if (result.length) {
+        setData((prevState) => offset === 0 ? result : ([...prevState, ...result]));
+        setOffset((prevState) => prevState + 1);
+      }
+    } catch (e) {
+      console.log('NomenclatureMeasurePicker: ', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     void (async () => {
-      try {
-        // TODO: replace by API
-        const result: MockNomenclature[] = await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(MOCK_NOMENCLATURE);
-          }, 1000);
-        });
-        setData(result);
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setIsLoading(false);
+      if (shouldRefresh) {
+        await fetchNomenclatures(0);
       }
+      setShouldRefresh(false);
     })();
-  }, []);
+  }, [fetchNomenclatures, shouldRefresh]);
+
+  const onEndReached = useCallback(async () => {
+    if (isLimitReached) {
+      return;
+    } else {
+      await fetchNomenclatures(offset);
+    }
+  }, [fetchNomenclatures, isLimitReached, offset]);
 
   const onAddPosition = useCallback(() => {
-    navigate('NomenclatureViewScreen', { nomenclature: undefined });
+    navigate('NomenclatureViewScreen', {
+      nomenclature: undefined,
+      onUpdate: () => {
+        setShouldRefresh(true);
+      }
+    });
   }, [navigate]);
 
-  const onEditPosition = useCallback((nomenclature: MockNomenclature) => {
-    navigate('NomenclatureViewScreen', { nomenclature });
+  const onEditPosition = useCallback((nomenclature: Nomenclature) => {
+    navigate('NomenclatureViewScreen', {
+      nomenclature,
+      onUpdate: () => {
+        setShouldRefresh(true);
+      }
+    });
   }, [navigate]);
 
-  const renderItem = useCallback(({ item }: { item: MockNomenclature}) => (
+  const renderItem = useCallback(({ item }: { item: Nomenclature}) => (
     <TouchableOpacity onPress={() => onEditPosition(item)} style={styles.nomenclatureContainer}>
-      <Text style={styles.nomenclatureText}>{`${item.measureId}${item.name}`}</Text>
+      <Text style={styles.nomenclatureText}>{`${item.measure.name} ${item.name}`}</Text>
     </TouchableOpacity>
   ), [onEditPosition, styles]);
 
@@ -74,6 +104,8 @@ export const NomenclatureScreen = () => {
           data={data}
           keyExtractor={item => item.id.toString()}
           renderItem={renderItem}
+          onEndReachedThreshold={0.5}
+          onEndReached={onEndReached}
         />
       </View>
     </Screen>

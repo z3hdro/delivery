@@ -7,3 +7,6 @@ export * from './geolocation';
 export * from './address';
 export * from './nomenclature';
 export * from './infoModal';
+export * from './contact';
+export * from './measure';
+export * from './jobs';
