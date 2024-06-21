@@ -7,18 +7,22 @@ import { LinkButton } from 'components/LinkButton';
 import { Button } from 'components/Button';
 import { useLoginNavigator } from 'navigation/hooks';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
-import { useAppData } from 'providers/AppProvider';
 
 import { useStyles } from './RegistrationScreen.styles';
 import { DRIVER_PASSWORD, DRIVER_PHONE } from 'mocks/mockUsers';
 import { networkService } from 'services/network';
 import { AxiosError } from 'axios';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectDeviceToken } from 'store/selectors';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import { setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
 
 export const RegistrationScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { navigate } = useLoginNavigator();
-  const { deviceToken, setPersonRole, setCurrentPerson } = useAppData();
+  const deviceToken = useAppSelector(selectDeviceToken);
+  const dispatch = useAppDispatch();
 
   const [phone, setPhone] = useState<string>(DRIVER_PHONE);
   const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
@@ -31,7 +35,7 @@ export const RegistrationScreen = () => {
       const { accessToken, refreshToken, user } = await networkService.register({
         phone: phone.replace('+', ''),
         password,
-        fcmToken: deviceToken
+        fcmToken: deviceToken ?? ''
       });
 
       networkService.setAuthHeader(accessToken);
@@ -40,15 +44,28 @@ export const RegistrationScreen = () => {
       await appStorage.storeData(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
       await appStorage.storeData(STORAGE_KEYS.ROLE, user.role.name);
 
-      setPersonRole(user.role.name);
+      dispatch(setUserRole(user.role.name));
 
-      const { person= null } = await networkService.getUserData();
-      setCurrentPerson(person);
+      try {
+        const { person = null } = await networkService.getUserData();
+
+        if (person) {
+          dispatch(setCurrentPerson(person));
+        }
+
+        const { phone: managerPhone } = await networkService.getDriverManagerPhone();
+
+        if (managerPhone) {
+          dispatch(setManagerPhone(managerPhone));
+        }
+      } catch (e) {
+        console.log('registered user data upload error: ', e);
+      }
     } catch (e) {
       const error = e as AxiosError;
       console.log('registration screen error: ', error?.response?.data ?? error);
     }
-  }, [deviceToken, password, phone, setCurrentPerson, setPersonRole]);
+  }, [phone, password, deviceToken, dispatch]);
 
   const onLoginPress = useCallback(() => {
     navigate('LoginScreen');

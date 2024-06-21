@@ -39,6 +39,12 @@
       ],
       "utils/*": [
         "./src/utils/*"
+      ],
+      "store/*": [
+        "./src/store/*"
+      ],
+      "hooks/*": [
+        "./src/hooks/*"
       ]
     }
   }

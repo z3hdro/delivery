@@ -10,6 +10,7 @@ export const OrderCardLabel: FC<Props> = memo(({
   secondLabel,
   thirdLabel,
   thirdSubtitle,
+  displayCostType= true,
   style
 }) => {
   const { t } = useTranslation();
@@ -18,28 +19,38 @@ export const OrderCardLabel: FC<Props> = memo(({
   return (
     <View style={[styles.destinationContainer, style]}>
       <View style={styles.cell}>
-        <Text style={styles.price}>
-          {firstLabel}
-        </Text>
-        <Text style={styles.city}>
-          {firstSubtitle}
-        </Text>
+        {firstLabel && (
+          <>
+            <Text style={styles.price}>
+              {firstLabel}
+            </Text>
+            <Text style={styles.city}>
+              {firstSubtitle}
+            </Text>
+          </>
+        )}
       </View>
-      <View style={[styles.cell, styles.route]}>
-        <Text style={styles.routeLabel}>
-          {t('Cost_type_label')}
-        </Text>
-        <Text style={styles.routeLabel}>
-          {secondLabel}
-        </Text>
-      </View>
+      {displayCostType && (
+        <View style={[styles.cell, styles.route]}>
+          <Text style={styles.routeLabel}>
+            {t('Cost_type_label')}
+          </Text>
+          <Text style={styles.routeLabel}>
+            {secondLabel}
+          </Text>
+        </View>
+      )}
       <View style={[styles.cell, styles.rightCityDescription]}>
-        <Text style={styles.price}>
-          {thirdLabel}
-        </Text>
-        <Text style={styles.city}>
-          {thirdSubtitle}
-        </Text>
+        {thirdLabel && (
+          <>
+            <Text style={styles.price}>
+              {thirdLabel}
+            </Text>
+            <Text style={styles.city}>
+              {thirdSubtitle}
+            </Text>
+          </>
+        )}
       </View>
     </View>
   );

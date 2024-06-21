@@ -4,7 +4,6 @@ export type Cargo = {
   id: number;
   name: string | null;
   netWeight: string;
-  grossWeight: string;
 }
 
 export type OrderData = {

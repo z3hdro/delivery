@@ -186,6 +186,7 @@ export const ViewOrderScreen = () => {
               onInfoPress={onInfoPress}
               track={order.geo ? parseGeo(order.geo) : undefined}
               displayTrack={type === ORDER_LIST.IN_PROGRESS}
+              showUserPosition={false}
             />
           </View>
         ) : (

@@ -6,7 +6,8 @@ export const useStyles = () => {
     map: {
       flex: 1,
       zIndex: 1,
-      height: 320
+      height: 320,
+      width: '100%'
     },
   }), []);
 };

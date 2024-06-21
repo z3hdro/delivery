@@ -1,13 +1,14 @@
 import React, { FC, useCallback } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
-import { useAppData } from 'providers/AppProvider';
 import { networkService } from 'services/network';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { useStyles } from './Screen.styles';
 import { Props } from './Screen.types';
 
 import { LogoIcon, LogoutIcon } from 'src/assets/icons';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import { clearCurrentPerson, clearUserRole, resetCurrentOrder } from 'store/slices';
 
 export const Screen: FC<Props> = ({
   children,
@@ -17,7 +18,8 @@ export const Screen: FC<Props> = ({
   hideLogout = false
 }) => {
   const styles = useStyles();
-  const { removeCurrentPerson, setDriverOrder, setPersonRole } = useAppData();
+
+  const dispatch = useAppDispatch();
 
   // TODO: remove logout later and pressable
   const onLogout = useCallback(async () => {
@@ -25,10 +27,12 @@ export const Screen: FC<Props> = ({
     await appStorage.removeData(STORAGE_KEYS.ACCESS_TOKEN);
     await appStorage.removeData(STORAGE_KEYS.REFRESH_TOKEN);
     await appStorage.removeData(STORAGE_KEYS.ROLE);
-    removeCurrentPerson();
-    setDriverOrder(null);
-    setPersonRole(null);
-  }, [removeCurrentPerson, setDriverOrder, setPersonRole]);
+    await appStorage.removeData(STORAGE_KEYS.NOTIFICATION_PERMISSION);
+    await appStorage.removeData(STORAGE_KEYS.NOTIFICATION_PERMISSION_BACKGROUND);
+    dispatch(clearCurrentPerson());
+    dispatch(resetCurrentOrder());
+    dispatch(clearUserRole());
+  }, [dispatch]);
 
   return (
     <View style={[styles.container, style]}>

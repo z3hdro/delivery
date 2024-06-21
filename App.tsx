@@ -6,13 +6,17 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import YaMap, { Geocoder } from 'react-native-yamap';
+import { Provider } from 'react-redux';
 
 import { RootNavigator } from 'navigation/RootNavigator';
 import { AppProvider } from 'providers/AppProvider';
 import { LocationWrapper } from 'wrapper/LocationWrapper';
-import yandexConfig from './secrets/yandex_config.json';
+import { persistor, store } from 'store/store';
 
 import 'localization/i18n.config';
+
+import yandexConfig from './secrets/yandex_config.json';
+import { PersistGate } from 'redux-persist/integration/react';
 
 void YaMap.init(yandexConfig.API_KEY);
 void Geocoder.init(yandexConfig.GEOCODER_API_KEY);
@@ -35,21 +39,23 @@ const App = () => {
   }
 
   return (
-    <SafeAreaProvider>
-      <GestureHandlerRootView
-        // onLayout={onLayoutRootView}
-        style={[
-          styles.gestureHandlerContainer
-        ]}>
-        <AppProvider>
-          <LocationWrapper>
-            <StatusBar style="dark" />
-            <RootNavigator />
-          </LocationWrapper>
-        </AppProvider>
-      </GestureHandlerRootView>
-    </SafeAreaProvider>
-
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <SafeAreaProvider>
+          <GestureHandlerRootView
+            style={[
+              styles.gestureHandlerContainer
+            ]}>
+            <AppProvider>
+              <LocationWrapper>
+                <StatusBar style="dark" />
+                <RootNavigator />
+              </LocationWrapper>
+            </AppProvider>
+          </GestureHandlerRootView>
+        </SafeAreaProvider>
+      </PersistGate>
+    </Provider>
   );
 };
 

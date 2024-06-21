@@ -13,6 +13,7 @@ import { Props } from './OrderCard.types';
 import { PathIcon, TrackIcon } from 'src/assets/icons';
 import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
 import { getWeightLabel } from 'utils/getWeightLabel';
+import { WEIGHT } from 'constants/weight';
 
 export const OrderCard: FC<Props> = ({
   order,
@@ -29,8 +30,8 @@ export const OrderCard: FC<Props> = ({
   const [nomenclatureLabel, totalGrossWeight, totalNetWeight] = useMemo(() => {
     if (order.nomenclatures) {
       const label = getNomenclatureLabel(order.nomenclatures);
-      const grossLabel = getWeightLabel(order.nomenclatures, 'gross_weight');
-      const netLabel = getWeightLabel(order.nomenclatures, 'net_weight');
+      const grossLabel = getWeightLabel(order.nomenclatures, 'gross_weight') + ` ${WEIGHT.T}.`;
+      const netLabel = getWeightLabel(order.nomenclatures, 'net_weight') + ` ${WEIGHT.T}.`;
 
       return [label, grossLabel, netLabel];
     }
@@ -45,6 +46,7 @@ export const OrderCard: FC<Props> = ({
         secondLabel={getCostType(order.cost_type)}
         thirdLabel={t('Orders_item_destination')}
         thirdSubtitle={order.destination.Address.City.name}
+        displayCostType={false}
       />
       <View style={styles.iconContainer}>
         <View style={styles.track}>
@@ -66,11 +68,9 @@ export const OrderCard: FC<Props> = ({
       )}
       {isManager && (
         <OrderCardLabel
-          firstLabel={t('Order_gross_weight')}
-          firstSubtitle={totalGrossWeight}
+          firstLabel={t('Order_net_weight')}
+          firstSubtitle={totalNetWeight}
           secondLabel={getCostType(order.cost_type)}
-          thirdLabel={t('Order_net_weight')}
-          thirdSubtitle={totalNetWeight}
         />
       )}
       {detailedView && (

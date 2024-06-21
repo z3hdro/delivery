@@ -18,6 +18,6 @@ export const getWeightLabel = (nomenclatures: OrderNomenclature[], key: OrderNom
   }
   const nomenclature = nomenclatures[0];
   return String(
-    weightConverter(nomenclature.OrderNomenclature[key], nomenclature.Measure.name.toLowerCase())
+    weightConverter(nomenclature.OrderNomenclature[key], nomenclature.Measure.name.toLowerCase()).toFixed(3)
   );
 };

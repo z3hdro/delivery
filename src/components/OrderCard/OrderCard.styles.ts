@@ -24,7 +24,6 @@ export const useStyles = () => {
       elevation: 2,
     },
     iconContainer: {
-      marginTop: -20,
       alignItems: 'center',
     },
     track: {

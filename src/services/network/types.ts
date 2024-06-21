@@ -1,7 +1,7 @@
 import { Contact } from 'types/contact';
 import { Measure } from 'types/measure';
 import { Nomenclature } from 'types/nomenclature';
-import { ApprovedDriver, Person, UnapprovedDriver, User } from 'types/user';
+import { ApprovedDriver, Manager, Person, UnapprovedDriver, User } from 'types/user';
 import { Order } from 'types/order';
 import { WorkingDriver } from 'types/driver';
 import { Address } from 'types/address';
@@ -184,7 +184,6 @@ export type WorkingDriversResponse = WorkingDriver[]
 
 export type OrderNomenclaturePayload = {
   id: number
-  grossWeight: number
   netWeight: number
 }
 
@@ -236,4 +235,9 @@ export type OrderGeoPayload = {
   orderId: number
   latitude: number
   longitude: number
+}
+
+export type GetManagerPhoneResponse = {
+  phone: string
+  manager: Manager
 }

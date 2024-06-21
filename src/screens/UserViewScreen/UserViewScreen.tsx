@@ -16,8 +16,10 @@ import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
   createCompanyInitialState,
+  createDrivingLicenseInitialState,
   createPassportInitialState,
-  createPersonInitialState, selectCompanyType,
+  createPersonInitialState,
+  selectCompanyType,
   selectEmploymentType
 } from './UserViewScreen.utils';
 import { useStyles } from './UserViewScreen.styles';
@@ -25,17 +27,19 @@ import {
   COMPANY_KEYS,
   COMPANY_TYPE,
   COMPANY_TYPE_VALUES,
+  DRIVING_LICENSE_KEYS,
   EMPLOYMENT,
   EMPLOYMENT_VALUES,
   PASSPORT_KEYS,
   PERSON_KEYS
 } from './UserViewScreen.consts';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
-import { CompanyData, ImageFile, PassportData, PersonData } from './UserViewScreen.types';
+import { CompanyData, DrivingLicense, ImageFile, PassportData, PersonData } from './UserViewScreen.types';
 import { Option } from 'types/picker';
 
 import { BackIcon } from 'src/assets/icons';
 import { AxiosError } from 'axios';
+import { USER } from 'constants/user';
 
 export const UserViewScreen = () => {
   const { t } = useTranslation();
@@ -48,6 +52,9 @@ export const UserViewScreen = () => {
   );
   const [passportData, setPassportData] = useState<PassportData>(
     createPassportInitialState(type, driver, user)
+  );
+  const [drivingLicenseData, setDrivingLicenseData] = useState<DrivingLicense>(
+    createDrivingLicenseInitialState(type, driver, user)
   );
   const [companyData, setCompanyData] = useState<CompanyData>(
     createCompanyInitialState(type, driver, user)
@@ -72,6 +79,10 @@ export const UserViewScreen = () => {
 
   const updatePassportData = useCallback((key: PASSPORT_KEYS, value: string) => {
     setPassportData(prevState => ({ ...prevState, [key]: value }));
+  }, []);
+
+  const updateDriverLicenseData = useCallback((key: DRIVING_LICENSE_KEYS, value: string) => {
+    setDrivingLicenseData(prevState => ({ ...prevState, [key]: value }));
   }, []);
 
   const updateCompanyData = useCallback((key: COMPANY_KEYS, value: string) => {
@@ -152,6 +163,7 @@ export const UserViewScreen = () => {
         }
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const driverInfo: any = {
         userId: personData.id,
         name: personData.name,
@@ -177,6 +189,7 @@ export const UserViewScreen = () => {
       const formData = new FormData();
 
       // Append each field to the form data
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       Object.entries(driverInfo).forEach(([key, value]) => {
         // If the value is an array (photos), append each file individually
         if (key === 'photos' && Array.isArray(value)) {
@@ -188,7 +201,14 @@ export const UserViewScreen = () => {
         }
       });
 
-      console.log('formData: ', formData);
+      if (drivingLicenseData.series.trim()) {
+        formData.append('drivingLicenseSerial', drivingLicenseData.series);
+      }
+
+      if (drivingLicenseData.number.trim()) {
+        formData.append('drivingLicenseNumber', drivingLicenseData.number);
+      }
+
       await networkService.confirmDriver(formData);
 
       onUpdate();
@@ -197,14 +217,90 @@ export const UserViewScreen = () => {
       if (e instanceof AxiosError) {
         console.log('e.code: ', e?.code);
         console.log('e.message: ', e?.message);
-        console.log('e.message: ', e?.status);
-        console.log('e.message: ', e?.request);
+        console.log('e.status: ', e?.status);
+        console.log('e.request: ', e?.request);
       }
       console.log('error on confirm driver: ', e);
     } finally {
       setIsLoading(false);
     }
-  }, [companyData, images, passportData, personData, goBack, isLoading, onUpdate]);
+  }, [
+    isLoading,
+    personData,
+    companyData,
+    passportData,
+    images,
+    drivingLicenseData.series,
+    drivingLicenseData.number,
+    onUpdate,
+    goBack
+  ]);
+
+  const onUpdateUserData = async () => {
+    try {
+      setIsLoading(true);
+
+      if (isLoading) {
+        return;
+      }
+
+      console.log('personData: ', personData);
+      console.log('companyData: ', companyData);
+      console.log('passportData: ', passportData);
+      console.log('images: ', images);
+
+      const files: ImageFile[] = [];
+
+      if (images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          const response = await fetch(image);
+          const blob = await response.blob();
+          const filename = image.split('/').pop();
+          const file: ImageFile = {
+            uri: image,
+            name: filename,
+            type: blob.type
+          };
+          files.push(file);
+        }
+      }
+
+      const formData = new FormData();
+
+      if (personData.id) {
+        formData.append('personId', String(personData.id));
+      }
+
+      if (personData.jobPosition?.value) {
+        formData.append('jobPositionId', String(personData.jobPosition?.value));
+      }
+
+      if (drivingLicenseData.series.trim()) {
+        formData.append('drivingLicenseSerial', drivingLicenseData.series);
+      }
+
+      if (drivingLicenseData.number.trim()) {
+        formData.append('drivingLicenseNumber', drivingLicenseData.number);
+      }
+
+      await networkService.updateDriver(formData);
+
+      onUpdate();
+      goBack();
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        console.log('e.code: ', e?.code);
+        console.log('e.message: ', e?.message);
+        console.log('e.status: ', e?.status);
+        console.log('e.request: ', e?.request);
+      }
+      console.log('error on update driver data: ', e);
+    } finally {
+      setIsLoading(false);
+
+    }
+  };
 
   const onCancel = useCallback(() => {
     goBack();
@@ -288,14 +384,6 @@ export const UserViewScreen = () => {
             value={personData.self_employed}
             onPress={() => {
               onToggleEmployment(EMPLOYMENT.SELF_EMPLOYED);
-            }}
-          />
-          <Checkbox
-            style={styles.section}
-            label={t('UserView_driver_checkbox_second_label')}
-            value={personData.individual}
-            onPress={() => {
-              onToggleEmployment(EMPLOYMENT.INDIVIDUAL);
             }}
           />
           <Checkbox
@@ -398,6 +486,29 @@ export const UserViewScreen = () => {
           />
 
           <Text style={styles.sectionTitle}>
+            {t('UserView_driver_license_section_title')}
+          </Text>
+          <View style={styles.row}>
+            <InfoSection
+              style={styles.rowItem}
+              label={t('UserView_driver_license_first_label')}
+              value={drivingLicenseData.series}
+              onUpdate={(text: string) => {
+                updateDriverLicenseData(DRIVING_LICENSE_KEYS.SERIES, text);
+              }}
+            />
+            <InfoSection
+              style={styles.rowItem}
+              label={t('UserView_driver_license_second_label')}
+              value={drivingLicenseData.number}
+              onUpdate={(text: string) => {
+                updateDriverLicenseData(DRIVING_LICENSE_KEYS.NUMBER, text);
+              }}
+              keyboardType={'numeric'}
+            />
+          </View>
+
+          <Text style={styles.sectionTitle}>
             {t('UserView_passport_section_title')}
           </Text>
           <View style={styles.row}>
@@ -447,6 +558,7 @@ export const UserViewScreen = () => {
               }}
             />
           </View>
+
           <Text style={[styles.label, styles.section]}>
             {t('UserView_passport_sixth_label')}
           </Text>
@@ -476,7 +588,7 @@ export const UserViewScreen = () => {
               style={styles.primaryButton}
               textStyle={styles.primaryButtonText}
               title={t('UserView_save_button')}
-              onPress={onSaveUserData}
+              onPress={type === USER.WAITING_APPROVAL ? onSaveUserData : onUpdateUserData}
               disabled={isLoading}
             />
             <Button

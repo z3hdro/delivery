@@ -14,7 +14,7 @@ export const ManagerOrderCard: FC<Props> = ({
   const styles = useStyles();
 
   const nomenclatureLabel = useMemo(() => {
-    if (order.nomenclatures) {
+    if (order.nomenclatures?.length) {
       return getNomenclatureLabel(order.nomenclatures);
     }
     return '';

@@ -7,10 +7,13 @@ const INITIAL_CONTEXT: AppContext = {
   userRole: null,
   currentOrder: null,
   deviceToken: '',
+  managerPhone: '',
   setCurrentPerson: () => {},
   removeCurrentPerson: () => {},
   setPersonRole: () => {},
   setDriverOrder: () => {},
+  setCompanyManagerPhone: () => {},
+  updateOrderGeo: async () => {},
 };
 
 export const APP_CONTEXT = createContext<AppContext>(INITIAL_CONTEXT);

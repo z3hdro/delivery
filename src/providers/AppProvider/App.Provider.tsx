@@ -1,18 +1,23 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as SplashScreen from 'expo-splash-screen';
+import { AxiosError } from 'axios';
 
 import { networkService } from 'services/network';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { registerForPushNotificationsAsync } from 'providers/AppProvider/App.utils';
-import { APP_CONTEXT } from './App.consts';
-import { Person } from 'types/user';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import {
+  setIsAppLoading,
+  setCurrentOrder,
+  setCurrentPerson,
+  setDeviceToken,
+  setManagerPhone,
+  setUserRole
+} from 'store/slices';
+import { selectCurrentOrder, selectCurrentPerson } from 'store/selectors';
 import { Props } from './App.types';
-import { AxiosError } from 'axios';
-import { Order } from 'types/order';
-import { LocationObject } from 'expo-location';
-import { OrderGeoPayload } from 'services/network/types';
-import { ORDER_STATUS } from 'constants/order';
+import { useAppSelector } from 'hooks/useAppSelector';
 
 Notifications.setNotificationHandler({
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -24,12 +29,13 @@ Notifications.setNotificationHandler({
 });
 
 export const AppProvider: FC<Props> = ({ children }) => {
-  const [person, setPerson] = useState<Person | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [deviceToken, setDeviceToken] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const person = useAppSelector(selectCurrentPerson);
+  const currentOrder = useAppSelector(selectCurrentOrder);
 
-  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const dispatch = useAppDispatch();
+
+  console.log('currentOrder on appProvider: ', !!currentOrder);
+  console.log('currentPerson on appProvider: ', !!person);
 
   useEffect(() => {
     void (async () => {
@@ -37,13 +43,14 @@ export const AppProvider: FC<Props> = ({ children }) => {
         const token = await registerForPushNotificationsAsync();
         console.log('token: ', token);
         if (token) {
-          setDeviceToken(token);
+          dispatch(setDeviceToken(token));
+          // setDeviceToken(token);
         }
         const role = await appStorage.getData(STORAGE_KEYS.ROLE);
         console.log('role: ', role);
 
         if (role) {
-          setUserRole(role);
+          dispatch(setUserRole(role));
         }
 
         const accessToken = await appStorage.getData(STORAGE_KEYS.ACCESS_TOKEN);
@@ -55,17 +62,23 @@ export const AppProvider: FC<Props> = ({ children }) => {
 
         if (refreshToken) {
           const { person } = await networkService.getUserData();
-          setPerson(person);
+          dispatch(setCurrentPerson(person));
 
           if (role === 'driver') {
             try {
               const { order } = await networkService.getCurrentOrder();
-              setCurrentOrder(order);
+
+              dispatch(setCurrentOrder(order));
             } catch (e) {
               const error = e as AxiosError;
               if (error?.response?.status === 404) {
-                setCurrentOrder(null);
+                console.log('current order not found');
               }
+            }
+
+            const { phone } = await networkService.getManagerPhone();
+            if (phone) {
+              dispatch(setManagerPhone(phone));
             }
           }
         }
@@ -78,75 +91,14 @@ export const AppProvider: FC<Props> = ({ children }) => {
         console.log('app provider error: ', error?.response?.data || e);
       } finally {
         await SplashScreen.hideAsync();
-        setIsLoading(false);
+        dispatch(setIsAppLoading(false));
       }
     })();
-  }, []);
-
-  const setCurrentPerson = useCallback((person: Person | null) => {
-    setPerson(person);
-  }, []);
-
-  const removeCurrentPerson = useCallback(() => {
-    setPerson(null);
-  }, []);
-
-  const setPersonRole = useCallback((role: string | null) => {
-    setUserRole(role);
-  }, []);
-
-  const setDriverOrder = useCallback((order: Order | null) => {
-    setCurrentOrder(order);
-  }, []);
-
-  const updateOrderGeo = useCallback(async (location: LocationObject) => {
-    if (
-      person
-      && person.user.role.name === 'driver'
-      && currentOrder
-      && currentOrder.status !== ORDER_STATUS.CONFIRMATION
-    ) {
-      try {
-        const payload: OrderGeoPayload = {
-          orderId: currentOrder.id,
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude
-        };
-
-        await networkService.updateOrderGeo(payload);
-      } catch (e) {
-        console.log('error while updating geo for order: ', e);
-      }
-    }
-  }, [currentOrder]);
-
-  const value = useMemo(() => ({
-    isLoading,
-    currentOrder,
-    person,
-    userRole,
-    deviceToken,
-    setCurrentPerson,
-    removeCurrentPerson,
-    setPersonRole,
-    setDriverOrder,
-    updateOrderGeo,
-  }), [
-    currentOrder,
-    deviceToken,
-    isLoading,
-    person,
-    removeCurrentPerson,
-    setCurrentPerson,
-    setDriverOrder,
-    setPersonRole,
-    userRole,
-    updateOrderGeo
-  ]);
+  }, [dispatch]);
 
   return (
-    <APP_CONTEXT.Provider value={value}>
+    <>
       {children}
-    </APP_CONTEXT.Provider>
+    </>
   );
 };

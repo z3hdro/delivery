@@ -10,6 +10,7 @@ export type Props = {
 export type AppContext = {
   isLoading: boolean;
   person: Person | null;
+  managerPhone: string;
   userRole: string | null;
   currentOrder: Order | null;
   deviceToken: string;
@@ -17,5 +18,6 @@ export type AppContext = {
   removeCurrentPerson: () => void;
   setPersonRole: (role: string | null) => void;
   setDriverOrder: (order: Order | null) => void;
+  setCompanyManagerPhone: (phone: string) => void;
   updateOrderGeo: (location: LocationObject) => Promise<void>;
 }
