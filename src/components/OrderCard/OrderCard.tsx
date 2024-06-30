@@ -27,15 +27,14 @@ export const OrderCard: FC<Props> = ({
 
   const statusLabel = selectStatusLabel(order.status);
 
-  const [nomenclatureLabel, totalGrossWeight, totalNetWeight] = useMemo(() => {
+  const [nomenclatureLabel, totalNetWeight] = useMemo(() => {
     if (order.nomenclatures) {
       const label = getNomenclatureLabel(order.nomenclatures);
-      const grossLabel = getWeightLabel(order.nomenclatures, 'gross_weight') + ` ${WEIGHT.T}.`;
       const netLabel = getWeightLabel(order.nomenclatures, 'net_weight') + ` ${WEIGHT.T}.`;
 
-      return [label, grossLabel, netLabel];
+      return [label, netLabel];
     }
-    return ['', '', ''];
+    return ['', ''];
   }, [order.nomenclatures]);
 
   return (

@@ -68,6 +68,7 @@ export const OrderListScreen = () => {
         navigate('OrderScreen', {
           onUpdate: () => {
             setShouldRefresh(true);
+            setOffset(0);
           }
         });
       }
@@ -156,6 +157,7 @@ export const OrderListScreen = () => {
     navigate('OrderScreen', {
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [dispatch, navigate]);

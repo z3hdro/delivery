@@ -63,6 +63,7 @@ export const NomenclatureScreen = () => {
       nomenclature: undefined,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);
@@ -72,6 +73,7 @@ export const NomenclatureScreen = () => {
       nomenclature,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);

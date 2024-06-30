@@ -61,6 +61,7 @@ export const InProgressList = () => {
       ORDER_LIST.IN_PROGRESS,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);
