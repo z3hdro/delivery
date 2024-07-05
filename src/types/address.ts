@@ -13,6 +13,11 @@ export type Street = {
   name: string
 }
 
+export type Region = {
+  id: number
+  name: string
+}
+
 export type Address = {
   id: number
   name: string | null
@@ -28,4 +33,5 @@ export type Address = {
   Country: Country
   City: City
   Street: Street
+  Region: Region | null
 }

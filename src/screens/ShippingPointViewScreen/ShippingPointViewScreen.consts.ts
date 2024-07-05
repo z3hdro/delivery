@@ -1,5 +1,5 @@
 export const EMPTY_ADDRESS = {
-  name: '',
+  region: '',
   city: '',
   street: '',
   house: '',

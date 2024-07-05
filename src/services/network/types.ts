@@ -128,7 +128,7 @@ export type ContactResponse = {
 export type UpdateContactResponse = Contact
 
 export type AddressPayload = {
-  name: string
+  region: string
   city: string
   street: string
   house: string

@@ -146,7 +146,7 @@ export const runLocationService = async (): Promise<void> => {
   console.log('start service');
   await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
     accuracy: Location.Accuracy.Balanced,
-    timeInterval: 20 * 1000,
+    timeInterval: 60 * 1000,
     distanceInterval: 100,
     showsBackgroundLocationIndicator: true,
     foregroundService: {

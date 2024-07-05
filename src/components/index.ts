@@ -19,3 +19,4 @@ export * from './SelectedImage';
 export * from './Map';
 export * from './InfoModal';
 export * from './OrderDriverView';
+export * from './OrderManagerView';

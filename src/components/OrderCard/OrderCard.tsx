@@ -14,6 +14,7 @@ import { PathIcon, TrackIcon } from 'src/assets/icons';
 import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
 import { getWeightLabel } from 'utils/getWeightLabel';
 import { WEIGHT } from 'constants/weight';
+import { OrderManagerView } from 'components/OrderManagerView';
 
 export const OrderCard: FC<Props> = ({
   order,
@@ -66,10 +67,12 @@ export const OrderCard: FC<Props> = ({
         />
       )}
       {isManager && (
-        <OrderCardLabel
+        <OrderManagerView
           firstLabel={t('Order_net_weight')}
           firstSubtitle={totalNetWeight}
           secondLabel={getCostType(order.cost_type)}
+          priceCashLabel={t('Cost_cash', { price: order.price_cash })}
+          priceNonCashLabel={t('Cost_non_cash', { price: order.price_non_cash })}
         />
       )}
       {detailedView && (
