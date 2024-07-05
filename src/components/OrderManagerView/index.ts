@@ -1,1 +1,1 @@
-export * from './OrderManagerView'
+export * from './OrderManagerView';

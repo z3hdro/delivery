@@ -26,7 +26,6 @@ export const createInitialAddressData = (point?: LogisticPoint): AddressView => 
       name: street
     },
     Region,
-    name,
     house,
     building,
     floor,
