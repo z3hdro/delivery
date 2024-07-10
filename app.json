@@ -2,6 +2,7 @@
   "expo": {
     "name": "Cargo Delivery",
     "slug": "cargo-delivery",
+    "owner": "z3hdro",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -10,6 +11,11 @@
       "image": "./src/assets/icons/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#D50D00"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2cf7c0ce-d188-4388-a3b9-5c3a3bc84029"
+      }
     },
     "updates": {
       "enabled": false,

@@ -21,7 +21,7 @@ class LocationService {
     this.subscription = await Location.watchPositionAsync(
       {
         accuracy: LocationAccuracy.High,
-        timeInterval: 5 * 1000,
+        timeInterval: 15 * 1000,
         distanceInterval: 20
       },
       (location) => {

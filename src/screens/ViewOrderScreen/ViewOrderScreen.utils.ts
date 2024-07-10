@@ -1,6 +1,8 @@
 import { ORDER_LIST } from 'constants/order';
 import { Order } from 'types/order';
 import { ViewOrder } from './ViewOrderScreen.types';
+import { parseGeo } from 'utils/geo';
+import { GeoPosition } from 'types/geolocation';
 
 export const getPrimaryButtonText = (type: ORDER_LIST): string => {
   switch (type) {
@@ -33,4 +35,21 @@ export const createInitialState = (order: Order): ViewOrder => {
     departureDatePlan: departure_date_plan,
     truckVin: truck ? truck.vin : String('')
   };
+};
+
+export const createInitialGeo = (order: Order): GeoPosition => {
+  const {
+    geo
+  } = order;
+
+  let result: GeoPosition = {
+    lat: 0,
+    lon: 0,
+  };
+
+  if (geo) {
+    result = parseGeo(geo);
+  }
+
+  return result;
 };

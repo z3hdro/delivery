@@ -241,3 +241,8 @@ export type GetManagerPhoneResponse = {
   phone: string
   manager: Manager
 }
+
+export type OrderGeoResponse = {
+  latitude: number
+  longitude: number
+}

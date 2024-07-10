@@ -57,8 +57,8 @@ export const InProgressList = () => {
 
   const onViewPress = useCallback( (order: Order) => {
     navigate('ViewOrderScreen', {
-      order, type:
-      ORDER_LIST.IN_PROGRESS,
+      order,
+      type: ORDER_LIST.IN_PROGRESS,
       onUpdate: () => {
         setShouldRefresh(true);
         setOffset(0);

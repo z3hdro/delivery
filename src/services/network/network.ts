@@ -32,7 +32,7 @@ import {
   MeasureResponse,
   MessageResponse,
   NomenclatureResponse,
-  OrderGeoPayload,
+  OrderGeoPayload, OrderGeoResponse,
   OrderPayload,
   RefreshResponse,
   RegisterPayload,
@@ -122,6 +122,7 @@ class NetworkService {
   }
 
   public async login(data: LoginPayload): Promise<LoginResponse> {
+    console.log('LoginPayload: ', data);
     const result = await this.unauthorizedClient.post<LoginResponse>('auth/signIn', data);
 
     console.log('login result: ', result.data);
@@ -130,6 +131,7 @@ class NetworkService {
   }
 
   public async register(data: RegisterPayload): Promise<RegisterResponse> {
+    console.log('RegisterPayload: ', data);
     const result = await this.unauthorizedClient.post<RegisterResponse>('auth/signUp', data);
 
     console.log('register result: ', result.data);
@@ -498,6 +500,14 @@ class NetworkService {
     const result = await this.authorizedClient.post<MessageResponse>('orders/cancel', data);
 
     console.log('cancelOrder result: ', result.data);
+
+    return result.data;
+  }
+
+  public async getOrderGeo(orderId: number): Promise<OrderGeoResponse> {
+    const result = await this.authorizedClient.get<OrderGeoResponse>(`orders/${orderId}/geo`);
+
+    console.log('getOrderGeo result: ', result.data);
 
     return result.data;
   }
