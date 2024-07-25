@@ -11,6 +11,7 @@ export const useStyles = () => {
     },
     cell: {
       flexGrow: 1,
+      width: '33%'
     },
     price: {
       color: colors.color7,

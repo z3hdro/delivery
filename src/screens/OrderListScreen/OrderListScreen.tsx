@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Linking, Text, View } from 'react-native';
+import { FlatList, Platform, Text, View } from 'react-native';
 import Modal from 'react-native-modal';
+import * as Linking from 'expo-linking';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -10,20 +11,25 @@ import { OrderCard } from 'components/OrderCard';
 import { Button } from 'components/Button';
 import { LinkButton } from 'components/LinkButton';
 import { useDriverNavigator } from 'navigation/hooks';
-import { INSTRUCTION_LINK } from 'constants/geolocation';
+// import { INSTRUCTION_LINK } from 'constants/geolocation';
 import { useStyles } from './OrderListScreen.styles';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
-import { useAppData } from 'providers/AppProvider';
 import { networkService } from 'services/network';
 import { MEASURE_LIMIT } from 'constants/limit';
 import { Order } from 'types/order';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectCurrentOrder } from 'store/selectors';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import { setCurrentOrder } from 'store/slices';
 
 export const OrderListScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
-  const { currentOrder } = useAppData();
+
   const { navigate } = useDriverNavigator();
 
+  const currentOrder = useAppSelector(selectCurrentOrder);
+  const dispatch = useAppDispatch();
 
   const [data, setData] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,6 +39,8 @@ export const OrderListScreen = () => {
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
   const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+
+  console.log('currentOrder: ', !!currentOrder);
 
   const fetchData = useCallback(async (offset: number) => {
     try {
@@ -54,16 +62,20 @@ export const OrderListScreen = () => {
       if (currentOrder) {
         await new Promise(resolve => setTimeout(resolve, 0));
         console.log('p1');
+
+        dispatch(setCurrentOrder(currentOrder));
+
         navigate('OrderScreen', {
-          order: currentOrder,
           onUpdate: () => {
             setShouldRefresh(true);
+            setOffset(0);
           }
         });
       }
       setIsInitialLoading(false);
     })();
-  }, [currentOrder, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, isInitialLoading, navigate]);
 
   useEffect(() => {
     void (async () => {
@@ -82,17 +94,32 @@ export const OrderListScreen = () => {
     }
   }, [fetchData, isLimitReached, offset]);
 
-  const onOpenLink = useCallback(async (url: string) => {
-    const supported = await Linking.canOpenURL(url);
-
-    if (supported) {
-      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-      // by some browser in the mobile
-      await Linking.openURL(url);
-    } else {
-      console.error(`Don't know how to open this URL: ${url}`);
+  const openSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:').catch((e) => {
+        console.log('error openSettings: ', e);
+        alert('Please go to Settings > Privacy & Security > Location Services');
+      });
+    } else if (Platform.OS === 'android') {
+      Linking.openSettings()
+        .catch((e) => {
+          console.log('error openSettings: ', e);
+          void Linking.openURL('intent://settings#Intent;action=android.settings.LOCATION_SETTINGS;end');
+        });
     }
-  }, []);
+  };
+
+  // const onOpenLink = useCallback(async (url: string) => {
+  //   const supported = await Linking.canOpenURL(url);
+  //
+  //   if (supported) {
+  //     // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+  //     // by some browser in the mobile
+  //     await Linking.openURL(url);
+  //   } else {
+  //     console.error(`Don't know how to open this URL: ${url}`);
+  //   }
+  // }, []);
 
   const onCloseModal = useCallback(() => {
     setDisplayModal(false);
@@ -125,13 +152,15 @@ export const OrderListScreen = () => {
       return;
     }
 
+    dispatch(setCurrentOrder(order));
+
     navigate('OrderScreen', {
-      order,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
-  }, [navigate]);
+  }, [dispatch, navigate]);
 
   const renderItem = useCallback(({ item }: { item: Order}) => (
     <OrderCard order={item} isDriver t={t} onPress={onOpenOrder} />
@@ -163,7 +192,7 @@ export const OrderListScreen = () => {
               style={styles.primaryButton}
               textStyle={styles.primaryButtonText}
               title={t('Geolocation_modal_confirm_button')}
-              onPress={() => onOpenLink(INSTRUCTION_LINK)}
+              onPress={() => openSettings()}
               disabled={isLoading}
             />
             <LinkButton

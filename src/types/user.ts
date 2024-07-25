@@ -1,4 +1,5 @@
 import { Job } from 'types/jobs';
+import { DrivingLicense } from 'screens/UserViewScreen/UserViewScreen.types';
 
 export type Role = {
   id: number
@@ -87,6 +88,7 @@ export type ApprovedDriver = {
   contragent: Contragent | null,
   jobPosition: Job | null,
   passport: Passport | null
+  drivingLicense: DrivingLicense | null
 }
 
 export type UnapprovedDriver = {
@@ -98,4 +100,32 @@ export type UnapprovedDriver = {
   createdAt: string
   updatedAt: string
   role: Role
+}
+
+export type Manager = {
+  id: number
+  user_id: number
+  name: string | null
+  surname: string | null
+  patronymic: string | null
+  job_position_id: number | null
+  inn: string | null
+  passport_id: string | null
+  self_employed: boolean
+  individual: boolean
+  company: boolean
+  contragent_id: number | null
+  email: string | null
+  telegram: string | null
+  createdAt: string
+  updatedAt: string
+  user: {
+    id: number
+    phone: string
+    role_id: number
+    approved: boolean
+    responsible_user: number | null
+    createdAt: string
+    updatedAt: string
+  }
 }

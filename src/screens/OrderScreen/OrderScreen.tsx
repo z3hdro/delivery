@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -14,12 +13,15 @@ import { RoundButton } from 'components/RoundButton';
 import { InfoModal } from 'components/InfoModal';
 import { Map } from 'components/Map';
 import { useDriverNavigator, useDriverRoute } from 'navigation/hooks';
-import { useAppData } from 'providers/AppProvider';
 import { networkService } from 'services/network';
+import {
+  runLocationService,
+  stopLocationService,
+} from 'wrapper/LocationWrapper';
 import { parseDateToInfoMap } from 'utils/parseDate';
 import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
 import { formatAddress } from 'utils/address';
-import { parseGeo } from 'utils/geo';
+import { parseGeo, updateOrderGeo } from 'utils/geo';
 import { getPrimaryButtonText } from 'screens/OrderScreen/OrderScreen.utils';
 import { EXPAND_MAP, INITIAL_STATE } from './OrderScreen.consts';
 import { ORDER_STATUS } from 'constants/order';
@@ -31,23 +33,36 @@ import { ExpandMap } from './OrderScreen.types';
 import { Order } from 'types/order';
 
 import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
-import * as Location from 'expo-location';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectCurrentOrder } from 'store/selectors';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import {
+  clearCurrentOrder, clearGeoCurrentOrderId,
+  resetCurrentOrder,
+  resetGeoState,
+  setCurrentOrder,
+  setGeoCurrentOrderId,
+  updateCurrentOrderStatus
+} from 'store/slices';
+import { locationService } from 'services/locationService';
 
 export const OrderScreen = () => {
   const styles = useStyles();
   const { t } = useTranslation();
 
-  const { currentOrder, setDriverOrder, updateOrderGeo } = useAppData();
-  const { goBack, setParams } = useDriverNavigator();
+  const { goBack } = useDriverNavigator();
   const { params } = useDriverRoute<'OrderScreen'>();
-  const { order, onUpdate } = params;
+  const { onUpdate } = params;
 
-  console.log('route params: ', params);
+  // const order = useAppSelector(selectOrder) as Order;
+  const order = useAppSelector(selectCurrentOrder) as Order;
+  const dispatch = useAppDispatch();
 
   const [expanded, setExpanded] = useState<ExpandMap>(INITIAL_STATE);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [displayMap, setDisplayMap] = useState<boolean>(false);
   const [mapPointInfo, setMapPointInfo] = useState<MapPointInfo | null>(null);
+  const [isCanCancelContentTouches, setCanCancelContentTouches] = useState<boolean>(true);
 
   const nomenclatureLabel = useMemo(() => {
     if (order.nomenclatures) {
@@ -66,8 +81,6 @@ export const OrderScreen = () => {
       order.status === ORDER_STATUS.COMPLETED
     ]
   ), [order.status]);
-
-  const [isCanCancelContentTouches, setCanCancelContentTouches] = useState<boolean>(true);
 
   const buttonStyle = useMemo(() => {
     if (order.status === ORDER_STATUS.DEPARTED) {
@@ -89,20 +102,39 @@ export const OrderScreen = () => {
     return [styles.declineButton, styles.declineButtonText];
   },[styles, order.status]);
 
-  const renderLeftPart = useCallback(() => {
-    if (currentOrder) {
-      return undefined;
+  useEffect(() => {
+    const isWatching = locationService.checkSubscription();
+
+    if (order?.status !== ORDER_STATUS.DEPARTED || isWatching) {
+      return;
     }
 
-    return (
-      <Pressable onPress={goBack}>
-        <View style={styles.headerButton}>
-          <BackIcon height={16} width={16} />
-        </View>
-      </Pressable>
+    void locationService.startWatching();
+    const unsubscribe = locationService.subscribe(updateOrderGeo);
 
-    );
-  }, [currentOrder, goBack, styles]);
+    return () => {
+      unsubscribe();
+      locationService.stopWatching();
+    };
+  }, [order?.status]);
+
+  const onBackPress = useCallback(() => {
+    dispatch(clearCurrentOrder());
+    goBack();
+  }, [dispatch, goBack]);
+
+  const renderLeftPart = useCallback(() => {
+    if (order.status === ORDER_STATUS.CREATED || order.status === ORDER_STATUS.CANCELLED) {
+      return (
+        <Pressable onPress={onBackPress}>
+          <View style={styles.headerButton}>
+            <BackIcon height={16} width={16} />
+          </View>
+        </Pressable>
+
+      );
+    }
+  }, [onBackPress, order.status, styles]);
 
   const renderDepartureContent = useCallback(() => {
     const { departure: { Address, contacts }, departure_date_plan  } = order;
@@ -144,34 +176,33 @@ export const OrderScreen = () => {
 
       if (status === ORDER_STATUS.LOADING) {
         result = await networkService.departOrder({ orderId });
+        // setCurrentOrderId(orderId);
+        dispatch(setGeoCurrentOrderId(orderId));
+
+        await runLocationService();
       }
 
       if (status === ORDER_STATUS.DEPARTED) {
         await networkService.completeOrder({ orderId });
 
-        const location = await Location.getCurrentPositionAsync({});
-        await updateOrderGeo(location);
+        await stopLocationService();
+        locationService.resetService();
 
-        setDriverOrder(null);
+        dispatch(clearGeoCurrentOrderId());
+
         onUpdate();
         goBack();
+        dispatch(resetGeoState());
+        dispatch(resetCurrentOrder());
         return;
       }
 
       if (result?.order && result.order.status !== status) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-        const updatedOrder: Order = cloneDeep(order);
-        updatedOrder.status = result.order.status;
-
-        console.log('updatedOrder.status: ', updatedOrder.status);
-
-        setParams(({
-          order: updatedOrder
-        }));
+        dispatch(updateCurrentOrderStatus(result.order.status));
       }
 
       if (result?.order && result.order.status === ORDER_STATUS.LOADING) {
-        setDriverOrder(order);
+        dispatch(setCurrentOrder(order));
       }
 
     } catch (e) {
@@ -179,22 +210,23 @@ export const OrderScreen = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [goBack, onUpdate, order, setDriverOrder, setParams]);
+  }, [dispatch, goBack, onUpdate, order]);
 
   const onDecline = useCallback(async (orderId: number) => {
     try {
       setIsLoading(true);
 
       await networkService.cancelOrder({ orderId });
-      setDriverOrder(null);
+
       onUpdate();
       goBack();
+      dispatch(clearCurrentOrder());
     } catch (e) {
       console.log('OrderScreen on decline e: ', e);
     } finally {
       setIsLoading(false);
     }
-  }, [setDriverOrder, onUpdate, goBack]);
+  }, [dispatch, onUpdate, goBack]);
 
   const onToggleMap = useCallback(() => {
     setDisplayMap(prevState => !prevState);
@@ -278,6 +310,9 @@ export const OrderScreen = () => {
               departure={{ ...order.departure.Address, geo: parseGeo(order.departure.geo) }}
               destination={{ ...order.destination.Address, geo: parseGeo(order.destination.geo) }}
               onInfoPress={onInfoPress}
+              track={order.geo ? parseGeo(order.geo) : undefined}
+              displayTrack={isInProgress}
+              showUserPosition={false}
             />
           </View>
         )}

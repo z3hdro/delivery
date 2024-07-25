@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -13,7 +13,7 @@ import { InfoModal } from 'components/InfoModal';
 import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import { formatAddress } from 'utils/address';
-import { createInitialState, getPrimaryButtonText } from './ViewOrderScreen.utils';
+import { createInitialGeo, createInitialState, getPrimaryButtonText } from './ViewOrderScreen.utils';
 import { parseGeo } from 'utils/geo';
 import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
 import { parseDateToInfoMap } from 'utils/parseDate';
@@ -26,6 +26,8 @@ import { MapPointInfo, ViewOrder } from './ViewOrderScreen.types';
 import { Address } from 'types/address';
 
 import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
+import isEqual from 'lodash/isEqual';
+import { GeoPosition } from 'types/geolocation';
 
 export const ViewOrderScreen = () => {
   const { t } = useTranslation();
@@ -34,6 +36,7 @@ export const ViewOrderScreen = () => {
   const { goBack } = useManagerNavigator();
 
   const [displayMap, setDisplayMap] = useState<boolean>(false);
+  const [currentGeo, setCurrentGeo] = useState<GeoPosition>(createInitialGeo(order));
   const [orderData, setOrderData] = useState<ViewOrder>(createInitialState(order));
   const [mapPointInfo, setMapPointInfo] = useState<MapPointInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -55,6 +58,32 @@ export const ViewOrderScreen = () => {
     return '';
   },
   [order.driver, orderData]);
+
+  useEffect(() => {
+    if (!order.id || type !== ORDER_LIST.IN_PROGRESS) {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      try {
+        const result = await networkService.getOrderGeo(order.id);
+        if (result) {
+          const { latitude, longitude } = result;
+          const newCoordinates = { lat: latitude, lon: longitude };
+
+          if (!isEqual(currentGeo, newCoordinates)) {
+            setCurrentGeo(newCoordinates);
+          }
+        }
+      } catch (e) {
+        console.log('error while polling order geo');
+      }
+    }, 1000 * 15);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [currentGeo, order.id, order.status, type]);
 
   const onUpdateOrder = useCallback((key: ORDER_KEYS, value: string) => {
     setOrderData((prevState) => ({ ...prevState, [key]: value }));
@@ -184,8 +213,9 @@ export const ViewOrderScreen = () => {
               departure={{ ...order.departure.Address, geo: parseGeo(order.departure.geo) }}
               destination={{ ...order.destination.Address, geo: parseGeo(order.destination.geo) }}
               onInfoPress={onInfoPress}
-              track={order.geo ? parseGeo(order.geo) : undefined}
+              track={order.geo ? currentGeo : undefined}
               displayTrack={type === ORDER_LIST.IN_PROGRESS}
+              showUserPosition={false}
             />
           </View>
         ) : (

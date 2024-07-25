@@ -13,6 +13,8 @@ import { Props } from './OrderCard.types';
 import { PathIcon, TrackIcon } from 'src/assets/icons';
 import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
 import { getWeightLabel } from 'utils/getWeightLabel';
+import { WEIGHT } from 'constants/weight';
+import { OrderManagerView } from 'components/OrderManagerView';
 
 export const OrderCard: FC<Props> = ({
   order,
@@ -26,15 +28,14 @@ export const OrderCard: FC<Props> = ({
 
   const statusLabel = selectStatusLabel(order.status);
 
-  const [nomenclatureLabel, totalGrossWeight, totalNetWeight] = useMemo(() => {
+  const [nomenclatureLabel, totalNetWeight] = useMemo(() => {
     if (order.nomenclatures) {
       const label = getNomenclatureLabel(order.nomenclatures);
-      const grossLabel = getWeightLabel(order.nomenclatures, 'gross_weight');
-      const netLabel = getWeightLabel(order.nomenclatures, 'net_weight');
+      const netLabel = getWeightLabel(order.nomenclatures, 'net_weight') + ` ${WEIGHT.T}.`;
 
-      return [label, grossLabel, netLabel];
+      return [label, netLabel];
     }
-    return ['', '', ''];
+    return ['', ''];
   }, [order.nomenclatures]);
 
   return (
@@ -45,6 +46,7 @@ export const OrderCard: FC<Props> = ({
         secondLabel={getCostType(order.cost_type)}
         thirdLabel={t('Orders_item_destination')}
         thirdSubtitle={order.destination.Address.City.name}
+        displayCostType={false}
       />
       <View style={styles.iconContainer}>
         <View style={styles.track}>
@@ -65,12 +67,12 @@ export const OrderCard: FC<Props> = ({
         />
       )}
       {isManager && (
-        <OrderCardLabel
-          firstLabel={t('Order_gross_weight')}
-          firstSubtitle={totalGrossWeight}
+        <OrderManagerView
+          firstLabel={t('Order_net_weight')}
+          firstSubtitle={totalNetWeight}
           secondLabel={getCostType(order.cost_type)}
-          thirdLabel={t('Order_net_weight')}
-          thirdSubtitle={totalNetWeight}
+          priceCashLabel={t('Cost_cash', { price: order.price_cash })}
+          priceNonCashLabel={t('Cost_non_cash', { price: order.price_non_cash })}
         />
       )}
       {detailedView && (

@@ -3,8 +3,9 @@ import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react
 import { ApprovalScreen } from 'screens/ApprovalScreen';
 import { OrderListScreen } from 'screens/OrderListScreen';
 import { OrderScreen } from 'screens/OrderScreen';
-import { useAppData } from 'providers/AppProvider';
 import { DriverStackParamList } from 'types/navigation';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectCurrentPerson } from 'store/selectors';
 
 const Stack = createNativeStackNavigator<DriverStackParamList>();
 
@@ -14,7 +15,7 @@ const customOptions: NativeStackNavigationOptions = {
 };
 
 export const DriverNavigator = () => {
-  const { person } = useAppData();
+  const person = useAppSelector(selectCurrentPerson);
 
   return (
     <Stack.Navigator

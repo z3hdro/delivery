@@ -136,8 +136,8 @@ export const CreateOrderScreen = () => {
         plannedLoadingDate: departureDatePlan,
         plannedDeliveryDate: deliveryDatePlan,
         nomenclatures: cargoData
-          .map(({ id, grossWeight, netWeight }) =>
-            ({ id, grossWeight: +grossWeight, netWeight: +netWeight })
+          .map(({ id, netWeight }) =>
+            ({ id, netWeight: +netWeight })
           ),
       };
 
@@ -146,6 +146,8 @@ export const CreateOrderScreen = () => {
       await networkService.addOrder(payload);
 
       resetForm();
+
+      navigate('MainBottomTabNavigator', { screen: 'CargoListScreen' });
 
       return;
     } catch (e) {
@@ -191,17 +193,6 @@ export const CreateOrderScreen = () => {
                   value={cargoData[index].name || ''}
                   onNavigate={() => onNavigateCargo(index)}
                   type={INFO_SECTION_TYPE.SCREEN}
-                />
-                <InfoSection
-                  style={styles.cargoWeight}
-                  textInputStyle={styles.weightStyle}
-                  labelStyle={styles.weightTextStyle}
-                  label={t('CreateOrder_fourth_section')}
-                  value={cargo.grossWeight}
-                  onUpdate={(text: string) => {
-                    updateData(index, CARGO_KEYS.GROSS_WEIGHT, text);
-                  }}
-                  keyboardType={'numeric'}
                 />
                 <InfoSection
                   style={styles.cargoWeight}

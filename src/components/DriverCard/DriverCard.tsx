@@ -13,7 +13,9 @@ export const DriverCard: FC<Props> = ({
 }) => {
   const styles = useStyles();
 
-  const driverName = `${driver.surname ?? ''} ${driver.name ?? ''} ${driver.patronymic ?? ''}`.trim();
+  const driverName = useMemo(() =>
+    `${driver.surname ?? ''} ${driver.name ?? ''} ${driver.patronymic ?? ''}`.trim()
+  , [driver]);
 
   return (
     <View style={styles.container}>

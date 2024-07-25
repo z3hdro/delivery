@@ -21,6 +21,11 @@ export type PersonData = {
   telegram: string | null
 }
 
+export type DrivingLicense = {
+  series: string
+  number: string
+}
+
 export type Passport = {
   series: string
   number: string

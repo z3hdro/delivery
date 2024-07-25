@@ -2,7 +2,7 @@
 export type ExpandedMap = Record<string, boolean>;
 
 export type AddressView = {
-  name: string
+  region: string
   city: string
   street: string
   house: string

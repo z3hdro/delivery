@@ -1,4 +1,4 @@
-import { CompanyData, Passport, PersonData } from './UserViewScreen.types';
+import { CompanyData, DrivingLicense, Passport, PersonData } from './UserViewScreen.types';
 
 export const DISPLAY_DATE_FORMAT = 'dd.MM.yyyy';
 
@@ -28,6 +28,11 @@ export enum PERSON_KEYS {
   TELEGRAM = 'telegram',
 }
 
+export const EMPTY_DRIVING_LICENSE: DrivingLicense = {
+  series: '',
+  number: '',
+};
+
 export const EMPTY_PASSPORT: Passport = {
   series: '',
   number: '',
@@ -42,6 +47,11 @@ export enum PASSPORT_KEYS {
   AUTHORITY = 'authority',
   DATE_OF_ISSUE = 'date_of_issue',
   DEPARTMENT_CODE = 'department_code',
+}
+
+export enum DRIVING_LICENSE_KEYS {
+  SERIES = 'series',
+  NUMBER = 'number',
 }
 
 export const EMPTY_COMPANY: CompanyData = {

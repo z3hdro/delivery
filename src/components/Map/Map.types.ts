@@ -9,4 +9,5 @@ export type Props = {
   onInfoPress: (type: LOGISTIC_POINT, address: Address) => void,
   track?: Point
   displayTrack?: boolean
+  showUserPosition?: boolean
 }

@@ -63,6 +63,7 @@ export const NomenclatureScreen = () => {
       nomenclature: undefined,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);
@@ -72,13 +73,14 @@ export const NomenclatureScreen = () => {
       nomenclature,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);
 
   const renderItem = useCallback(({ item }: { item: Nomenclature}) => (
     <TouchableOpacity onPress={() => onEditPosition(item)} style={styles.nomenclatureContainer}>
-      <Text style={styles.nomenclatureText}>{`${item.measure.name} ${item.name}`}</Text>
+      <Text style={styles.nomenclatureText}>{item.name}</Text>
     </TouchableOpacity>
   ), [onEditPosition, styles]);
 

@@ -61,6 +61,7 @@ export const ApprovedList = () => {
       type: USER.APPROVED,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);

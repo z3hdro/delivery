@@ -6,7 +6,7 @@ export const formatAddress = (address: Address): string => {
     Street,
     house,
     building,
-    name,
+    Region,
   } = address;
 
   let result = City.name ?? '';
@@ -23,8 +23,8 @@ export const formatAddress = (address: Address): string => {
     result += `, ${building}`;
   }
 
-  if (name) {
-    result += `, ${name}`;
+  if (Region?.name) {
+    result += `, ${Region.name}`;
   }
 
   return result;

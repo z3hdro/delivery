@@ -10,15 +10,19 @@ import { LinkButton } from 'components/LinkButton';
 import { Button } from 'components/Button';
 import { useLoginNavigator } from 'navigation/hooks';
 import { useStyles } from './LoginScreen.styles';
-import { useAppData } from 'providers/AppProvider';
 import { DRIVER_PASSWORD, DRIVER_PHONE, MANAGER_PASSWORD, MANAGER_PHONE } from 'mocks/mockUsers';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectDeviceToken } from 'store/selectors';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import { setCurrentOrder, setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
 
 
 export const LoginScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { navigate } = useLoginNavigator();
-  const { deviceToken, setCurrentPerson, setDriverOrder, setPersonRole } = useAppData();
+  const deviceToken = useAppSelector(selectDeviceToken);
+  const dispatch = useAppDispatch();
 
   const [phone, setPhone] = useState<string>(DRIVER_PHONE);
   const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
@@ -36,7 +40,7 @@ export const LoginScreen = () => {
       const { accessToken, refreshToken, user } = await networkService.login({
         phone: phone.replace('+', ''),
         password,
-        fcmToken: deviceToken
+        fcmToken: deviceToken ?? ''
       });
 
       networkService.setAuthHeader(accessToken);
@@ -45,19 +49,42 @@ export const LoginScreen = () => {
       await appStorage.storeData(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
       await appStorage.storeData(STORAGE_KEYS.ROLE, user.role.name);
 
-      setPersonRole(user.role.name);
+      dispatch(setUserRole(user.role.name));
 
       const { person= null } = await networkService.getUserData();
-      setCurrentPerson(person);
+
+      if (person) {
+        dispatch(setCurrentPerson(person));
+      }
+
       if (person?.user.role.name === 'driver') {
         try {
           const { order } = await networkService.getCurrentOrder();
-          setDriverOrder(order);
+
+          // setDriverOrder(order);
+          if (order) {
+            dispatch(setCurrentOrder(order));
+          }
+
         } catch (e) {
           const error = e as AxiosError;
           if (error?.response?.status === 404) {
-            setDriverOrder(null);
+            console.log('no current order after logging page');
           }
+        }
+
+        let managerPhone;
+
+        if (user.approved) {
+          const { phone: result } = await networkService.getManagerPhone();
+          managerPhone = result;
+        } else {
+          const { phone: result } = await networkService.getDriverManagerPhone();
+          managerPhone = result;
+        }
+
+        if (managerPhone) {
+          dispatch(setManagerPhone(managerPhone));
         }
       }
     } catch (e) {
@@ -65,9 +92,9 @@ export const LoginScreen = () => {
       if (error?.response?.status === 401) {
         setErrorText(t('Login_bottom_unauthorized_user'));
       }
-      console.log(error?.response?.data);
+      console.log('error on Login screen: ', error?.response?.data || error);
     }
-  }, [deviceToken, password, phone, setCurrentPerson, setPersonRole, t]);
+  }, [deviceToken, dispatch, password, phone, t]);
 
   const onRegisterPress = useCallback(() => {
     navigate('RegistrationScreen');

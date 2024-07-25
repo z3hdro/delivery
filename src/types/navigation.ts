@@ -17,7 +17,6 @@ export type DriverStackParamList = {
   ApprovalScreen: undefined;
   OrderListScreen: undefined;
   OrderScreen: {
-    order: Order
     onUpdate: () => void
   };
   DriverMap: undefined;

@@ -15,7 +15,6 @@ export enum ORDER_LIST {
 
 export enum CARGO_KEYS {
   NAME = 'name',
-  GROSS_WEIGHT = 'grossWeight',
   NET_WEIGHT = 'netWeight',
 }
 

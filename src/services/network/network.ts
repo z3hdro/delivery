@@ -24,7 +24,7 @@ import {
   ContactPayload,
   ContactResponse,
   CurrentOrderResponse,
-  DepartOrderPayload,
+  DepartOrderPayload, GetManagerPhoneResponse,
   JobsResponse,
   LoginPayload,
   LoginResponse,
@@ -32,7 +32,7 @@ import {
   MeasureResponse,
   MessageResponse,
   NomenclatureResponse,
-  OrderGeoPayload,
+  OrderGeoPayload, OrderGeoResponse,
   OrderPayload,
   RefreshResponse,
   RegisterPayload,
@@ -122,6 +122,7 @@ class NetworkService {
   }
 
   public async login(data: LoginPayload): Promise<LoginResponse> {
+    console.log('LoginPayload: ', data);
     const result = await this.unauthorizedClient.post<LoginResponse>('auth/signIn', data);
 
     console.log('login result: ', result.data);
@@ -130,6 +131,7 @@ class NetworkService {
   }
 
   public async register(data: RegisterPayload): Promise<RegisterResponse> {
+    console.log('RegisterPayload: ', data);
     const result = await this.unauthorizedClient.post<RegisterResponse>('auth/signUp', data);
 
     console.log('register result: ', result.data);
@@ -192,17 +194,30 @@ class NetworkService {
   }
 
   public async confirmDriver(data: FormData): Promise<MessageResponse> {
-    const result = await this.authorizedClient.post<MessageResponse>('drivers/confirm', data);
+    console.log('formData: ', data);
+    const result = await this.authorizedClient.post<MessageResponse>('drivers/confirm', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
 
     console.log('confirmDriver result: ', result.data);
 
     return result.data;
   }
 
-  public async updateDriver(data: any): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async updateDriver(data: FormData): Promise<any> {
+    console.log('formData: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('drivers/update', data);
 
     console.log('updateDriver result: ', result.data);
+
+    return result.data;
+  }
+
+  public async getDriverManagerPhone(): Promise<GetManagerPhoneResponse> {
+    const result = await this.authorizedClient.get<GetManagerPhoneResponse>('drivers/getManagerPhone');
+
+    console.log('getManagerPhone result: ', result.data);
 
     return result.data;
   }
@@ -468,13 +483,13 @@ class NetworkService {
     console.log('OrderGeoPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/updateGeo', data);
 
-    console.log('updateOrderGeo result: ', result.data);
+    console.log('updateOrderGeo result: ', JSON.stringify(result.data));
 
     return result.data;
   }
 
-  public async getManagerPhone(): Promise<MessageResponse> {
-    const result = await this.authorizedClient.get<MessageResponse>('orders/getManagerPhone');
+  public async getManagerPhone(): Promise<GetManagerPhoneResponse> {
+    const result = await this.authorizedClient.get<GetManagerPhoneResponse>('orders/getManagerPhone');
 
     console.log('getManagerPhone result: ', result.data);
 
@@ -485,6 +500,14 @@ class NetworkService {
     const result = await this.authorizedClient.post<MessageResponse>('orders/cancel', data);
 
     console.log('cancelOrder result: ', result.data);
+
+    return result.data;
+  }
+
+  public async getOrderGeo(orderId: number): Promise<OrderGeoResponse> {
+    const result = await this.authorizedClient.get<OrderGeoResponse>(`orders/${orderId}/geo`);
+
+    console.log('getOrderGeo result: ', result.data);
 
     return result.data;
   }

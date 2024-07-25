@@ -1,14 +1,11 @@
-import { MockUser } from 'mocks/mockUsers';
 import { USER } from 'constants/user';
-import { MockDriver } from 'mocks/mockDrivers';
-import { CompanyData, PassportData, PersonData } from './UserViewScreen.types';
+import { CompanyData, DrivingLicense, PassportData, PersonData } from './UserViewScreen.types';
 import {
   COMPANY_TYPE,
   EMPLOYMENT,
-  EMPTY_COMPANY,
+  EMPTY_COMPANY, EMPTY_DRIVING_LICENSE,
   EMPTY_PASSPORT,
   EMPTY_PERSON,
-  PERSON_KEYS
 } from './UserViewScreen.consts';
 import { ApprovedDriver, UnapprovedDriver } from 'types/user';
 
@@ -52,7 +49,11 @@ export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, us
   return { ...EMPTY_PERSON };
 };
 
-export const createPassportInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): PassportData => {
+export const createPassportInitialState = (
+  type: USER,
+  driver?: ApprovedDriver,
+  user?: UnapprovedDriver
+): PassportData => {
   if (type === USER.WAITING_APPROVAL && user) {
     return {  ...EMPTY_PASSPORT, photo: []};
   }
@@ -68,7 +69,7 @@ export const createPassportInitialState = (type: USER, driver?: ApprovedDriver, 
         date_of_issue,
         authority,
         department_code
-      } = passport
+      } = passport;
 
       return {
         series: String(series),
@@ -83,7 +84,39 @@ export const createPassportInitialState = (type: USER, driver?: ApprovedDriver, 
   return { ...EMPTY_PASSPORT, photo: []};
 };
 
-export const createCompanyInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): CompanyData => {
+export const createDrivingLicenseInitialState = (
+  type: USER,
+  driver?: ApprovedDriver,
+  user?: UnapprovedDriver
+): DrivingLicense => {
+  if (type === USER.WAITING_APPROVAL && user) {
+    return {  ...EMPTY_DRIVING_LICENSE };
+  }
+  if (type === USER.APPROVED && driver) {
+    const {
+      drivingLicense
+    } = driver;
+
+    if (drivingLicense) {
+      const {
+        series,
+        number,
+      } = drivingLicense;
+
+      return {
+        series: String(series),
+        number: String(number),
+      };
+    }
+  }
+  return { ...EMPTY_DRIVING_LICENSE };
+};
+
+export const createCompanyInitialState = (
+  type: USER,
+  driver?: ApprovedDriver,
+  user?: UnapprovedDriver
+): CompanyData => {
   if (type === USER.WAITING_APPROVAL && user) {
     return {  ...EMPTY_COMPANY };
   }
@@ -113,26 +146,26 @@ export const createCompanyInitialState = (type: USER, driver?: ApprovedDriver, u
 
 export const selectEmploymentType = (personData: PersonData): string => {
   if (personData.self_employed) {
-    return EMPLOYMENT.SELF_EMPLOYED
+    return EMPLOYMENT.SELF_EMPLOYED;
   }
   if (personData.individual) {
-    return EMPLOYMENT.INDIVIDUAL
+    return EMPLOYMENT.INDIVIDUAL;
   }
   if (personData.company) {
-    return EMPLOYMENT.COMPANY
+    return EMPLOYMENT.COMPANY;
   }
-  return ''
-}
+  return '';
+};
 
 export const selectCompanyType = (companyData: CompanyData): string => {
   if (companyData.buyer) {
-    return COMPANY_TYPE.BUYER
+    return COMPANY_TYPE.BUYER;
   }
   if (companyData.supplier) {
-    return COMPANY_TYPE.SUPPLIER
+    return COMPANY_TYPE.SUPPLIER;
   }
   if (companyData.transport_company) {
-    return COMPANY_TYPE.TRANSPORT_COMPANY
+    return COMPANY_TYPE.TRANSPORT_COMPANY;
   }
-  return ''
-}
+  return '';
+};

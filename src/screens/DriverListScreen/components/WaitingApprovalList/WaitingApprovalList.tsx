@@ -61,6 +61,7 @@ export const WaitingApprovalList = () => {
       type: USER.WAITING_APPROVAL,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);

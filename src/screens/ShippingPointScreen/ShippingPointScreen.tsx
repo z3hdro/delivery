@@ -62,6 +62,7 @@ export const ShippingPointScreen = () => {
     navigate('ShippingPointViewScreen', { point,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);

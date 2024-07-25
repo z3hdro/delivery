@@ -13,8 +13,10 @@ export const Map: FC<Props> = ({
   destination,
   track,
   onInfoPress,
-  displayTrack = false
+  displayTrack = false,
+  showUserPosition = true
 }) => {
+  console.log('track: ', track);
   const styles = useStyles();
 
   const mapRef = useRef<YaMap | null>(null);
@@ -22,6 +24,7 @@ export const Map: FC<Props> = ({
   return (
     <YaMap
       ref={mapRef}
+      showUserPosition={showUserPosition}
       style={styles.map}
       onMapLoaded={() => {
         if (displayMap && mapRef.current) {

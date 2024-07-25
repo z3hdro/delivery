@@ -1,20 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from 'components/Screen';
+import { formatPhoneNumber } from 'utils/phone';
 import { colors } from 'constants/colors';
 import { useStyles } from './ApprovalScreen.styles';
 
 import { WarningIcon } from 'src/assets/icons';
-
-// TODO: remove later
-import { DISPLAY_MANAGER_PHONE } from 'mocks/mockUsers';
-import { formatPhoneNumber } from 'utils/phone';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectManagerPhone } from 'store/selectors';
 
 export const ApprovalScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
+
+  const managerPhone = useAppSelector(selectManagerPhone);
+  console.log('managerPhone: ', managerPhone);
+
+  useEffect(() => {
+
+  }, []);
 
   return (
     <Screen style={styles.screen}>
@@ -29,7 +35,7 @@ export const ApprovalScreen = () => {
           {t('Approval_description')}
         </Text>
         <Text style={styles.phoneText}>
-          {formatPhoneNumber(DISPLAY_MANAGER_PHONE)}
+          {formatPhoneNumber(managerPhone ?? '')}
         </Text>
       </View>
     </Screen>

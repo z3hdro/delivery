@@ -61,6 +61,7 @@ export const AvailableList = () => {
       type: ORDER_LIST.AVAILABLE,
       onUpdate: () => {
         setShouldRefresh(true);
+        setOffset(0);
       }
     });
   }, [navigate]);

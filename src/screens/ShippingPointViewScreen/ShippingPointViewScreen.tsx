@@ -73,8 +73,8 @@ export const ShippingPointViewScreen = () => {
     try {
       let searchAddress = '';
 
-      if (addressData.name) {
-        searchAddress += `${addressData.name}`;
+      if (addressData.region) {
+        searchAddress += `${addressData.region}`;
       }
 
       if (addressData.city) {
@@ -166,7 +166,7 @@ export const ShippingPointViewScreen = () => {
       setIsLoading(true);
 
       const addressPayload = {
-        name: address.name,
+        region: address.region,
         city: address.city,
         street: address.street,
         house: address.house,
@@ -210,7 +210,7 @@ export const ShippingPointViewScreen = () => {
         }
 
         const addressPayload = {
-          name: address.name,
+          region: address.region,
           city: address.city,
           street: address.street,
           house: address.house,
