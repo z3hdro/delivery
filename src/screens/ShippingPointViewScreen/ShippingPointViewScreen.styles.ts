@@ -133,7 +133,8 @@ export const useStyles = () => {
     },
     mapContainer: {
       marginTop: 16,
-      position: 'relative'
+      position: 'relative',
+      flex: 1,
     },
     geoLabel: {
       marginLeft: 14,
