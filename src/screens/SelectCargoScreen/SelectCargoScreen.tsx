@@ -94,7 +94,7 @@ export const SelectCargoScreen = () => {
     } else {
       await fetchMeasures(offset);
     }
-  }, [fetchMeasures, isLimitReached, offset]);
+  }, [fetchMeasures, isLimitReached, offset, isLoading]);
 
   const renderItem = useCallback(({ item }: { item: Nomenclature}) => (
     <TouchableOpacity onPress={() => onSelectItem(item)} style={styles.item}>

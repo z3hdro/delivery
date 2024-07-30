@@ -53,7 +53,7 @@ export const WaitingApprovalList = () => {
     } else {
       await fetchLogisticPoints(offset);
     }
-  }, [fetchLogisticPoints, isLimitReached, offset]);
+  }, [fetchLogisticPoints, isLimitReached, offset, isLoading]);
 
   const onUserPress = useCallback( (user: UnapprovedDriver) => {
     navigate('UserViewScreen', {

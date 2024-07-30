@@ -69,7 +69,7 @@ export const SelectLogisticPointScreen = () => {
     } else {
       await fetchLogisticPoints(offset);
     }
-  }, [fetchLogisticPoints, isLimitReached, offset]);
+  }, [fetchLogisticPoints, isLimitReached, offset, isLoading]);
 
   const renderItem = useCallback(({ item }: { item: LogisticPoint}) => (
     <TouchableOpacity

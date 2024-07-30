@@ -53,7 +53,7 @@ export const ApprovedList = () => {
     } else {
       await fetchLogisticPoints(offset);
     }
-  }, [fetchLogisticPoints, isLimitReached, offset]);
+  }, [fetchLogisticPoints, isLimitReached, offset, isLoading]);
 
   const onDriverPress = useCallback( (driver: ApprovedDriver) => {
     navigate('UserViewScreen', {

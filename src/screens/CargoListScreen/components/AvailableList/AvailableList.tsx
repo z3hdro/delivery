@@ -53,7 +53,7 @@ export const AvailableList = () => {
     } else {
       await fetchData(offset);
     }
-  }, [fetchData, isLimitReached, offset]);
+  }, [fetchData, isLimitReached, offset, isLoading]);
 
   const onEditPress = useCallback( (order: Order) => {
     navigate('ViewOrderScreen', {

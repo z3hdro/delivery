@@ -53,7 +53,7 @@ export const InProgressList = () => {
     } else {
       await fetchData(offset);
     }
-  }, [fetchData, isLimitReached, offset]);
+  }, [fetchData, isLimitReached, offset, isLoading]);
 
   const onViewPress = useCallback( (order: Order) => {
     navigate('ViewOrderScreen', {

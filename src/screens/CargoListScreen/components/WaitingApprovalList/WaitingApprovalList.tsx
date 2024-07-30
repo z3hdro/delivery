@@ -53,7 +53,7 @@ export const WaitingApprovalList = () => {
     } else {
       await fetchData(offset);
     }
-  }, [fetchData, isLimitReached, offset]);
+  }, [fetchData, isLimitReached, offset, isLoading]);
 
   const onApprovePress = useCallback( (order: Order) => {
     navigate('ViewOrderScreen', {

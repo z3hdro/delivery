@@ -56,7 +56,7 @@ export const ShippingPointScreen = () => {
     } else {
       await fetchLogisticPoints(offset);
     }
-  }, [fetchLogisticPoints, isLimitReached, offset]);
+  }, [fetchLogisticPoints, isLimitReached, offset, isLoading]);
 
   const onLogisticPointPress = useCallback((point?: LogisticPoint) => {
     navigate('ShippingPointViewScreen', { point,

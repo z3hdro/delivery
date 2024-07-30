@@ -56,7 +56,7 @@ export const NomenclatureScreen = () => {
     } else {
       await fetchNomenclatures(offset);
     }
-  }, [fetchNomenclatures, isLimitReached, offset]);
+  }, [fetchNomenclatures, isLimitReached, offset, isLoading]);
 
   const onAddPosition = useCallback(() => {
     navigate('NomenclatureViewScreen', {

@@ -69,7 +69,7 @@ export const SelectMeasureScreen = () => {
     } else {
       await fetchMeasures(offset);
     }
-  }, [fetchMeasures, isLimitReached, offset]);
+  }, [fetchMeasures, isLimitReached, offset, isLoading]);
 
   const renderItem = useCallback(({ item }: { item: Measure}) => (
     <TouchableOpacity onPress={() => onSelectItem(item)} style={styles.item}>

@@ -92,7 +92,7 @@ export const OrderListScreen = () => {
     } else {
       await fetchData(offset);
     }
-  }, [fetchData, isLimitReached, offset]);
+  }, [fetchData, isLimitReached, offset, isLoading]);
 
   const openSettings = () => {
     if (Platform.OS === 'ios') {
