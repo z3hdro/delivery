@@ -8,7 +8,7 @@ import { useManagerNavigator } from 'navigation/hooks';
 import { useStyles } from './WaitingApprovalList.styles';
 import { USER } from 'constants/user';
 import { UserCard } from 'components/UserCard';
-import { MEASURE_LIMIT } from 'constants/limit';
+import { DRIVER_LIST_LIMIT } from 'constants/limit';
 import { UnapprovedDriver } from 'types/user';
 
 export const WaitingApprovalList = () => {
@@ -21,7 +21,7 @@ export const WaitingApprovalList = () => {
   const [offset, setOffset] = useState<number>(0);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
-  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * DRIVER_LIST_LIMIT, [data.length, offset]);
 
   const fetchLogisticPoints = useCallback(async (offset: number) => {
     try {
@@ -48,7 +48,7 @@ export const WaitingApprovalList = () => {
   }, [fetchLogisticPoints, shouldRefresh]);
 
   const onEndReached = useCallback(async () => {
-    if (isLimitReached) {
+    if (isLimitReached || isLoading) {
       return;
     } else {
       await fetchLogisticPoints(offset);

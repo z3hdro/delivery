@@ -8,7 +8,7 @@ import { Preloader } from 'components/Preloader';
 import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import { useStyles } from './SelectLogisticPointScreen.styles';
-import { MEASURE_LIMIT } from 'constants/limit';
+import { LOGISTIC_POINT_LIMIT } from 'constants/limit';
 
 import { BackIcon } from 'assets/icons';
 import { LogisticPoint } from 'services/network/types';
@@ -24,7 +24,7 @@ export const SelectLogisticPointScreen = () => {
   const [data, setData] = useState<LogisticPoint[]>([]);
   const [offset, setOffset] = useState<number>(0);
 
-  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * LOGISTIC_POINT_LIMIT, [data.length, offset]);
 
   const fetchLogisticPoints = useCallback(async (offset: number) => {
     try {
@@ -64,7 +64,7 @@ export const SelectLogisticPointScreen = () => {
   }, [goBack, onSelect]);
 
   const onEndReached = useCallback(async () => {
-    if (isLimitReached) {
+    if (isLimitReached || isLoading) {
       return;
     } else {
       await fetchLogisticPoints(offset);
