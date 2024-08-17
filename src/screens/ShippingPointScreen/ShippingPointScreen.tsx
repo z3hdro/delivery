@@ -9,7 +9,7 @@ import { colors } from 'constants/colors';
 import { useManagerNavigator } from 'navigation/hooks';
 import { networkService } from 'services/network';
 import { useStyles } from './ShippingPointScreen.styles';
-import { MEASURE_LIMIT } from 'constants/limit';
+import { LOGISTIC_POINT_LIMIT } from 'constants/limit';
 import { LogisticPoint } from 'services/network/types';
 
 import { PlusIcon } from 'src/assets/icons';
@@ -24,7 +24,7 @@ export const ShippingPointScreen = () => {
   const [offset, setOffset] = useState<number>(0);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
-  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * LOGISTIC_POINT_LIMIT, [data.length, offset]);
 
   const fetchLogisticPoints = useCallback(async (offset: number) => {
     try {
@@ -51,12 +51,12 @@ export const ShippingPointScreen = () => {
   }, [fetchLogisticPoints, shouldRefresh]);
 
   const onEndReached = useCallback(async () => {
-    if (isLimitReached) {
+    if (isLimitReached || isLoading) {
       return;
     } else {
       await fetchLogisticPoints(offset);
     }
-  }, [fetchLogisticPoints, isLimitReached, offset]);
+  }, [fetchLogisticPoints, isLimitReached, offset, isLoading]);
 
   const onLogisticPointPress = useCallback((point?: LogisticPoint) => {
     navigate('ShippingPointViewScreen', { point,

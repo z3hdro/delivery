@@ -11,7 +11,7 @@ import { useStyles } from './NomenclatureScreen.styles';
 
 import { PlusIcon } from 'src/assets/icons';
 import { networkService } from 'services/network';
-import { MEASURE_LIMIT } from 'constants/limit';
+import { NOMENCLATURE_LIMIT } from 'constants/limit';
 import { Nomenclature } from 'types/nomenclature';
 
 export const NomenclatureScreen = () => {
@@ -24,7 +24,7 @@ export const NomenclatureScreen = () => {
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
   const [offset, setOffset] = useState<number>(0);
 
-  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * NOMENCLATURE_LIMIT, [data.length, offset]);
 
   const fetchNomenclatures = useCallback(async (offset: number) => {
     try {
@@ -51,12 +51,12 @@ export const NomenclatureScreen = () => {
   }, [fetchNomenclatures, shouldRefresh]);
 
   const onEndReached = useCallback(async () => {
-    if (isLimitReached) {
+    if (isLimitReached || isLoading) {
       return;
     } else {
       await fetchNomenclatures(offset);
     }
-  }, [fetchNomenclatures, isLimitReached, offset]);
+  }, [fetchNomenclatures, isLimitReached, offset, isLoading]);
 
   const onAddPosition = useCallback(() => {
     navigate('NomenclatureViewScreen', {

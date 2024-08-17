@@ -8,7 +8,7 @@ import { networkService } from 'services/network';
 import { useManagerNavigator } from 'navigation/hooks';
 import { useStyles } from './WaitingApprovalList.styles';
 import { ORDER_LIST, ORDER_TAB_STATUS } from 'constants/order';
-import { MEASURE_LIMIT } from 'constants/limit';
+import { ORDER_LIMIT } from 'constants/limit';
 import { Order } from 'types/order';
 
 export const WaitingApprovalList = () => {
@@ -21,7 +21,7 @@ export const WaitingApprovalList = () => {
   const [offset, setOffset] = useState<number>(0);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
-  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
 
   const fetchData = useCallback(async (offset: number) => {
     try {
@@ -48,12 +48,12 @@ export const WaitingApprovalList = () => {
   }, [fetchData, shouldRefresh]);
 
   const onEndReached = useCallback(async () => {
-    if (isLimitReached) {
+    if (isLimitReached || isLoading) {
       return;
     } else {
       await fetchData(offset);
     }
-  }, [fetchData, isLimitReached, offset]);
+  }, [fetchData, isLimitReached, offset, isLoading]);
 
   const onApprovePress = useCallback( (order: Order) => {
     navigate('ViewOrderScreen', {

@@ -24,7 +24,7 @@ export const SelectMeasureScreen = () => {
   const [data, setData] = useState<Measure[]>([]);
   const [offset, setOffset] = useState<number>(0);
 
-  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * MEASURE_LIMIT, [data.length, offset]);
 
   const fetchMeasures = useCallback(async (offset: number) => {
     try {
@@ -64,12 +64,12 @@ export const SelectMeasureScreen = () => {
   }, [goBack, onSelect]);
 
   const onEndReached = useCallback(async () => {
-    if (isLimitReached) {
+    if (isLimitReached || isLoading) {
       return;
     } else {
       await fetchMeasures(offset);
     }
-  }, [fetchMeasures, isLimitReached, offset]);
+  }, [fetchMeasures, isLimitReached, offset, isLoading]);
 
   const renderItem = useCallback(({ item }: { item: Measure}) => (
     <TouchableOpacity onPress={() => onSelectItem(item)} style={styles.item}>

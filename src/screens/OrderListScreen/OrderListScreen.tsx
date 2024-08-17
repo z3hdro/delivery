@@ -15,7 +15,7 @@ import { useDriverNavigator } from 'navigation/hooks';
 import { useStyles } from './OrderListScreen.styles';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { networkService } from 'services/network';
-import { MEASURE_LIMIT } from 'constants/limit';
+import { ORDER_LIMIT } from 'constants/limit';
 import { Order } from 'types/order';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectCurrentOrder } from 'store/selectors';
@@ -38,7 +38,7 @@ export const OrderListScreen = () => {
   const [offset, setOffset] = useState<number>(0);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
-  const isLimitReached = useMemo(() => data.length < (offset + 1) * MEASURE_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
 
   console.log('currentOrder: ', !!currentOrder);
 
@@ -87,12 +87,12 @@ export const OrderListScreen = () => {
   }, [fetchData, shouldRefresh]);
 
   const onEndReached = useCallback(async () => {
-    if (isLimitReached) {
+    if (isLimitReached || isLoading) {
       return;
     } else {
       await fetchData(offset);
     }
-  }, [fetchData, isLimitReached, offset]);
+  }, [fetchData, isLimitReached, offset, isLoading]);
 
   const openSettings = () => {
     if (Platform.OS === 'ios') {
