@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "47069401123",
+    "project_id": "delivery-app-a6643",
+    "storage_bucket": "delivery-app-a6643.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:47069401123:android:964596bf0638964f39e196",
+        "android_client_info": {
+          "package_name": "com.z3hdro.cargodelivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdcYZlnSKJBkyrKpLkUjPE-vhW3MCnyys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
