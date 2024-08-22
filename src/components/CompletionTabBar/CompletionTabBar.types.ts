@@ -16,9 +16,12 @@ export type TabBarRoutes = {
   secondLabel: string;
   thirdScreen?: JSX.Element;
   thirdLabel?: string;
+  fourthScreen?: JSX.Element;
+  fourthLabel?: string;
   tabsContainerStyle?: ViewStyle;
   labelTextStyle?: TextStyle;
   tabStyle?: ViewStyle;
+  displayIcons?: boolean;
 };
 
 export type RenderTabBarProps = SceneRendererProps & {

@@ -69,6 +69,7 @@
   "CargoList_waiting_approval_button": "Подтвердить",
   "CargoList_in_progress_button": "Просмотр",
   "CargoList_available_button": "Редактировать",
+  "CargoList_completed_button": "Просмотр",
   "ViewOrder_header_title": "Рейс",
   "ViewOrder_first_section": "Водитель",
   "ViewOrder_second_section": "Телефон",

@@ -62,7 +62,7 @@ export const  InfoSection: FC<Props> = ({
   const renderContent = () => {
     if (type === INFO_SECTION_TYPE.DATE_PICKER) {
       return (
-        <TouchableOpacity style={styles.valueContainer} onPress={onTogglePicker}>
+        <TouchableOpacity disabled={!editable} style={styles.valueContainer} onPress={onTogglePicker}>
           <Text style={styles.value}>
             {value ? format(value, DISPLAY_DATE_FORMAT) : ''}
           </Text>
@@ -72,7 +72,7 @@ export const  InfoSection: FC<Props> = ({
 
     if (type === INFO_SECTION_TYPE.SCREEN) {
       return (
-        <TouchableOpacity style={styles.valueContainer} onPress={onNavigate}>
+        <TouchableOpacity disabled={!editable} style={styles.valueContainer} onPress={onNavigate}>
           <Text style={styles.value}>
             {value ?? ''}
           </Text>

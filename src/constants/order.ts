@@ -10,7 +10,8 @@ export enum ORDER_STATUS {
 export enum ORDER_LIST {
   WAITING_APPROVAL,
   IN_PROGRESS,
-  AVAILABLE
+  AVAILABLE,
+  COMPLETED
 }
 
 export enum CARGO_KEYS {
@@ -21,8 +22,9 @@ export enum CARGO_KEYS {
 export enum ORDER_TAB_STATUS {
   ALL = 'all',
   CONFIRMATION = 'confirmation',
+  AVAILABLE = 'available',
   IN_WORK = 'inwork',
-  AVAILABLE = 'available'
+  COMPLETED = 'completed'
 }
 
 export enum COST_TYPE {

@@ -3,7 +3,7 @@ import { withAppDelegate, ConfigPlugin } from 'expo/config-plugins';
 import yandexConfig from './secrets/yandex_config.json';
 
 const VERSION = '1.0.0';
-const BUILD_NUMBER = 3;
+const BUILD_NUMBER = 8;
 const NAME = 'Delivery app';
 const SLUG = 'Delivery';
 

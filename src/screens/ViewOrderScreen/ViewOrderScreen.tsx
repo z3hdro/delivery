@@ -103,7 +103,7 @@ export const ViewOrderScreen = () => {
     try {
       setIsLoading(true);
 
-      if (type === ORDER_LIST.IN_PROGRESS) {
+      if (type === ORDER_LIST.IN_PROGRESS || type === ORDER_LIST.COMPLETED) {
         goBack();
         console.log('close');
       } else if (type === ORDER_LIST.WAITING_APPROVAL) {
@@ -214,7 +214,7 @@ export const ViewOrderScreen = () => {
               destination={{ ...order.destination.Address, geo: parseGeo(order.destination.geo) }}
               onInfoPress={onInfoPress}
               track={order.geo ? currentGeo : undefined}
-              displayTrack={type === ORDER_LIST.IN_PROGRESS}
+              displayTrack={type === ORDER_LIST.IN_PROGRESS || type === ORDER_LIST.COMPLETED}
               showUserPosition={false}
             />
           </View>
@@ -237,6 +237,7 @@ export const ViewOrderScreen = () => {
               label={t('ViewOrder_third_section')}
               value={orderData.departureDatePlan}
               type={INFO_SECTION_TYPE.DATE_PICKER}
+              editable={type !== ORDER_LIST.COMPLETED}
               onUpdate={(text: string) => {
                 onUpdateOrder(ORDER_KEYS.DEPARTURE_DATE_PLAN, text);
               }}
@@ -246,6 +247,7 @@ export const ViewOrderScreen = () => {
               label={t('ViewOrder_fourth_section')}
               value={orderData.deliveryDatePlan}
               type={INFO_SECTION_TYPE.DATE_PICKER}
+              editable={type !== ORDER_LIST.COMPLETED}
               minimumDate={new Date(orderData.departureDatePlan)}
               onUpdate={(text: string) => {
                 onUpdateOrder(ORDER_KEYS.DELIVERY_DATE_PLAN, text);
@@ -280,7 +282,7 @@ export const ViewOrderScreen = () => {
               onPress={() => onPress(orderData)}
               disabled={isLoading}
             />
-            {type !== ORDER_LIST.IN_PROGRESS && (
+            {(type !== ORDER_LIST.IN_PROGRESS && type !== ORDER_LIST.COMPLETED) && (
               <View style={styles.secondaryButtonContainer}>
                 {type === ORDER_LIST.WAITING_APPROVAL ? (
                   <Button

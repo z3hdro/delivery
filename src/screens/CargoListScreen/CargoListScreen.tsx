@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
 import { CompletionTabBar } from 'components/CompletionTabBar';
-import { WaitingApprovalList, InProgressList, AvailableList } from './components';
+import { WaitingApprovalList, InProgressList, AvailableList, CompletedList } from './components';
 
 import { useStyles } from './CargoListScreen.styles';
 
@@ -30,6 +30,8 @@ export const CargoListScreen = () => {
           firstScreen={<WaitingApprovalList />}
           secondScreen={<InProgressList />}
           thirdScreen={<AvailableList />}
+          fourthScreen={<CompletedList />}
+          displayIcons
         />
       </View>
     </Screen>
