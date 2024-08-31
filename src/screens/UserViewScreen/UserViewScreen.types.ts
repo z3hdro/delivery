@@ -44,3 +44,21 @@ export type CompanyData = {
   buyer: boolean
   transport_company: boolean
 }
+
+export type ErrorMap = {
+  phone: boolean
+  manager: boolean
+  companyName: boolean
+  companyInn: boolean
+  companyKpp: boolean
+  email: boolean
+}
+
+export type ValidationArgs = {
+  manager: string
+  company: boolean
+  companyName: string
+  companyInn: string
+  companyKpp: string
+  email?: string
+}

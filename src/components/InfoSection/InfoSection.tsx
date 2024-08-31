@@ -19,6 +19,9 @@ export const  InfoSection: FC<Props> = ({
   type = INFO_SECTION_TYPE.INPUT,
   keyboardType,
   minimumDate = new Date(),
+  isRequired = false,
+  isError = false,
+  errorText = '',
   onNavigate,
 }) => {
   const styles = useStyles();
@@ -62,32 +65,41 @@ export const  InfoSection: FC<Props> = ({
   const renderContent = () => {
     if (type === INFO_SECTION_TYPE.DATE_PICKER) {
       return (
-        <TouchableOpacity disabled={!editable} style={styles.valueContainer} onPress={onTogglePicker}>
-          <Text style={styles.value}>
-            {value ? format(value, DISPLAY_DATE_FORMAT) : ''}
-          </Text>
-        </TouchableOpacity>
+        <>
+          {isRequired && <Text style={styles.required}>*</Text>}
+          <TouchableOpacity disabled={!editable} style={[styles.valueContainer, isError && styles.error]} onPress={onTogglePicker}>
+            <Text style={styles.value}>
+              {value ? format(value, DISPLAY_DATE_FORMAT) : ''}
+            </Text>
+          </TouchableOpacity>
+        </>
       );
     }
 
     if (type === INFO_SECTION_TYPE.SCREEN) {
       return (
-        <TouchableOpacity disabled={!editable} style={styles.valueContainer} onPress={onNavigate}>
-          <Text style={styles.value}>
-            {value ?? ''}
-          </Text>
-        </TouchableOpacity>
+        <>
+          {isRequired && <Text style={styles.required}>*</Text>}
+          <TouchableOpacity disabled={!editable} style={styles.valueContainer} onPress={onNavigate}>
+            <Text style={styles.value}>
+              {value ?? ''}
+            </Text>
+          </TouchableOpacity>
+        </>
       );
     }
 
     return (
-      <TextInput
-        keyboardType={keyboardType}
-        style={[styles.textInput, !editable && styles.displayText, textInputStyle]}
-        value={inputValue}
-        onChangeText={onChangeText}
-        editable={editable}
-      />
+      <>
+        {isRequired && <Text style={styles.required}>*</Text>}
+        <TextInput
+          keyboardType={keyboardType}
+          style={[styles.textInput, !editable && styles.displayText, textInputStyle, isError && styles.error]}
+          value={inputValue}
+          onChangeText={onChangeText}
+          editable={editable}
+        />
+      </>
     );
   };
 
@@ -98,6 +110,7 @@ export const  InfoSection: FC<Props> = ({
           {label}
         </Text>
         {renderContent()}
+        {isError && errorText && <Text style={styles.errorText}>{errorText}</Text>}
       </View>
 
       {type === INFO_SECTION_TYPE.DATE_PICKER && (

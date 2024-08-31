@@ -9,6 +9,7 @@ import { Preloader } from 'components/Preloader';
 import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
+import { DEFAULT_MEASURE_NAME } from './NomenclatureViewScreen.consts';
 import { useStyles } from './NomenclatureViewScreen.styles';
 import { Measure } from 'types/measure';
 
@@ -26,6 +27,7 @@ export const NomenclatureViewScreen = () => {
   const [name, setName] = useState<string>(nomenclature?.name || '');
   const [measure, setMeasure] = useState<Measure | null>(nomenclature?.measure || null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -42,13 +44,29 @@ export const NomenclatureViewScreen = () => {
     try {
       setIsLoading(true);
 
-      if (!name.trim().length || !measure) {
-        return;
+      const nomenclatureName = name.trim();
+
+      if (!nomenclatureName.length) {
+        setIsError(true);
+        return
+      }
+
+      let selectedMeasure = measure;
+
+      if (!selectedMeasure) {
+        const { measures } = await networkService.getAllMeasures(0);
+        if (measures.length) {
+          selectedMeasure = measures.find(({ name }) => name.toLowerCase() === DEFAULT_MEASURE_NAME) ?? null
+        }
+      }
+
+      if (!selectedMeasure) {
+        return
       }
 
       await networkService.addNomenclature({
         name,
-        measureId: measure.id
+        measureId: selectedMeasure.id
       });
       onUpdate();
       goBack();
@@ -62,6 +80,13 @@ export const NomenclatureViewScreen = () => {
   const onSavePosition = useCallback(async () => {
     try {
       setIsLoading(true);
+
+      const nomenclatureName = name.trim();
+
+      if (!nomenclatureName.length) {
+        setIsError(true);
+        return
+      }
 
       if (!name.trim().length || !measure || !nomenclature) {
         return;
@@ -83,9 +108,23 @@ export const NomenclatureViewScreen = () => {
     }
   }, [goBack, measure, name, nomenclature, onUpdate]);
 
-  // TODO: add DELETE request for nomenclature
-  const onDeletePosition = useCallback(() => {
-    goBack();
+  const onDeletePosition = useCallback(async () => {
+    try {
+      setIsLoading(true)
+
+      if (!nomenclature) {
+        return
+      }
+
+      await networkService.deleteNomenclature(nomenclature?.id)
+
+      onUpdate();
+      goBack();
+    } catch (e) {
+      console.log('delete nomenclature error: ', e);
+    } finally {
+      setIsLoading(false)
+    }
   }, [goBack]);
 
   const onNavigate = useCallback(() => {
@@ -108,11 +147,17 @@ export const NomenclatureViewScreen = () => {
       {isLoading && <Preloader style={styles.preloader} />}
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <InfoSection
+          isRequired
           label={t('Nomenclature_add_first_section')}
           value={name}
           onUpdate={(text) => {
+            if (isError) {
+              setIsError(false);
+            }
             setName(text);
           }}
+          isError={isError}
+          errorText={t('Nomenclature_add_error_empty_name')}
         />
         <InfoSection
           style={styles.section}
@@ -132,12 +177,14 @@ export const NomenclatureViewScreen = () => {
         {isEdit && (
           <View style={styles.buttonsContainer}>
             <Button
+              disabled={isLoading}
               style={styles.secondaryButton}
               textStyle={styles.primaryButtonText}
               title={t('Nomenclature_add_delete_button')}
               onPress={onDeletePosition}
             />
             <Button
+              disabled={isLoading}
               style={styles.secondaryButton}
               textStyle={styles.primaryButtonText}
               title={t('Nomenclature_add_cancel_button')}

@@ -136,5 +136,8 @@ export const useStyles = () => {
       borderRadius: 50,
       backgroundColor: colors.color2,
     },
+    required: {
+      color: colors.red,
+    }
   }), [bottom]);
 };

@@ -1,13 +1,22 @@
 import { USER } from 'constants/user';
-import { CompanyData, DrivingLicense, PassportData, PersonData } from './UserViewScreen.types';
+import {
+  CompanyData,
+  DrivingLicense,
+  ErrorMap,
+  PassportData,
+  PersonData,
+  ValidationArgs
+} from './UserViewScreen.types';
 import {
   COMPANY_TYPE,
   EMPLOYMENT,
   EMPTY_COMPANY, EMPTY_DRIVING_LICENSE,
   EMPTY_PASSPORT,
-  EMPTY_PERSON,
+  EMPTY_PERSON, INITIAL_ERROR_MAP,
 } from './UserViewScreen.consts';
-import { ApprovedDriver, UnapprovedDriver } from 'types/user';
+import { ApprovedDriver, ExtendedPerson, Person, UnapprovedDriver } from 'types/user';
+import { useCallback } from 'react';
+import { EMAIL_REGEX, IS_DIGIT_ONLY_REGEX } from 'constants/regex';
 
 export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): PersonData => {
   if (type === USER.WAITING_APPROVAL && user) {
@@ -169,3 +178,61 @@ export const selectCompanyType = (companyData: CompanyData): string => {
   }
   return '';
 };
+
+export const createManagerFullName = (person?: ExtendedPerson): string => {
+  let fullName = ''
+
+  if (!person) {
+    return fullName
+  }
+
+  const { surname, name, patronymic } = person
+
+  if (surname) {
+    fullName += surname
+  }
+
+  if (name) {
+    fullName += fullName.length ? ` ${name}` : name
+  }
+
+  if (patronymic) {
+    fullName += fullName.length ? ` ${patronymic}` : patronymic
+  }
+
+  return fullName
+}
+
+export const checkValidation = ({
+  manager,
+  email,
+  company,
+  companyName,
+  companyInn,
+  companyKpp
+}: ValidationArgs): ErrorMap => {
+  const errorMap = {...INITIAL_ERROR_MAP};
+
+  if (email && !EMAIL_REGEX.test(email)) {
+    errorMap.email = true;
+  }
+
+  if (!manager.trim()) {
+    errorMap.manager = true;
+  }
+
+  if (company) {
+    if (!companyName) {
+      errorMap.companyName = true;
+    }
+
+    if (!companyInn) {
+      errorMap.companyInn = true;
+    }
+    if (companyKpp.length > 0 && !IS_DIGIT_ONLY_REGEX.test(companyKpp)) {
+      errorMap.companyKpp = true;
+    }
+  }
+
+  return errorMap
+}

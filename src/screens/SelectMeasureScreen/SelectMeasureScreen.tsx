@@ -24,6 +24,8 @@ export const SelectMeasureScreen = () => {
   const [data, setData] = useState<Measure[]>([]);
   const [offset, setOffset] = useState<number>(0);
 
+  console.log('data: ', data);
+
   const isLimitReached = useMemo(() => data.length < offset * MEASURE_LIMIT, [data.length, offset]);
 
   const fetchMeasures = useCallback(async (offset: number) => {

@@ -64,7 +64,12 @@ export type Person = {
   user: UserPerson
   contragent: Contragent
   jobPosition: PersonJobPosition
+}
 
+export type ExtendedPerson = Person & {
+  name: string | null
+  surname: string | null
+  patronymic: string | null
 }
 
 export type ApprovedDriver = {

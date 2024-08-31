@@ -17,6 +17,7 @@ import { selectDeviceToken } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
 import { INITIAL_ERROR_MAP, NETWORK_ERROR_TEXT, REGISTRATION_ERROR_TEXT } from './RegistrationScreen.consts';
+import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX } from 'constants/regex';
 import { ErrorMap } from './RegistrationScreen.types';
 
 export const RegistrationScreen = () => {
@@ -39,13 +40,13 @@ export const RegistrationScreen = () => {
         return;
       }
 
-      if (!/^[^a-zA-Z]*$/.test(trimPhone)) {
+      if (!CONTAINS_LETTERS_REGEX.test(trimPhone)) {
         setErrorText(REGISTRATION_ERROR_TEXT.PHONE_CONTAIN_WORDS);
         setIsError(prevState => ({ ...prevState, phone: true }));
         return;
       }
 
-      if ((trimPhone.match(/\d/g) || []).length !== 11) {
+      if ((trimPhone.match(DIGIT_REGEX) || []).length !== 11) {
         setErrorText(REGISTRATION_ERROR_TEXT.PHONE_LENGTH);
         setIsError(prevState => ({ ...prevState, phone: true }));
         return;

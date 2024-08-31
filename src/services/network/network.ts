@@ -334,6 +334,7 @@ class NetworkService {
   }
 
   public async addNomenclature(data: AddNomenclaturePayload): Promise<Nomenclature> {
+    console.log('AddNomenclaturePayload: ', data);
     const result = await this.authorizedClient.post<Nomenclature>('nomenclature', data);
 
     console.log('addNomenclature result: ', result.data);
@@ -350,6 +351,17 @@ class NetworkService {
 
     return result.data;
   }
+
+  public async deleteNomenclature(nomenclatureId: number): Promise<MessageResponse> {
+    console.log('nomenclatureId: ', nomenclatureId);
+    const result = await this.authorizedClient.delete<MessageResponse>(`nomenclature/${nomenclatureId}`);
+
+    console.log('deleteNomenclature result: ', result.data);
+
+    return result.data;
+  }
+
+
 
   public async getAvailableOrders(
     offset: number,

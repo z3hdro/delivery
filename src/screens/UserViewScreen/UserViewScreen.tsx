@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
+import { AxiosError } from 'axios';
 
 import { ScreenHeader } from 'components/ScreenHeader';
 import { InfoSection } from 'components/InfoSection';
@@ -13,16 +14,18 @@ import { Button } from 'components/Button';
 import { Preloader } from 'components/Preloader';
 import { JobPositionPicker } from 'components/JobPositionPicker';
 import { networkService } from 'services/network';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectCurrentPerson } from 'store/selectors';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
+  checkValidation,
   createCompanyInitialState,
-  createDrivingLicenseInitialState,
+  createDrivingLicenseInitialState, createManagerFullName,
   createPassportInitialState,
   createPersonInitialState,
   selectCompanyType,
   selectEmploymentType
 } from './UserViewScreen.utils';
-import { useStyles } from './UserViewScreen.styles';
 import {
   COMPANY_KEYS,
   COMPANY_TYPE,
@@ -31,21 +34,35 @@ import {
   EMPLOYMENT,
   EMPLOYMENT_VALUES,
   PASSPORT_KEYS,
-  PERSON_KEYS
+  PERSON_KEYS,
+  INITIAL_ERROR_MAP, USER_APPROVE_ERROR_TEXT
 } from './UserViewScreen.consts';
+import { USER } from 'constants/user';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
-import { CompanyData, DrivingLicense, ImageFile, PassportData, PersonData } from './UserViewScreen.types';
+import { EMAIL_REGEX, IS_DIGIT_ONLY_REGEX } from 'constants/regex';
+import {
+  CompanyData,
+  DrivingLicense,
+  ErrorMap,
+  ImageFile,
+  PassportData,
+  PersonData,
+  ValidationArgs
+} from './UserViewScreen.types';
 import { Option } from 'types/picker';
+import { ExtendedPerson } from 'types/user';
+import { useStyles } from './UserViewScreen.styles';
 
 import { BackIcon } from 'src/assets/icons';
-import { AxiosError } from 'axios';
-import { USER } from 'constants/user';
+
 
 export const UserViewScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { goBack } = useManagerNavigator();
   const { params: { user, driver, type, onUpdate } } = useManagerRoute<'UserViewScreen'>();
+
+  const person = useAppSelector(selectCurrentPerson);
 
   const [personData, setPersonData] = useState<PersonData>(
     createPersonInitialState(type, driver, user)
@@ -59,8 +76,18 @@ export const UserViewScreen = () => {
   const [companyData, setCompanyData] = useState<CompanyData>(
     createCompanyInitialState(type, driver, user)
   );
+  const [manager, setManager] = useState<string>(
+    createManagerFullName(person as ExtendedPerson)
+  )
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [errorText, setErrorText] = useState<string | null>(null);
+  const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
+
+  const isValidError = useMemo(() => {
+    return Object.values(isError).some((err) => err);
+  }, [JSON.stringify(isError)])
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -133,7 +160,7 @@ export const UserViewScreen = () => {
     setPersonData(prevState => ({ ...prevState, jobPosition: item }));
   }, []);
 
-  const onSaveUserData = useCallback(async () => {
+  const onSaveUserData = async () => {
     try {
       setIsLoading(true);
 
@@ -145,6 +172,20 @@ export const UserViewScreen = () => {
       console.log('companyData: ', companyData);
       console.log('passportData: ', passportData);
       console.log('images: ', images);
+
+      const errorMap = checkValidation({
+        manager: manager.trim(),
+        company: personData.company,
+        companyName: companyData.name,
+        companyInn: companyData.inn,
+        companyKpp: companyData.kpp,
+        email: personData?.email?.trim()
+      })
+
+      if (Object.values(errorMap).some((err) => err)) {
+        setIsError(errorMap)
+        return
+      }
 
       const files: ImageFile[] = [];
 
@@ -224,17 +265,7 @@ export const UserViewScreen = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [
-    isLoading,
-    personData,
-    companyData,
-    passportData,
-    images,
-    drivingLicenseData.series,
-    drivingLicenseData.number,
-    onUpdate,
-    goBack
-  ]);
+  }
 
   const onUpdateUserData = async () => {
     try {
@@ -248,6 +279,20 @@ export const UserViewScreen = () => {
       console.log('companyData: ', companyData);
       console.log('passportData: ', passportData);
       console.log('images: ', images);
+
+      const errorMap = checkValidation({
+        manager: manager.trim(),
+        company: personData.company,
+        companyName: companyData.name,
+        companyInn: companyData.inn,
+        companyKpp: companyData.kpp,
+        email: personData?.email?.trim()
+      })
+
+      if (Object.values(errorMap).some((err) => err)) {
+        setIsError(errorMap)
+        return
+      }
 
       const files: ImageFile[] = [];
 
@@ -327,15 +372,32 @@ export const UserViewScreen = () => {
             style={styles.section}
             label={t('UserView_manager_first_label')}
             value={personData.phone}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.PHONE, text);
-            }}
+            editable={false}
+            isRequired
+            // onUpdate={(text: string) => {
+            //   if (errorText) {
+            //     setErrorText(null);
+            //     setIsError(INITIAL_ERROR_MAP);
+            //   }
+            //   updatePersonData(PERSON_KEYS.PHONE, text);
+            // }}
+            // isError={isError.phone}
+            // errorText={errorText}
           />
           <InfoSection
             style={styles.section}
             label={t('UserView_manager_second_label')}
-            value={'Петров Петр Петрович'}
-            editable={false}
+            value={manager}
+            onUpdate={(text) => {
+              if (isValidError) {
+                setErrorText(null)
+                setIsError(INITIAL_ERROR_MAP)
+              }
+              setManager(text)
+            }}
+            isRequired
+            isError={isError.manager}
+            errorText={t(errorText || USER_APPROVE_ERROR_TEXT.MANAGER_EMPTY)}
           />
 
           <Text style={styles.sectionTitle}>
@@ -403,8 +465,15 @@ export const UserViewScreen = () => {
                 label={t('UserView_company_first_label')}
                 value={companyData.name}
                 onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
                   updateCompanyData(COMPANY_KEYS.NAME, text);
                 }}
+                isRequired
+                isError={isError.companyName}
+                errorText={t(errorText || USER_APPROVE_ERROR_TEXT.COMPANY_NAME_EMPTY)}
               />
               <InfoSection
                 style={styles.section}
@@ -412,9 +481,16 @@ export const UserViewScreen = () => {
                 label={t('UserView_company_second_label')}
                 value={companyData.inn}
                 onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
                   updateCompanyData(COMPANY_KEYS.INN, text);
                 }}
                 keyboardType={'numeric'}
+                isRequired
+                isError={isError.companyInn}
+                errorText={t(errorText || USER_APPROVE_ERROR_TEXT.COMPANY_INN_EMPTY)}
               />
               <InfoSection
                 style={styles.section}
@@ -422,12 +498,20 @@ export const UserViewScreen = () => {
                 label={t('UserView_company_third_label')}
                 value={companyData.kpp}
                 onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
                   updateCompanyData(COMPANY_KEYS.KPP, text);
                 }}
                 keyboardType={'numeric'}
+                isError={isError.companyKpp}
+                errorText={t(errorText || USER_APPROVE_ERROR_TEXT.COMPANY_KPP_ONLY_NUMBERS)}
               />
               <View style={styles.section}>
                 <Text style={styles.label}>
+                  <Text style={styles.required}>*</Text>
+                  {' '}
                   {t('UserView_company_fourth_label')}
                 </Text>
                 <Checkbox
@@ -473,8 +557,14 @@ export const UserViewScreen = () => {
             label={t('UserView_contact_first_label')}
             value={personData.email ?? ''}
             onUpdate={(text: string) => {
+              if (isValidError) {
+                setErrorText(null);
+                setIsError(INITIAL_ERROR_MAP);
+              }
               updatePersonData(PERSON_KEYS.EMAIL, text);
             }}
+            isError={isError.email}
+            errorText={t(errorText || USER_APPROVE_ERROR_TEXT.INCORRECT_EMAIL)}
           />
           <InfoSection
             style={styles.section}
@@ -589,7 +679,7 @@ export const UserViewScreen = () => {
               textStyle={styles.primaryButtonText}
               title={t('UserView_save_button')}
               onPress={type === USER.WAITING_APPROVAL ? onSaveUserData : onUpdateUserData}
-              disabled={isLoading}
+              disabled={isLoading || isValidError}
             />
             <Button
               style={styles.secondaryButton}
