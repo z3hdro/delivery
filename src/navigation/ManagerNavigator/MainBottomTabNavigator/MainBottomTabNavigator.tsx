@@ -11,6 +11,10 @@ import { DriverListScreen } from 'screens/DriverListScreen';
 import { ShippingPointScreen } from 'screens/ShippingPointScreen';
 
 import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'src/assets/icons';
+import { WEBSOCKET_URL } from 'constants/websocket';
+import useWebSocket from 'react-native-use-websocket';
+import { networkService } from 'services/network';
+import { WSOrderManager } from 'types/websocket';
 
 const Tab = createBottomTabNavigator<MainBottomTabNavigatorParamList>();
 
@@ -21,6 +25,32 @@ const customOptions = {
 
 export const MainBottomTabNavigator = () => {
   const { t } = useTranslation();
+
+  const { sendMessage, lastMessage, readyState } = useWebSocket(WEBSOCKET_URL.ORDER, {
+    onOpen: () => console.log('ws opened'),
+    options: {
+      headers: {
+        Authorization: networkService.getAuthorizationToken(),
+      }
+    },
+    onMessage: (e) => {
+      const message = JSON.parse((e.data as string)) as WSOrderManager;
+      console.log('Received message:', message);
+
+    },
+    onClose: (e) => console.log('ws closed', e),
+    onError: (e) => console.log('ws error', e),
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (closeEvent) => true,
+    reconnectAttempts: 5
+  });
+  console.log('lastMessage: ', lastMessage);
+
+  // console.log('readyState websocket', readyState);
+
+  // const connectionStatus = CONNECTION_STATUS[readyState];
+
+  // console.log('connectionStatus: ', connectionStatus);
 
   return (
     <Tab.Navigator

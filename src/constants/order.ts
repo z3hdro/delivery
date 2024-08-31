@@ -7,6 +7,8 @@ export enum ORDER_STATUS {
   CANCELLED = 'cancelled',
 }
 
+export type ORDER_STATUS_VALUES =`${ORDER_STATUS}`
+
 export enum ORDER_LIST {
   WAITING_APPROVAL,
   IN_PROGRESS,

@@ -16,6 +16,8 @@ import { useAppSelector } from 'hooks/useAppSelector';
 import { selectDeviceToken } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
+import { INITIAL_ERROR_MAP, NETWORK_ERROR_TEXT, REGISTRATION_ERROR_TEXT } from './RegistrationScreen.consts';
+import { ErrorMap } from './RegistrationScreen.types';
 
 export const RegistrationScreen = () => {
   const { t } = useTranslation();
@@ -26,14 +28,37 @@ export const RegistrationScreen = () => {
 
   const [phone, setPhone] = useState<string>(DRIVER_PHONE);
   const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
+  const [errorText, setErrorText] = useState<string | null>(null);
+  const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
 
-  const onRegisterPress = useCallback(async () => {
+  const onRegisterPress = useCallback(async (enteredPhone: string, enteredPassword: string) => {
     try {
-      if (!phone.trim().length || !password.trim().length) {
+      const trimPhone = enteredPhone.trim();
+      const trimPassword = enteredPassword.trim();
+      if (!trimPhone.length || !trimPassword.length) {
         return;
       }
+
+      if (!/^[^a-zA-Z]*$/.test(trimPhone)) {
+        setErrorText(REGISTRATION_ERROR_TEXT.PHONE_CONTAIN_WORDS);
+        setIsError(prevState => ({ ...prevState, phone: true }));
+        return;
+      }
+
+      if ((trimPhone.match(/\d/g) || []).length !== 11) {
+        setErrorText(REGISTRATION_ERROR_TEXT.PHONE_LENGTH);
+        setIsError(prevState => ({ ...prevState, phone: true }));
+        return;
+      }
+
+      if (trimPassword.length < 6) {
+        setErrorText(REGISTRATION_ERROR_TEXT.PASSWORD_LENGTH);
+        setIsError(prevState => ({ ...prevState, password: true }));
+        return;
+      }
+
       const { accessToken, refreshToken, user } = await networkService.register({
-        phone: phone.replace('+', ''),
+        phone: enteredPhone.replace('+', ''),
         password,
         fcmToken: deviceToken ?? ''
       });
@@ -64,6 +89,9 @@ export const RegistrationScreen = () => {
     } catch (e) {
       const error = e as AxiosError;
       console.log('registration screen error: ', error?.response?.data ?? error);
+      if ((error?.response?.data as { message: string })?.message === NETWORK_ERROR_TEXT.USER_ALREADY_EXISTS) {
+        setErrorText(REGISTRATION_ERROR_TEXT.USER_EXISTS);
+      }
     }
   }, [phone, password, deviceToken, dispatch]);
 
@@ -94,19 +122,39 @@ export const RegistrationScreen = () => {
         </View>
         <TextInput
           value={phone}
-          onChangeText={setPhone}
-          style={styles.textInputContainer}
-          keyboardType={'phone-pad'}
+          onChangeText={(text) => {
+            if (errorText) {
+              setErrorText(null);
+              setIsError(INITIAL_ERROR_MAP);
+            }
+            setPhone(text);
+          }}
+          style={[styles.textInputContainer, isError.phone && styles.errorField]}
+          // keyboardType={'phone-pad'}
           placeholder={t('Registration_phone_input_placeholder')}
         />
         <TextInput
           value={password}
-          onChangeText={setPassword}
-          style={styles.textInputContainer}
+          onChangeText={(text) => {
+            if (errorText) {
+              setErrorText(null);
+              setIsError(INITIAL_ERROR_MAP);
+            }
+            setPassword(text);
+          }}
+          style={[styles.textInputContainer, isError.password && styles.errorField]}
           placeholder={t('Registration_password_input_placeholder')}
           secureTextEntry
         />
-        <Button hasShadows onPress={onRegisterPress} title={t('Registration_button')} style={styles.button} />
+        {errorText && (
+          <Text style={styles.errorText}>{t(errorText)}</Text>
+        )}
+        <Button
+          hasShadows
+          onPress={() => onRegisterPress(phone, password)}
+          title={t('Registration_button')}
+          style={errorText ? styles.buttonWithError : styles.button}
+        />
       </View>
     </Screen>
   );

@@ -10,3 +10,4 @@ export * from './infoModal';
 export * from './contact';
 export * from './measure';
 export * from './jobs';
+export * from './websocket';

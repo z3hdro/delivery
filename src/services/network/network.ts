@@ -109,6 +109,10 @@ class NetworkService {
     this.authorizedClient.defaults.headers.common.Authorization = `Bearer ${token}`;
   }
 
+  public getAuthorizationToken(): string {
+    return this.authorizedClient.defaults.headers.common.Authorization as string;
+  }
+
   public clearAuthHeader() {
     this.authorizedClient.defaults.headers.common.Authorization = '';
   }

@@ -9,3 +9,4 @@ export * from './limit';
 export * from './contact';
 export * from './emitEvents';
 export * from './weight';
+export * from './websocket';
