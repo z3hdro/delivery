@@ -36,20 +36,20 @@ export const useStyles = () => {
       marginTop: 8,
       columnGap: 8,
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'flex-start'
     },
     cargoPicker: {
       flexBasis: 'auto',
       flexGrow: 1
     },
     cargoWeight: {
-      minWidth: 70,
+      minWidth: 90,
       flex: 1,
       flexBasis: 'auto',
       flexGrow: 0
     },
     weightStyle: {
-      maxWidth: 70
+      maxWidth: 90
     },
     weightTextStyle: {
       marginLeft: 0
@@ -68,6 +68,7 @@ export const useStyles = () => {
       letterSpacing: 1
     },
     deleteButton: {
+      marginTop: 10,
       paddingTop: 16,
     }
   }), [bottom]);

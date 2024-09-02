@@ -6,14 +6,15 @@ export type Cargo = {
   netWeight: string;
 }
 
-export type OrderData = {
-  departureId: number
-  destinationId: number
-  plannedLoadingDate: string
-  plannedDeliveryDate: string
-  priceOption: string
-  cashPrice: string
-  cashlessPrice: string
+export type ErrorMap = {
+  departure: boolean;
+  destination: boolean;
+  price: boolean;
+}
+
+export type CargoError = {
+  cargoName: boolean;
+  cargoNetWeight: boolean;
 }
 
 export type LogisticPointView = Pick<LogisticPoint, 'id' | 'name'>

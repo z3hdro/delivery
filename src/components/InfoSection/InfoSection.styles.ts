@@ -63,7 +63,7 @@ export const useStyles = () => {
       borderColor: colors.red,
     },
     errorText: {
-      marginTop: 2,
+      marginTop: 4,
       color: colors.red,
       fontFamily: 'Roboto',
       fontSize: 14,
