@@ -14,8 +14,7 @@ import {
   EMPTY_PASSPORT,
   EMPTY_PERSON, INITIAL_ERROR_MAP,
 } from './UserViewScreen.consts';
-import { ApprovedDriver, ExtendedPerson, Person, UnapprovedDriver } from 'types/user';
-import { useCallback } from 'react';
+import { ApprovedDriver, ExtendedPerson, UnapprovedDriver } from 'types/user';
 import { EMAIL_REGEX, IS_DIGIT_ONLY_REGEX } from 'constants/regex';
 
 export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): PersonData => {
@@ -180,28 +179,28 @@ export const selectCompanyType = (companyData: CompanyData): string => {
 };
 
 export const createManagerFullName = (person?: ExtendedPerson): string => {
-  let fullName = ''
+  let fullName = '';
 
   if (!person) {
-    return fullName
+    return fullName;
   }
 
-  const { surname, name, patronymic } = person
+  const { surname, name, patronymic } = person;
 
   if (surname) {
-    fullName += surname
+    fullName += surname;
   }
 
   if (name) {
-    fullName += fullName.length ? ` ${name}` : name
+    fullName += fullName.length ? ` ${name}` : name;
   }
 
   if (patronymic) {
-    fullName += fullName.length ? ` ${patronymic}` : patronymic
+    fullName += fullName.length ? ` ${patronymic}` : patronymic;
   }
 
-  return fullName
-}
+  return fullName;
+};
 
 export const checkValidation = ({
   manager,
@@ -211,7 +210,7 @@ export const checkValidation = ({
   companyInn,
   companyKpp
 }: ValidationArgs): ErrorMap => {
-  const errorMap = {...INITIAL_ERROR_MAP};
+  const errorMap = { ...INITIAL_ERROR_MAP };
 
   if (email && !EMAIL_REGEX.test(email)) {
     errorMap.email = true;
@@ -234,5 +233,5 @@ export const checkValidation = ({
     }
   }
 
-  return errorMap
-}
+  return errorMap;
+};

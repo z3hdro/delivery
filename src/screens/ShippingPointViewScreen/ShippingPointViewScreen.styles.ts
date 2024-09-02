@@ -170,6 +170,8 @@ export const useStyles = () => {
       padding: 8,
       position: 'absolute',
       zIndex: 99,
+    },
+    geoPositionLabelBox: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between'
@@ -183,5 +185,21 @@ export const useStyles = () => {
       height: 320,
       width: '100%',
     },
+    requiredLabel: {
+      color: colors.red,
+    },
+    errorLabel: {
+      borderWidth: 1,
+      borderColor: colors.red,
+    },
+    errorText: {
+      color: colors.red,
+      fontFamily: 'Roboto',
+      fontSize: 14,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 16,
+      letterSpacing: 0.2,
+    }
   }), [bottom]);
 };

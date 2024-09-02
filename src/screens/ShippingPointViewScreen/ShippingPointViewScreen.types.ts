@@ -1,3 +1,5 @@
+import { GeoPosition } from 'types/geolocation';
+import { EMPTY_CONTACT } from 'constants/contact';
 
 export type ExpandedMap = Record<string, boolean>;
 
@@ -8,7 +10,6 @@ export type AddressView = {
   house: string
   building: string
   floor: string
-  postcode: string
   apartment: string
   description: string
 }
@@ -26,3 +27,29 @@ export type ContactView = {
 
 export type AddressKeys = keyof AddressView;
 export type ContactKeys = keyof ContactView;
+
+export type ContactError = {
+  contactNumberNonDigit: boolean
+  contactNumberLength: boolean
+  contactName: boolean
+  contactSurname: boolean
+  contactEmail: boolean
+}
+
+export type ContactErrorMap = ContactError[]
+
+export type ErrorMap = {
+  name: boolean
+  address: boolean
+  contact: boolean
+  geo: boolean
+}
+
+export type ValidationArgs = {
+  name: string
+  address: AddressView
+  geoData: GeoPosition
+  contacts: ContactView[]
+}
+
+export type RequiredContactKeys =  keyof typeof EMPTY_CONTACT

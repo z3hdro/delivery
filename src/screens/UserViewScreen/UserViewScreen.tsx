@@ -39,15 +39,13 @@ import {
 } from './UserViewScreen.consts';
 import { USER } from 'constants/user';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
-import { EMAIL_REGEX, IS_DIGIT_ONLY_REGEX } from 'constants/regex';
 import {
   CompanyData,
   DrivingLicense,
   ErrorMap,
   ImageFile,
   PassportData,
-  PersonData,
-  ValidationArgs
+  PersonData
 } from './UserViewScreen.types';
 import { Option } from 'types/picker';
 import { ExtendedPerson } from 'types/user';
@@ -78,7 +76,7 @@ export const UserViewScreen = () => {
   );
   const [manager, setManager] = useState<string>(
     createManagerFullName(person as ExtendedPerson)
-  )
+  );
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -87,7 +85,8 @@ export const UserViewScreen = () => {
 
   const isValidError = useMemo(() => {
     return Object.values(isError).some((err) => err);
-  }, [JSON.stringify(isError)])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(isError)]);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -180,11 +179,11 @@ export const UserViewScreen = () => {
         companyInn: companyData.inn,
         companyKpp: companyData.kpp,
         email: personData?.email?.trim()
-      })
+      });
 
       if (Object.values(errorMap).some((err) => err)) {
-        setIsError(errorMap)
-        return
+        setIsError(errorMap);
+        return;
       }
 
       const files: ImageFile[] = [];
@@ -265,7 +264,7 @@ export const UserViewScreen = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const onUpdateUserData = async () => {
     try {
@@ -287,11 +286,11 @@ export const UserViewScreen = () => {
         companyInn: companyData.inn,
         companyKpp: companyData.kpp,
         email: personData?.email?.trim()
-      })
+      });
 
       if (Object.values(errorMap).some((err) => err)) {
-        setIsError(errorMap)
-        return
+        setIsError(errorMap);
+        return;
       }
 
       const files: ImageFile[] = [];
@@ -390,10 +389,10 @@ export const UserViewScreen = () => {
             value={manager}
             onUpdate={(text) => {
               if (isValidError) {
-                setErrorText(null)
-                setIsError(INITIAL_ERROR_MAP)
+                setErrorText(null);
+                setIsError(INITIAL_ERROR_MAP);
               }
-              setManager(text)
+              setManager(text);
             }}
             isRequired
             isError={isError.manager}

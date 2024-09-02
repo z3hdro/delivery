@@ -67,7 +67,10 @@ export const  InfoSection: FC<Props> = ({
       return (
         <>
           {isRequired && <Text style={styles.required}>*</Text>}
-          <TouchableOpacity disabled={!editable} style={[styles.valueContainer, isError && styles.error]} onPress={onTogglePicker}>
+          <TouchableOpacity
+            disabled={!editable}
+            style={[styles.valueContainer, isError && styles.error]}
+            onPress={onTogglePicker}>
             <Text style={styles.value}>
               {value ? format(value, DISPLAY_DATE_FORMAT) : ''}
             </Text>

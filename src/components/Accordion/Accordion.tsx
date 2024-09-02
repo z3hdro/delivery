@@ -14,6 +14,8 @@ export const Accordion: FC<Props> = ({
   content,
   disabled = false,
   style,
+  isError = false,
+  errorText = ''
 }) => {
   const styles = useStyles();
 
@@ -41,6 +43,7 @@ export const Accordion: FC<Props> = ({
         )}
       </TouchableOpacity>
       {isExpanded && content}
+      {isError && errorText && <Text style={styles.errorText}>{errorText}</Text>}
     </View>
   );
 };

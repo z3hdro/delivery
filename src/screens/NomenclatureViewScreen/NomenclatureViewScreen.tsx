@@ -125,7 +125,7 @@ export const NomenclatureViewScreen = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [goBack]);
+  }, [goBack, onUpdate, nomenclature]);
 
   const onNavigate = useCallback(() => {
     navigate('SelectMeasureScreen', {

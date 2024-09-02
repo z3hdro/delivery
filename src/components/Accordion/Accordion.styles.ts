@@ -51,6 +51,16 @@ export const useStyles = () => {
       letterSpacing: 0.1,
       textTransform: 'uppercase',
       color: colors.white
-    }
+    },
+    errorText: {
+      marginBottom: 8,
+      fontFamily: 'Roboto',
+      fontSize: 14,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 16,
+      letterSpacing: 0.2,
+      color: colors.red,
+    },
   }), []);
 };

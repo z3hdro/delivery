@@ -300,6 +300,14 @@ class NetworkService {
     console.log('updateLogisticPoint result: ', result.data);
   }
 
+  public async deleteLogisticPoint(pointId: number): Promise<void> {
+    console.log('deleteLogisticPoint pointId: ', pointId);
+    const result =
+      await this.authorizedClient.delete<void>(`logisticPoint/${pointId}`);
+
+    console.log('deleteLogisticPoint result: ', result.data);
+  }
+
   public async getAllMeasures(offset: number): Promise<MeasureResponse> {
     const result =
       await this.authorizedClient.get<MeasureResponse>(

@@ -134,7 +134,6 @@ export type AddressPayload = {
   house: string
   building: string
   floor: number
-  postcode: string
   description: string
 }
 
