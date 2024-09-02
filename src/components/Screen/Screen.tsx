@@ -8,7 +8,13 @@ import { Props } from './Screen.types';
 
 import { LogoIcon, LogoutIcon } from 'src/assets/icons';
 import { useAppDispatch } from 'hooks/useAppDispatch';
-import { clearCurrentPerson, clearUserRole, resetCurrentOrder, resetGeoState } from 'store/slices';
+import {
+  clearCurrentPerson,
+  clearIsAuthorizationFinished,
+  clearUserRole,
+  resetCurrentOrder,
+  resetGeoState
+} from 'store/slices';
 
 export const Screen: FC<Props> = ({
   children,
@@ -27,8 +33,7 @@ export const Screen: FC<Props> = ({
     await appStorage.removeData(STORAGE_KEYS.ACCESS_TOKEN);
     await appStorage.removeData(STORAGE_KEYS.REFRESH_TOKEN);
     await appStorage.removeData(STORAGE_KEYS.ROLE);
-    await appStorage.removeData(STORAGE_KEYS.NOTIFICATION_PERMISSION);
-    await appStorage.removeData(STORAGE_KEYS.NOTIFICATION_PERMISSION_BACKGROUND);
+    dispatch(clearIsAuthorizationFinished());
     dispatch(clearCurrentPerson());
     dispatch(clearUserRole());
     dispatch(resetCurrentOrder());

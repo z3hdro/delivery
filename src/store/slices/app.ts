@@ -3,6 +3,7 @@ import { Person } from 'types/user';
 
 export type AppInitialState = {
   appIsLoading: boolean
+  isAuthorizationFinished: boolean
   deviceToken?: string;
   role?: string
   managerPhone?: string
@@ -11,6 +12,7 @@ export type AppInitialState = {
 
 const initialState: AppInitialState = {
   appIsLoading: true,
+  isAuthorizationFinished: false,
   deviceToken: undefined,
   role: undefined,
   managerPhone: undefined,
@@ -45,6 +47,12 @@ export const appSlice = createSlice({
     clearCurrentPerson: (state) => {
       state.person = undefined;
     },
+    setIsAuthorizationFinished: (state, { payload }: PayloadAction<boolean>) => {
+      state.isAuthorizationFinished = payload;
+    },
+    clearIsAuthorizationFinished: (state) => {
+      state.isAuthorizationFinished = false;
+    },
     resetAppState: () => initialState,
   }
 });
@@ -58,7 +66,9 @@ export const {
   clearManagerPhone,
   setCurrentPerson,
   clearCurrentPerson,
-  resetAppState
+  resetAppState,
+  setIsAuthorizationFinished,
+  clearIsAuthorizationFinished,
 } = appSlice.actions;
 
 export const appReducer = appSlice.reducer;

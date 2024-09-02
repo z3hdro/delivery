@@ -15,7 +15,7 @@ import { AxiosError } from 'axios';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectDeviceToken } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
-import { setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
+import { setCurrentPerson, setIsAuthorizationFinished, setManagerPhone, setUserRole } from 'store/slices';
 import { INITIAL_ERROR_MAP, NETWORK_ERROR_TEXT, REGISTRATION_ERROR_TEXT } from './RegistrationScreen.consts';
 import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX } from 'constants/regex';
 import { ErrorMap } from './RegistrationScreen.types';
@@ -93,6 +93,8 @@ export const RegistrationScreen = () => {
       if ((error?.response?.data as { message: string })?.message === NETWORK_ERROR_TEXT.USER_ALREADY_EXISTS) {
         setErrorText(REGISTRATION_ERROR_TEXT.USER_EXISTS);
       }
+    } finally {
+      dispatch(setIsAuthorizationFinished(true));
     }
   }, [phone, password, deviceToken, dispatch]);
 

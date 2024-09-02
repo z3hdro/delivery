@@ -464,6 +464,7 @@ class NetworkService {
   }
 
   public async takeOrder(data: TakeOrderPayload): Promise<MessageResponse> {
+    console.log('TakeOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/take', data);
 
     console.log('takeOrder result: ', result.data);
@@ -472,6 +473,7 @@ class NetworkService {
   }
 
   public async confirmOrder(data: ConfirmOrderPayload): Promise<MessageResponse> {
+    console.log('ConfirmOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/confirm', data);
 
     console.log('confirmOrder result: ', result.data);
@@ -480,6 +482,7 @@ class NetworkService {
   }
 
   public async rejectOrder(data: RejectOrderPayload): Promise<MessageResponse> {
+    console.log('RejectOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/rejectDriver', data);
 
     console.log('rejectOrder result: ', result.data);
@@ -488,6 +491,7 @@ class NetworkService {
   }
 
   public async departOrder(data: DepartOrderPayload): Promise<MessageResponse> {
+    console.log('DepartOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/depart', data);
 
     console.log('departOrder result: ', result.data);
@@ -496,6 +500,7 @@ class NetworkService {
   }
 
   public async completeOrder(data: CompleteOrderPayload): Promise<MessageResponse> {
+    console.log('CompleteOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/complete', data);
 
     console.log('completeOrder result: ', result.data);

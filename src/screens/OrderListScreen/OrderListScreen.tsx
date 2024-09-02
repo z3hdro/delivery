@@ -11,16 +11,15 @@ import { OrderCard } from 'components/OrderCard';
 import { Button } from 'components/Button';
 import { LinkButton } from 'components/LinkButton';
 import { useDriverNavigator } from 'navigation/hooks';
-// import { INSTRUCTION_LINK } from 'constants/geolocation';
-import { useStyles } from './OrderListScreen.styles';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { networkService } from 'services/network';
-import { ORDER_LIMIT } from 'constants/limit';
-import { Order } from 'types/order';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectCurrentOrder } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { setCurrentOrder } from 'store/slices';
+import { ORDER_LIMIT } from 'constants/limit';
+import { Order } from 'types/order';
+import { useStyles } from './OrderListScreen.styles';
 
 export const OrderListScreen = () => {
   const { t } = useTranslation();
@@ -59,11 +58,8 @@ export const OrderListScreen = () => {
 
   useEffect(() => {
     void (async () => {
-      if (currentOrder) {
+      if (currentOrder && isInitialLoading) {
         await new Promise(resolve => setTimeout(resolve, 0));
-        console.log('p1');
-
-        dispatch(setCurrentOrder(currentOrder));
 
         navigate('OrderScreen', {
           onUpdate: () => {

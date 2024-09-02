@@ -44,7 +44,6 @@ export const AppProvider: FC<Props> = ({ children }) => {
         console.log('token: ', token);
         if (token) {
           dispatch(setDeviceToken(token));
-          // setDeviceToken(token);
         }
         const role = await appStorage.getData(STORAGE_KEYS.ROLE);
         console.log('role: ', role);

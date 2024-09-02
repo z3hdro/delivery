@@ -14,7 +14,13 @@ import { DRIVER_PASSWORD, DRIVER_PHONE, MANAGER_PASSWORD, MANAGER_PHONE } from '
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectDeviceToken } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
-import { setCurrentOrder, setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
+import {
+  setCurrentOrder,
+  setCurrentPerson,
+  setIsAuthorizationFinished,
+  setManagerPhone,
+  setUserRole
+} from 'store/slices';
 
 
 export const LoginScreen = () => {
@@ -61,7 +67,6 @@ export const LoginScreen = () => {
         try {
           const { order } = await networkService.getCurrentOrder();
 
-          // setDriverOrder(order);
           if (order) {
             dispatch(setCurrentOrder(order));
           }
@@ -93,6 +98,8 @@ export const LoginScreen = () => {
         setErrorText(t('Login_bottom_unauthorized_user'));
       }
       console.log('error on Login screen: ', error?.response?.data || error);
+    } finally {
+      dispatch(setIsAuthorizationFinished(true));
     }
   }, [deviceToken, dispatch, password, phone, t]);
 

@@ -9,3 +9,5 @@ export const selectDeviceToken = (state: RootState) => state.app.deviceToken;
 export const selectManagerPhone = (state: RootState) => state.app.managerPhone;
 
 export const selectIsAppLoading = (state: RootState) => state.app.appIsLoading;
+
+export const selectIsAuthorizationFinished = (state: RootState) => state.app.isAuthorizationFinished;
