@@ -20,3 +20,4 @@ export * from './Map';
 export * from './InfoModal';
 export * from './OrderDriverView';
 export * from './OrderManagerView';
+export * from './Label';

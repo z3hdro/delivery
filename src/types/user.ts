@@ -1,5 +1,6 @@
 import { Job } from 'types/jobs';
 import { DrivingLicense } from 'screens/UserViewScreen/UserViewScreen.types';
+import { USER_STATUS } from 'constants/user';
 
 export type Role = {
   id: number
@@ -134,3 +135,5 @@ export type Manager = {
     updatedAt: string
   }
 }
+
+export type USER_STATUS_VALUES = `${USER_STATUS}`

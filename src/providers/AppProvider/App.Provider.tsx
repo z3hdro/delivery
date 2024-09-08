@@ -13,7 +13,8 @@ import {
   setCurrentPerson,
   setDeviceToken,
   setManagerPhone,
-  setUserRole
+  setUserRole,
+  setIsAuthorizationFinished
 } from 'store/slices';
 import { selectCurrentOrder, selectCurrentPerson } from 'store/selectors';
 import { Props } from './App.types';
@@ -55,6 +56,9 @@ export const AppProvider: FC<Props> = ({ children }) => {
         const accessToken = await appStorage.getData(STORAGE_KEYS.ACCESS_TOKEN);
         const refreshToken = await appStorage.getData(STORAGE_KEYS.REFRESH_TOKEN);
 
+        console.log('accessToken: ', accessToken);
+        console.log('refreshToken: ', refreshToken);
+
         if (accessToken) {
           networkService.setAuthHeader(accessToken);
         }
@@ -62,6 +66,10 @@ export const AppProvider: FC<Props> = ({ children }) => {
         if (refreshToken) {
           const { person } = await networkService.getUserData();
           dispatch(setCurrentPerson(person));
+
+          if (!person) {
+            return
+          }
 
           if (role === 'driver') {
             try {
@@ -91,6 +99,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
       } finally {
         await SplashScreen.hideAsync();
         dispatch(setIsAppLoading(false));
+        dispatch(setIsAuthorizationFinished(true));
       }
     })();
   }, [dispatch]);

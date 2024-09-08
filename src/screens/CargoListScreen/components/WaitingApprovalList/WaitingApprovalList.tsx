@@ -1,20 +1,29 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { ManagerOrderCard } from 'components/ManagerOrderCard';
 import { Preloader } from 'components/Preloader';
 import { networkService } from 'services/network';
 import { useManagerNavigator } from 'navigation/hooks';
-import { useStyles } from './WaitingApprovalList.styles';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import { resetNewOrdersQty } from 'store/slices';
+import { selectNewOrdersQty } from 'store/selectors';
 import { ORDER_LIST, ORDER_TAB_STATUS } from 'constants/order';
 import { ORDER_LIMIT } from 'constants/limit';
 import { Order } from 'types/order';
 
+import { useStyles } from './WaitingApprovalList.styles';
+
 export const WaitingApprovalList = () => {
   const { t } = useTranslation();
-  const { navigate } = useManagerNavigator();
   const styles = useStyles();
+
+  const newOrdersQty = useAppSelector(selectNewOrdersQty);
+  const dispatch = useAppDispatch()
+  const { navigate } = useManagerNavigator();
 
   const [data, setData] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,6 +31,14 @@ export const WaitingApprovalList = () => {
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
   const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
+
+  useFocusEffect(useCallback(() => {
+    console.log('isFocused WaitingApprovalList for Orders');
+    if (newOrdersQty > 0) {
+      dispatch(resetNewOrdersQty());
+      setShouldRefresh(true);
+    }
+  }, [newOrdersQty, dispatch]))
 
   const fetchData = useCallback(async (offset: number) => {
     try {

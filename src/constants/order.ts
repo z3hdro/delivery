@@ -1,13 +1,12 @@
 export enum ORDER_STATUS {
   CREATED = 'created',
   CONFIRMATION = 'confirmation',
+  CONFIRMED = 'confirmed',
   LOADING = 'loading',
   DEPARTED = 'departed',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
 }
-
-export type ORDER_STATUS_VALUES =`${ORDER_STATUS}`
 
 export enum ORDER_LIST {
   WAITING_APPROVAL,

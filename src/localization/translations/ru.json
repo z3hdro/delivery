@@ -233,5 +233,10 @@
   "Cost_type_ton": "за тонну",
   "Cost_type_route": "за рейс",
   "Cost_cash": "нал. {{price}} р.",
-  "Cost_non_cash": "б/нал. {{price}} р."
+  "Cost_non_cash": "б/нал. {{price}} р.",
+  "ok": "OK",
+  "Alert_title": "Статус изменен",
+  "Alert_description_confirmation": "Дождитесь подтверждение менеджером",
+  "Alert_description_loading": "Погрузка завершена, выезжайте в пункт выгрузки",
+  "Alert_description_completed": "Рейс завершен"
 }

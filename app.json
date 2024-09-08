@@ -2,6 +2,7 @@
   "expo": {
     "name": "Cargo Delivery",
     "slug": "cargo-delivery",
+    "scheme": "cargodelivery",
     "owner": "z3hdro",
     "version": "1.0.0",
     "orientation": "portrait",

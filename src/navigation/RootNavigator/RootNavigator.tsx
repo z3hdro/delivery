@@ -12,6 +12,7 @@ import {
   selectIsAuthorizationFinished,
   selectUserRole
 } from 'store/selectors';
+import { linkingConfiguration } from './RootNavigator.consts';
 
 export const RootNavigator = () => {
   const isLoading = useAppSelector(selectIsAppLoading);
@@ -36,7 +37,7 @@ export const RootNavigator = () => {
   };
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linkingConfiguration}>
       {renderNavigator()}
     </NavigationContainer>
   );

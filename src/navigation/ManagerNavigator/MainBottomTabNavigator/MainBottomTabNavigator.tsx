@@ -11,10 +11,8 @@ import { DriverListScreen } from 'screens/DriverListScreen';
 import { ShippingPointScreen } from 'screens/ShippingPointScreen';
 
 import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'src/assets/icons';
-import { WEBSOCKET_URL } from 'constants/websocket';
-import useWebSocket from 'react-native-use-websocket';
-import { networkService } from 'services/network';
-import { WSOrderManager } from 'types/websocket';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectNewOrdersQty, selectNewDriversQty } from 'store/selectors';
 
 const Tab = createBottomTabNavigator<MainBottomTabNavigatorParamList>();
 
@@ -25,32 +23,8 @@ const customOptions = {
 
 export const MainBottomTabNavigator = () => {
   const { t } = useTranslation();
-
-  const { sendMessage, lastMessage, readyState } = useWebSocket(WEBSOCKET_URL.ORDER, {
-    onOpen: () => console.log('ws opened'),
-    options: {
-      headers: {
-        Authorization: networkService.getAuthorizationToken(),
-      }
-    },
-    onMessage: (e) => {
-      const message = JSON.parse((e.data as string)) as WSOrderManager;
-      console.log('Received message:', message);
-
-    },
-    onClose: (e) => console.log('ws closed', e),
-    onError: (e) => console.log('ws error', e),
-    //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (closeEvent) => true,
-    reconnectAttempts: 5
-  });
-  console.log('lastMessage: ', lastMessage);
-
-  // console.log('readyState websocket', readyState);
-
-  // const connectionStatus = CONNECTION_STATUS[readyState];
-
-  // console.log('connectionStatus: ', connectionStatus);
+  const newOrdersQty = useAppSelector(selectNewOrdersQty);
+  const newDriversQty = useAppSelector(selectNewDriversQty);
 
   return (
     <Tab.Navigator
@@ -62,9 +36,10 @@ export const MainBottomTabNavigator = () => {
         component={CargoListScreen}
         options={{
           tabBarLabel: t('CargoList'),
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ focused, color, size }) => (
             <CargoIcon height={size} width={size} color={color} />
-          )
+          ),
+          tabBarBadge: newOrdersQty
         }}
       />
       <Tab.Screen
@@ -84,7 +59,8 @@ export const MainBottomTabNavigator = () => {
           tabBarLabel: t('DriverList'),
           tabBarIcon: ({ color, size }) => (
             <DriversIcon height={size} width={size} color={color} />
-          )
+          ),
+          tabBarBadge: newDriversQty
         }}
       />
       <Tab.Screen
