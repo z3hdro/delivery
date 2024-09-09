@@ -39,18 +39,18 @@ export const ManagerNavigator = () => {
       const message = JSON.parse((e?.data as string)) as WSOrderManager;
       console.log('Received message:', message);
       if (message?.id && message?.status) {
-        const status = message.status.toLowerCase()
+        const status = message.status.toLowerCase();
         if (status === ORDER_STATUS.CONFIRMATION) {
-          dispatch(setNewOrdersQty(1))
+          dispatch(setNewOrdersQty(1));
         } else if (status === ORDER_STATUS.CREATED) {
-          dispatch(setNewOrdersQty(-1))
+          dispatch(setNewOrdersQty(-1));
         }
       }
     },
     onClose: (e) => console.log('ws closed', e),
     onError: (e) => console.log('ws error', e),
     //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (closeEvent) => true,
+    shouldReconnect: () => true,
     reconnectAttempts: 5
   });
 
@@ -67,14 +67,14 @@ export const ManagerNavigator = () => {
       console.log('Received message:', message);
       if (message?.user_id && message?.status) {
         if (message.status === USER_STATUS.NEW_USER) {
-          dispatch(setNewDriversQty(1))
+          dispatch(setNewDriversQty(1));
         }
       }
     },
     onClose: (e) => console.log('ws closed', e),
     onError: (e) => console.log('ws error', e),
     //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (closeEvent) => true,
+    shouldReconnect: () => true,
     reconnectAttempts: 5
   });
 

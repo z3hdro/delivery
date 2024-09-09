@@ -13,8 +13,11 @@ import {
   selectUserRole
 } from 'store/selectors';
 import { linkingConfiguration } from './RootNavigator.consts';
+import { useStyles } from './RootNavigator.styles';
 
 export const RootNavigator = () => {
+  const styles = useStyles();
+
   const isLoading = useAppSelector(selectIsAppLoading);
   const person = useAppSelector(selectCurrentPerson);
   const userRole = useAppSelector(selectUserRole);
@@ -37,7 +40,10 @@ export const RootNavigator = () => {
   };
 
   return (
-    <NavigationContainer linking={linkingConfiguration}>
+    <NavigationContainer
+      linking={linkingConfiguration}
+      fallback={<Preloader style={styles.preloader} />}
+    >
       {renderNavigator()}
     </NavigationContainer>
   );

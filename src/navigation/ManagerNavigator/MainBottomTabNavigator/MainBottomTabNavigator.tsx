@@ -36,7 +36,7 @@ export const MainBottomTabNavigator = () => {
         component={CargoListScreen}
         options={{
           tabBarLabel: t('CargoList'),
-          tabBarIcon: ({ focused, color, size }) => (
+          tabBarIcon: ({ color, size }) => (
             <CargoIcon height={size} width={size} color={color} />
           ),
           tabBarBadge: newOrdersQty

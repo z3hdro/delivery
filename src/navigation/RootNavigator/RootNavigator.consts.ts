@@ -1,11 +1,25 @@
 import { LinkingOptions } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
-import { Linking } from 'react-native';
+import * as Linking from 'expo-linking';
+
+const prefix = Linking.createURL('/');
+
+const config = {
+  screens: {
+    OrderListScreen: 'orderlist',
+    OrderScreen: 'driverorder/:orderId',
+    MainBottomTabNavigator: {
+      screens: {
+        CargoListScreen: 'order/:orderId',
+
+      }
+    },
+  }
+};
 
 export const linkingConfiguration: LinkingOptions<any> = {
-  config: {
-    // Configuration for linking
-  },
+  prefixes: [prefix],
+  config,
   async getInitialURL() {
     // First, you may want to do the default deep link handling
     // Check if app was opened from a deep link
@@ -45,4 +59,4 @@ export const linkingConfiguration: LinkingOptions<any> = {
       subscription.remove();
     };
   },
-}
+};
