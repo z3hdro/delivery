@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Alert, DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
@@ -43,28 +43,29 @@ export const CreateOrderScreen = () => {
   const [cashlessPrice, setCashlessPrice] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
-  const [isCargoError, setIsCargoError] = useState<CargoError[]>(INITIAL_CARGO_ERROR_MAP)
+  const [isCargoError, setIsCargoError] = useState<CargoError[]>(INITIAL_CARGO_ERROR_MAP);
 
   const isValidError = useMemo(() =>
     Object.values(isError).some((err) => err),
-    [JSON.stringify(isError)])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [JSON.stringify(isError)]);
 
   const onAddCargo = useCallback(() => {
     setCargoData((prevState) => ([...prevState, { ...EMPTY_CARGO_DATA }]));
-    setIsCargoError(prevState => ([...prevState, { ...INITIAL_CARGO_ERROR }]))
+    setIsCargoError(prevState => ([...prevState, { ...INITIAL_CARGO_ERROR }]));
   }, []);
 
   const resetIsError = useCallback(() => {
     if (isValidError) {
-      setIsError({...INITIAL_ERROR_MAP})
+      setIsError({ ...INITIAL_ERROR_MAP });
     }
-  }, [isValidError])
+  }, [isValidError]);
 
   const resetCargoError = useCallback((selectedIndex: number) => {
     setIsCargoError((prevState) => prevState.map(
       (cargo, index) => index === selectedIndex ? INITIAL_CARGO_ERROR : cargo)
-    )
-  }, [])
+    );
+  }, []);
 
   const resetForm = useCallback(() => {
     setDeparture(null);
@@ -94,7 +95,7 @@ export const CreateOrderScreen = () => {
     setCargoData((prevState) =>
       prevState.filter((_, index) => index !== selectedIndex)
     );
-    setIsCargoError(prevState => prevState.filter((_, index) => index !== selectedIndex))
+    setIsCargoError(prevState => prevState.filter((_, index) => index !== selectedIndex));
   }, []);
 
   const onNavigateCargo = useCallback((index: number, isValidCargoError: boolean) => {
@@ -142,21 +143,7 @@ export const CreateOrderScreen = () => {
     try {
       setIsLoading(true);
 
-      // if (
-      //   !departure?.id
-      //   || !delivery?.id
-      //   || !cashPrice.trim().length
-      //   || !cashlessPrice.trim().length
-      //   || !departureDatePlan
-      //   || !deliveryDatePlan
-      //   || !cargoData.every(({ id }) => !!id)
-      //   || !cargoData.length
-      // ) {
-      //   Alert.alert(t('CreateOrder_error_title'), t('CreateOrder_error_message'));
-      //   return;
-      // }
-
-      const errorMap = { ...INITIAL_ERROR_MAP }
+      const errorMap = { ...INITIAL_ERROR_MAP };
 
       if (!departure?.id) {
         errorMap.departure = true;
@@ -171,29 +158,29 @@ export const CreateOrderScreen = () => {
       }
 
       if (Object.values(errorMap).some((err) => err)) {
-        setIsError(errorMap)
+        setIsError(errorMap);
         return;
       }
 
-      const cargoErrorMap = [] as CargoError[]
-      const cargoErrorSet = new Set()
+      const cargoErrorMap = [] as CargoError[];
+      const cargoErrorSet = new Set();
 
       cargoData.forEach((cargo, index) => {
-        const cargoError = { ...INITIAL_CARGO_ERROR }
+        const cargoError = { ...INITIAL_CARGO_ERROR };
         if (!cargo?.id && !cargo?.name?.trim()) {
           cargoError.cargoName = true;
         }
         if (!cargo.netWeight.trim()) {
           cargoError.cargoNetWeight = true;
         }
-        cargoErrorMap.push(cargoError)
+        cargoErrorMap.push(cargoError);
         if (Object.values(cargoError).some(err => err)) {
-          cargoErrorSet.add(index)
+          cargoErrorSet.add(index);
         }
-      }, [])
+      }, []);
 
       if (cargoErrorSet.size > 0) {
-        setIsCargoError(cargoErrorMap)
+        setIsCargoError(cargoErrorMap);
         return;
       }
 
@@ -285,7 +272,7 @@ export const CreateOrderScreen = () => {
                   value={cargo.netWeight}
                   onUpdate={(text: string) => {
                     if (isValidCargoError) {
-                      resetCargoError(index)
+                      resetCargoError(index);
                     }
                     updateData(index, CARGO_KEYS.NET_WEIGHT, text);
                   }}
@@ -331,7 +318,7 @@ export const CreateOrderScreen = () => {
             value={cashPrice}
             keyboardType={'numeric'}
             onUpdate={(text) => {
-              resetIsError()
+              resetIsError();
               setCashPrice(text);
             }}
             isError={isError.price}
@@ -343,7 +330,7 @@ export const CreateOrderScreen = () => {
             value={cashlessPrice}
             keyboardType={'numeric'}
             onUpdate={(text) => {
-              resetIsError()
+              resetIsError();
               setCashlessPrice(text);
             }}
             isError={isError.price}

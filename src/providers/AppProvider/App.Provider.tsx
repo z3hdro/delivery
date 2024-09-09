@@ -68,7 +68,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
           dispatch(setCurrentPerson(person));
 
           if (!person) {
-            return
+            return;
           }
 
           if (role === 'driver') {

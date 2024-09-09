@@ -2,7 +2,8 @@ import { LinkingOptions } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import * as Linking from 'expo-linking';
 
-const prefix = Linking.createURL('/');
+const prefix = Linking.createURL('');
+console.log('prefix: ', prefix);
 
 const config = {
   screens: {
@@ -11,7 +12,6 @@ const config = {
     MainBottomTabNavigator: {
       screens: {
         CargoListScreen: 'order/:orderId',
-
       }
     },
   }
@@ -33,7 +33,9 @@ export const linkingConfiguration: LinkingOptions<any> = {
     const response = await Notifications.getLastNotificationResponseAsync();
     console.log('response from expo push notifications ', response);
 
-    return response?.notification?.request?.content?.data?.url;
+    if (response?.notification?.request?.content?.data?.url) {
+      return response?.notification?.request?.content?.data?.url;
+    }
   },
   subscribe(listener) {
     const onReceiveURL = ({ url }: { url: string }) => listener(url);

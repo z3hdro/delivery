@@ -54,7 +54,6 @@ export const ManagerNavigator = () => {
     reconnectAttempts: 5
   });
 
-  // TODO: when will be available for manager
   useWebSocket(WEBSOCKET_URL.AUTH, {
     onOpen: () => console.log('ws opened on ManagerNavigator AUTH'),
     options: {

@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import useWebSocket from 'react-native-use-websocket';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -17,17 +18,18 @@ import { createInitialGeo, createInitialState, getPrimaryButtonText } from './Vi
 import { parseGeo } from 'utils/geo';
 import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
 import { parseDateToInfoMap } from 'utils/parseDate';
-import { useStyles } from './ViewOrderScreen.styles';
 import { ORDER_KEYS } from './ViewOrderScreen.consts';
 import { ORDER_LIST } from 'constants/order';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { LOGISTIC_POINT } from 'constants/map';
+import { WEBSOCKET_URL } from 'constants/websocket';
 import { MapPointInfo, ViewOrder } from './ViewOrderScreen.types';
+import { GeoPosition } from 'types/geolocation';
+import { WSOrderLocation } from 'types/websocket';
 import { Address } from 'types/address';
+import { useStyles } from './ViewOrderScreen.styles';
 
 import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
-import isEqual from 'lodash/isEqual';
-import { GeoPosition } from 'types/geolocation';
 
 export const ViewOrderScreen = () => {
   const { t } = useTranslation();
@@ -59,31 +61,53 @@ export const ViewOrderScreen = () => {
   },
   [order.driver, orderData]);
 
-  useEffect(() => {
-    if (!order.id || type !== ORDER_LIST.IN_PROGRESS) {
-      return;
-    }
-
-    const interval = setInterval(async () => {
-      try {
-        const result = await networkService.getOrderGeo(order.id);
-        if (result) {
-          const { latitude, longitude } = result;
-          const newCoordinates = { lat: latitude, lon: longitude };
-
-          if (!isEqual(currentGeo, newCoordinates)) {
-            setCurrentGeo(newCoordinates);
-          }
-        }
-      } catch (e) {
-        console.log('error while polling order geo');
+  useWebSocket(`${WEBSOCKET_URL.ORDER_LOCATION}/${order.id}`, {
+    onOpen: () => console.log('ws opened on ViewOrderScreen'),
+    options: {
+      headers: {
+        Authorization: networkService.getAuthorizationToken(),
       }
-    }, 1000 * 15);
+    },
+    onMessage: (e) => {
+      const message = JSON.parse((e?.data as string)) as WSOrderLocation;
+      console.log('Received message:', message);
+      if (message?.latitude && message?.longitude) {
+        const newCoordinates = { lat: message?.latitude, lon: message?.longitude };
+        setCurrentGeo(newCoordinates);
+      }
+    },
+    onClose: (e) => console.log('ws closed', e),
+    onError: (e) => console.log('ws error', e),
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: () => true,
+    reconnectAttempts: 5
+  });
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [currentGeo, order.id, order.status, type]);
+  // useEffect(() => {
+  //   if (!order.id || type !== ORDER_LIST.IN_PROGRESS) {
+  //     return;
+  //   }
+  //
+  //   const interval = setInterval(async () => {
+  //     try {
+  //       const result = await networkService.getOrderGeo(order.id);
+  //       if (result) {
+  //         const { latitude, longitude } = result;
+  //         const newCoordinates = { lat: latitude, lon: longitude };
+  //
+  //         if (!isEqual(currentGeo, newCoordinates)) {
+  //           setCurrentGeo(newCoordinates);
+  //         }
+  //       }
+  //     } catch (e) {
+  //       console.log('error while polling order geo');
+  //     }
+  //   }, 1000 * 15);
+  //
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [currentGeo, order.id, order.status, type]);
 
   const onUpdateOrder = useCallback((key: ORDER_KEYS, value: string) => {
     setOrderData((prevState) => ({ ...prevState, [key]: value }));

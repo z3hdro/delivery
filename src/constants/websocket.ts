@@ -3,7 +3,7 @@ import { ReadyState } from 'react-native-use-websocket';
 export const WEBSOCKET_URL = {
   DRIVER: 'ws://185.247.17.177:8000/api/drivers/updates',
   ORDER: 'ws://185.247.17.177:8000/api/orders/updates',
-  ORDER_LOCATION: 'ws://185.247.17.177:8000/api/orders/location/',
+  ORDER_LOCATION: 'ws://185.247.17.177:8000/api/orders/location',
   AUTH: 'ws://185.247.17.177:8000/api/auth/new'
 };
 

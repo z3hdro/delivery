@@ -125,7 +125,7 @@ export const OrderScreen = () => {
     onClose: (e) => console.log('ws closed', e),
     onError: (e) => console.log('ws error', e),
     //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (closeEvent) => true,
+    shouldReconnect: () => true,
     reconnectAttempts: 5
   });
 
@@ -202,7 +202,7 @@ export const OrderScreen = () => {
     Alert.alert(t('Alert_title'), t(description), [
       { text: t('ok'), style: 'cancel', onPress },
     ]);
-  }, [t])
+  }, [t]);
 
   const onPressMain = useCallback(async (orderId: number, status: ORDER_STATUS) => {
     try {
@@ -234,7 +234,7 @@ export const OrderScreen = () => {
           goBack();
           dispatch(resetGeoState());
           dispatch(resetCurrentOrder());
-        })
+        });
 
         return;
       }
@@ -247,7 +247,7 @@ export const OrderScreen = () => {
         dispatch(updateCurrentOrderStatus(newStatus));
       }
 
-      displayAlert(status)
+      displayAlert(status);
 
       if (result?.order && result.order.status === ORDER_STATUS.LOADING) {
         dispatch(setCurrentOrder(order));

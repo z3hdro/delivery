@@ -15,3 +15,8 @@ export type WSOrderApprovedDriver = {
   user_id: number,
   status: USER_STATUS_VALUES
 }
+
+export type WSOrderLocation = {
+  latitude: number,
+  longitude: number
+}
