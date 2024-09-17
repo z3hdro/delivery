@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useImperativeHandle, useState } from 'react';
 import { Dimensions, View, Text } from 'react-native';
 
 import {
@@ -18,6 +18,7 @@ import { colors } from 'constants/colors';
 import { PointMarkerIcon, RecyclingTimeIcon, TrackFilledIcon, TrackFinishedIcon } from 'assets/icons';
 
 export const CompletionTabBar: React.FC<TabBarRoutes> = ({
+  tabBarRef,
   tabsContainerStyle,
   firstScreen,
   secondScreen,
@@ -43,6 +44,13 @@ export const CompletionTabBar: React.FC<TabBarRoutes> = ({
     fourthLabel,
   );
   const styles = useStyles();
+
+  useImperativeHandle(tabBarRef, () => ({
+    switchTab: (index: number) => {
+      setCurrentIndex(index);
+    },
+    getCurrentIndex: () => currentIndex,
+  }));
 
   const renderIcon = useCallback((index: number, isActive: boolean) => {
     const color = isActive ? colors.white : colors.color7;

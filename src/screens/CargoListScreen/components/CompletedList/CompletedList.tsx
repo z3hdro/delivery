@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -10,8 +10,9 @@ import { useStyles } from './CompletedList.styles';
 import { ORDER_LIST, ORDER_TAB_STATUS } from 'constants/order';
 import { ORDER_LIMIT } from 'constants/limit';
 import { Order } from 'types/order';
+import { Props } from './CompletedList.types';
 
-export const CompletedList = () => {
+export const CompletedList: FC<Props> = ({ initialOrder, resetInitialOrder }) => {
   const { t } = useTranslation();
   const { navigate } = useManagerNavigator();
   const styles = useStyles();
@@ -37,6 +38,20 @@ export const CompletedList = () => {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (initialOrder && navigate) {
+      navigate('ViewOrderScreen', {
+        order: initialOrder,
+        type: ORDER_LIST.COMPLETED,
+        onUpdate: () => {
+          setShouldRefresh(true);
+          setOffset(0);
+        }
+      });
+      resetInitialOrder();
+    }
+  }, [initialOrder, navigate, resetInitialOrder]);
 
   useEffect(() => {
     void (async () => {

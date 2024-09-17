@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
+import * as Notifications from 'expo-notifications';
+import { PersistGate } from 'redux-persist/integration/react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import YaMap, { Geocoder } from 'react-native-yamap';
@@ -16,10 +18,21 @@ import { persistor, store } from 'store/store';
 import 'localization/i18n.config';
 
 import yandexConfig from './secrets/yandex_config.json';
-import { PersistGate } from 'redux-persist/integration/react';
 
 void YaMap.init(yandexConfig.API_KEY);
 void Geocoder.init(yandexConfig.GEOCODER_API_KEY);
+
+Notifications.setNotificationHandler({
+  // eslint-disable-next-line @typescript-eslint/require-await
+  handleNotification: async (notification) => {
+    console.log('handleNotification notification: ', notification);
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    };
+  },
+});
 
 const App = () => {
   const [fontsLoaded, fontError] = useFonts({

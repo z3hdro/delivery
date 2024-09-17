@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -6,12 +6,13 @@ import { ManagerOrderCard } from 'components/ManagerOrderCard';
 import { Preloader } from 'components/Preloader';
 import { networkService } from 'services/network';
 import { useManagerNavigator } from 'navigation/hooks';
-import { useStyles } from './InProgressList.styles';
 import { ORDER_LIST, ORDER_TAB_STATUS } from 'constants/order';
 import { ORDER_LIMIT } from 'constants/limit';
 import { Order } from 'types/order';
+import { Props } from './InProgressList.types';
+import { useStyles } from './InProgressList.styles';
 
-export const InProgressList = () => {
+export const InProgressList: FC<Props> = ({ initialOrder, resetInitialOrder }) => {
   const { t } = useTranslation();
   const { navigate } = useManagerNavigator();
   const styles = useStyles();
@@ -37,6 +38,20 @@ export const InProgressList = () => {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (initialOrder && navigate) {
+      navigate('ViewOrderScreen', {
+        order: initialOrder,
+        type: ORDER_LIST.IN_PROGRESS,
+        onUpdate: () => {
+          setShouldRefresh(true);
+          setOffset(0);
+        }
+      });
+      resetInitialOrder();
+    }
+  }, [initialOrder, navigate, resetInitialOrder]);
 
   useEffect(() => {
     void (async () => {

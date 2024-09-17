@@ -25,7 +25,9 @@ export type DriverStackParamList = {
 export type DriverRoute = keyof DriverStackParamList | undefined
 
 export type MainBottomTabNavigatorParamList = {
-  CargoListScreen: undefined;
+  CargoListScreen: {
+    orderId?: string
+  };
   AddOrderScreen: undefined;
   DriverListScreen: undefined;
   ShippingPointScreen: undefined;

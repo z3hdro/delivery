@@ -200,7 +200,7 @@ export const OrderScreen = () => {
     const description = getDescriptionByStatus(status);
 
     Alert.alert(t('Alert_title'), t(description), [
-      { text: t('ok'), style: 'cancel', onPress },
+      { text: t('ok'), style: 'destructive', onPress },
     ]);
   }, [t]);
 
@@ -238,8 +238,6 @@ export const OrderScreen = () => {
 
         return;
       }
-
-
 
       if (result?.order && result.order.status !== status) {
         const newStatus = result.order.status;

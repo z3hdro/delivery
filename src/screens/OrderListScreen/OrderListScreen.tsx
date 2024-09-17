@@ -48,6 +48,8 @@ export const OrderListScreen = () => {
       if (orders.length) {
         setData((prevState) => offset === 0 ? orders : ([...prevState, ...orders]));
         setOffset((prevState) => prevState + 1);
+      } else {
+        setData([]);
       }
     } catch (e) {
       console.log(e);

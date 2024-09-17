@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
@@ -14,15 +14,16 @@ import { selectNewOrdersQty } from 'store/selectors';
 import { ORDER_LIST, ORDER_TAB_STATUS } from 'constants/order';
 import { ORDER_LIMIT } from 'constants/limit';
 import { Order } from 'types/order';
+import { Props } from './WaitingApprovalList.types';
 
 import { useStyles } from './WaitingApprovalList.styles';
 
-export const WaitingApprovalList = () => {
+export const WaitingApprovalList: FC<Props> = ({ initialOrder, resetInitialOrder }) => {
   const { t } = useTranslation();
   const styles = useStyles();
 
   const newOrdersQty = useAppSelector(selectNewOrdersQty);
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const { navigate } = useManagerNavigator();
 
   const [data, setData] = useState<Order[]>([]);
@@ -38,7 +39,7 @@ export const WaitingApprovalList = () => {
       dispatch(resetNewOrdersQty());
       setShouldRefresh(true);
     }
-  }, [newOrdersQty, dispatch]))
+  }, [newOrdersQty, dispatch]));
 
   const fetchData = useCallback(async (offset: number) => {
     try {
@@ -54,6 +55,20 @@ export const WaitingApprovalList = () => {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (initialOrder && navigate) {
+      navigate('ViewOrderScreen', {
+        order: initialOrder,
+        type: ORDER_LIST.WAITING_APPROVAL,
+        onUpdate: () => {
+          setShouldRefresh(true);
+          setOffset(0);
+        }
+      });
+      resetInitialOrder();
+    }
+  }, [initialOrder, navigate, resetInitialOrder]);
 
   useEffect(() => {
     void (async () => {

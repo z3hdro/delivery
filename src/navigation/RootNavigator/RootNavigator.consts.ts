@@ -25,16 +25,21 @@ export const linkingConfiguration: LinkingOptions<any> = {
     // Check if app was opened from a deep link
     const url = await Linking.getInitialURL();
 
+    console.log('url on getInitialURL: ', url);
+
     if (url != null) {
       return url;
     }
 
     // Handle URL from expo push notifications
-    const response = await Notifications.getLastNotificationResponseAsync();
+    const response = await Notifications.getLastNotificationResponseAsync() as any;
     console.log('response from expo push notifications ', response);
 
-    if (response?.notification?.request?.content?.data?.url) {
-      return response?.notification?.request?.content?.data?.url;
+    const deepLinkUrl = response?.notification?.request?.trigger?.remoteMessage?.data?.url;
+
+    if (deepLinkUrl) {
+      console.log('deepLinkUrl: ', deepLinkUrl);
+      return deepLinkUrl;
     }
   },
   subscribe(listener) {
@@ -46,7 +51,8 @@ export const linkingConfiguration: LinkingOptions<any> = {
     // Listen to expo push notifications
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
       console.log('notification response: ', JSON.stringify(response));
-      const url = response?.notification?.request?.content?.data?.url;
+      const url = (response as any)?.notification?.request?.trigger?.remoteMessage?.data?.url
+
 
       // Any custom logic to see whether the URL needs to be handled
       //...
