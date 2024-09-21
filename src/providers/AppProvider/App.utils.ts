@@ -2,17 +2,6 @@ import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
-// Notifications.setNotificationHandler({
-//   handleNotification: async (notification) => {
-//     console.log('handleNotification notification: ', notification);
-//     return {
-//       shouldShowAlert: true,
-//       shouldPlaySound: true,
-//       shouldSetBadge: false,
-//     };
-//   },
-// });
-
 export const registerForPushNotificationsAsync = async () => {
   let token;
 

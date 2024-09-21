@@ -36,6 +36,7 @@ export const OrderListScreen = () => {
   const [displayModal, setDisplayModal] = useState<boolean>(false);
   const [offset, setOffset] = useState<number>(0);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
 
@@ -81,6 +82,7 @@ export const OrderListScreen = () => {
         await fetchData(0);
       }
       setShouldRefresh(false);
+      setIsRefreshing(false);
     })();
   }, [fetchData, shouldRefresh]);
 
@@ -109,6 +111,12 @@ export const OrderListScreen = () => {
 
   const onCloseModal = useCallback(() => {
     setDisplayModal(false);
+  }, []);
+
+  const handleOnRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    setShouldRefresh(true);
+    setOffset(0);
   }, []);
 
   // TODO: uncomment when sorting and filtering will be applied
@@ -199,6 +207,8 @@ export const OrderListScreen = () => {
             renderItem={renderItem}
             onEndReachedThreshold={0.5}
             onEndReached={onEndReached}
+            refreshing={isRefreshing}
+            onRefresh={handleOnRefresh}
           />
         )}
       </View>
