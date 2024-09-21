@@ -96,7 +96,7 @@ export const RegistrationScreen = () => {
     } finally {
       dispatch(setIsAuthorizationFinished(true));
     }
-  }, [phone, password, deviceToken, dispatch]);
+  }, [password, deviceToken, dispatch]);
 
   const onLoginPress = useCallback(() => {
     navigate('LoginScreen');
