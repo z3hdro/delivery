@@ -74,7 +74,7 @@ export const OrderListScreen = () => {
       setIsInitialLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isInitialLoading, navigate]);
+  }, [isInitialLoading, navigate]);
 
   useEffect(() => {
     void (async () => {

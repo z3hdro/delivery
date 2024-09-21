@@ -8,7 +8,7 @@ import { UserCard } from 'components/UserCard';
 import { networkService } from 'services/network';
 import { useManagerNavigator } from 'navigation/hooks';
 import { useAppSelector } from 'hooks/useAppSelector';
-import { resetNewDriversQty, resetNewOrdersQty } from 'store/slices';
+import { resetNewDriversQty } from 'store/slices';
 import { selectNewDriversQty } from 'store/selectors';
 import { DRIVER_LIST_LIMIT } from 'constants/limit';
 import { USER } from 'constants/user';
@@ -38,7 +38,7 @@ export const WaitingApprovalList = () => {
       dispatch(resetNewDriversQty());
       setShouldRefresh(true);
     }
-  }, [newDriversQty, dispatch]))
+  }, [newDriversQty, dispatch]));
 
   const fetchLogisticPoints = useCallback(async (offset: number) => {
     try {

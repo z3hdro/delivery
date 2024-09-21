@@ -51,7 +51,8 @@ export const linkingConfiguration: LinkingOptions<any> = {
     // Listen to expo push notifications
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
       console.log('notification response: ', JSON.stringify(response));
-      const url = (response as any)?.notification?.request?.trigger?.remoteMessage?.data?.url
+      const url = (response as any)?.notification?.request?.trigger?.remoteMessage?.data?.url;
+      console.log('notification url: ', url);
 
 
       // Any custom logic to see whether the URL needs to be handled
