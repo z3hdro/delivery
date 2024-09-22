@@ -12,13 +12,15 @@ import { getTabIndex } from './CargoListScreen.utils';
 
 import { TabBarRef } from 'components/CompletionTabBar/CompletionTabBar.types';
 import { Order } from 'types/order';
+import { MainBottomTabNavigatorParamList } from 'types/navigation';
 import { useStyles } from './CargoListScreen.styles';
 
 export const CargoListScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
 
-  const { params } = useManagerRoute();
+  const route = useManagerRoute<'MainBottomTabNavigator'>();
+  const params = route?.params as MainBottomTabNavigatorParamList['CargoListScreen'];
   const { setParams } = useManagerNavigator();
   console.log('params on CargoListScreen: ', params);
 
@@ -66,7 +68,11 @@ export const CargoListScreen = () => {
           firstLabel={t('CargoList_tab_one_label')}
           secondLabel={t('CargoList_tab_two_label')}
           thirdLabel={t('CargoList_tab_three_label')}
-          firstScreen={<WaitingApprovalList initialOrder={orderFromNotification} resetInitialOrder={resetInitialOrder} />}
+          firstScreen={
+            <WaitingApprovalList
+              initialOrder={orderFromNotification}
+              resetInitialOrder={resetInitialOrder}
+            />}
           secondScreen={<InProgressList initialOrder={orderFromNotification} resetInitialOrder={resetInitialOrder} />}
           thirdScreen={<AvailableList />}
           fourthScreen={<CompletedList initialOrder={orderFromNotification} resetInitialOrder={resetInitialOrder} />}

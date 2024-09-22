@@ -15,7 +15,9 @@ export type LoginStackParamList = {
 
 export type DriverStackParamList = {
   ApprovalScreen: undefined;
-  OrderListScreen: undefined;
+  OrderListScreen: {
+    orderId?: string;
+  };
   OrderScreen: {
     onUpdate: () => void
   };

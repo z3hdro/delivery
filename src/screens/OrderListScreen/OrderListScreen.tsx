@@ -10,7 +10,7 @@ import { Preloader } from 'src/components/Preloader';
 import { OrderCard } from 'components/OrderCard';
 import { Button } from 'components/Button';
 import { LinkButton } from 'components/LinkButton';
-import { useDriverNavigator } from 'navigation/hooks';
+import { useDriverNavigator, useDriverRoute } from 'navigation/hooks';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { networkService } from 'services/network';
 import { useAppSelector } from 'hooks/useAppSelector';
@@ -26,6 +26,8 @@ export const OrderListScreen = () => {
   const styles = useStyles();
 
   const { navigate } = useDriverNavigator();
+  const route = useDriverRoute<'OrderListScreen'>();
+  const { setParams } = useDriverNavigator();
 
   const currentOrder = useAppSelector(selectCurrentOrder);
   const dispatch = useAppDispatch();
@@ -39,6 +41,7 @@ export const OrderListScreen = () => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
+  const isNotificationLink = useMemo(() => !!route?.params?.orderId, [route?.params?.orderId]);
 
   console.log('currentOrder: ', !!currentOrder);
 
@@ -61,7 +64,7 @@ export const OrderListScreen = () => {
 
   useEffect(() => {
     void (async () => {
-      if (currentOrder && isInitialLoading) {
+      if (currentOrder && (isInitialLoading || isNotificationLink)) {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         navigate('OrderScreen', {
@@ -70,11 +73,16 @@ export const OrderListScreen = () => {
             setOffset(0);
           }
         });
+
+        if (isNotificationLink) {
+          setParams({ orderId: undefined });
+        }
+
       }
       setIsInitialLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isInitialLoading, navigate]);
+  }, [isInitialLoading, navigate, isNotificationLink]);
 
   useEffect(() => {
     void (async () => {
