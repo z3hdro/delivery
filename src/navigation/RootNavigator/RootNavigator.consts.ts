@@ -7,7 +7,7 @@ console.log('prefix: ', prefix);
 
 const config = {
   screens: {
-    OrderListScreen: 'orderlist',
+    OrderListScreen: 'orderlist/:orderId?',
     OrderScreen: 'driverorder/:orderId',
     MainBottomTabNavigator: {
       screens: {
