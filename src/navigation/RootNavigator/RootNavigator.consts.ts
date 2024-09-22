@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { LinkingOptions } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import * as Linking from 'expo-linking';
@@ -35,7 +36,9 @@ export const linkingConfiguration: LinkingOptions<any> = {
     const response = await Notifications.getLastNotificationResponseAsync() as any;
     console.log('response from expo push notifications ', response);
 
-    const deepLinkUrl = response?.notification?.request?.trigger?.remoteMessage?.data?.url;
+    const deepLinkUrl = Platform.OS === 'android' ?
+      (response as any)?.notification?.request?.trigger?.remoteMessage?.data?.url :
+      (response as any)?.notification?.request?.trigger?.payload?.url;
 
     if (deepLinkUrl) {
       console.log('deepLinkUrl: ', deepLinkUrl);
@@ -51,7 +54,9 @@ export const linkingConfiguration: LinkingOptions<any> = {
     // Listen to expo push notifications
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
       console.log('notification response: ', JSON.stringify(response));
-      const url = (response as any)?.notification?.request?.trigger?.remoteMessage?.data?.url
+      const url = Platform.OS === 'android' ?
+        (response as any)?.notification?.request?.trigger?.remoteMessage?.data?.url :
+        (response as any)?.notification?.request?.trigger?.payload?.url;
 
 
       // Any custom logic to see whether the URL needs to be handled
