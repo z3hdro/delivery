@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Platform, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from 'components/Screen';
@@ -61,7 +61,8 @@ export const RegistrationScreen = () => {
       const { accessToken, refreshToken, user } = await networkService.register({
         phone: enteredPhone.replace('+', ''),
         password,
-        fcmToken: deviceToken ?? ''
+        fcmToken: deviceToken ?? '',
+        deviceType: Platform.OS
       });
 
       networkService.setAuthHeader(accessToken);

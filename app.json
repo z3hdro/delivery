@@ -8,6 +8,9 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./src/assets/icons/app_icon.png",
+    "notification": {
+      "iosDisplayInForeground": true
+    },
     "splash": {
       "image": "./src/assets/icons/splash.png",
       "resizeMode": "contain",

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, Pressable } from 'react-native';
+import { View, Text, TextInput, Pressable, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
@@ -46,7 +46,8 @@ export const LoginScreen = () => {
       const { accessToken, refreshToken, user } = await networkService.login({
         phone: phone.replace('+', ''),
         password,
-        fcmToken: deviceToken ?? ''
+        fcmToken: deviceToken ?? '',
+        deviceType: Platform.OS
       });
 
       networkService.setAuthHeader(accessToken);
