@@ -12,12 +12,14 @@ export type LoginPayload = {
   phone: string
   password: string
   fcmToken: string
+  deviceType: string
 }
 
 export type RegisterPayload = {
   phone: string
   password: string
   fcmToken: string
+  deviceType: string
 }
 
 export type LoginResponse = {

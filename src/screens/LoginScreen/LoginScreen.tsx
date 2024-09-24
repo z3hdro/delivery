@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, Pressable, Platform } from 'react-native';
+import { View, Text, TextInput, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
@@ -10,7 +10,6 @@ import { LinkButton } from 'components/LinkButton';
 import { Button } from 'components/Button';
 import { useLoginNavigator } from 'navigation/hooks';
 import { useStyles } from './LoginScreen.styles';
-import { DRIVER_PASSWORD, DRIVER_PHONE, MANAGER_PASSWORD, MANAGER_PHONE } from 'mocks/mockUsers';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectDeviceToken } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
@@ -30,8 +29,8 @@ export const LoginScreen = () => {
   const deviceToken = useAppSelector(selectDeviceToken);
   const dispatch = useAppDispatch();
 
-  const [phone, setPhone] = useState<string>(DRIVER_PHONE);
-  const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
+  const [phone, setPhone] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [errorText, setErrorText] = useState<string>('');
 
   const onForgotPassword = useCallback(() => {
@@ -125,15 +124,18 @@ export const LoginScreen = () => {
     >
       <View style={styles.container}>
         <View style={styles.labelContainer}>
-          <Pressable onPress={() => {
-            // TODO: remove it later
-            setPhone((prevState) => prevState === DRIVER_PHONE ? MANAGER_PHONE : DRIVER_PHONE);
-            setPassword((prevState) => prevState === DRIVER_PASSWORD ? MANAGER_PASSWORD : DRIVER_PASSWORD);
-          }}>
-            <Text style={styles.label}>
-              {t('Login_label')}
-            </Text>
-          </Pressable>
+          <Text style={styles.label}>
+            {t('Login_label')}
+          </Text>
+          {/*<Pressable onPress={() => {*/}
+          {/*  // TODO: remove it later*/}
+          {/*  setPhone((prevState) => prevState === DRIVER_PHONE ? MANAGER_PHONE : DRIVER_PHONE);*/}
+          {/*  setPassword((prevState) => prevState === DRIVER_PASSWORD ? MANAGER_PASSWORD : DRIVER_PASSWORD);*/}
+          {/*}}>*/}
+          {/*  <Text style={styles.label}>*/}
+          {/*    {t('Login_label')}*/}
+          {/*  </Text>*/}
+          {/*</Pressable>*/}
         </View>
         <TextInput
           value={phone}
