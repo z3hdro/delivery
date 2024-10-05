@@ -1,6 +1,6 @@
 {
   "Login_label": "Войти",
-  "Login_phone_input_placeholder": "Телефон",
+  "Login_phone_input_placeholder": "+7(123)456-78-90",
   "Login_password_input_placeholder": "Пароль",
   "Login_button": "Войти",
   "Login_forgot_password_button": "Забыли пароль?",
@@ -8,7 +8,7 @@
   "Login_bottom_button": "Зарегистрироваться",
   "Login_bottom_unauthorized_user": "Введен неправильный номер или пароль",
   "Registration_label": "Регистрация",
-  "Registration_phone_input_placeholder": "+7 999 99 99 99",
+  "Registration_phone_input_placeholder": "+7(123)456-78-90",
   "Registration_password_input_placeholder": "Пароль",
   "Registration_button": "Зарегистрироваться",
   "Registration_bottom_label": "Уже зарегистрирован",

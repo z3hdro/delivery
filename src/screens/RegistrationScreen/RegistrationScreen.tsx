@@ -19,6 +19,8 @@ import { setCurrentPerson, setIsAuthorizationFinished, setManagerPhone, setUserR
 import { INITIAL_ERROR_MAP, NETWORK_ERROR_TEXT, REGISTRATION_ERROR_TEXT } from './RegistrationScreen.consts';
 import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX } from 'constants/regex';
 import { ErrorMap } from './RegistrationScreen.types';
+import {MaskedTextInput} from "react-native-mask-text";
+import {PHONE_MASK} from "constants/user";
 
 export const RegistrationScreen = () => {
   const { t } = useTranslation();
@@ -27,8 +29,9 @@ export const RegistrationScreen = () => {
   const deviceToken = useAppSelector(selectDeviceToken);
   const dispatch = useAppDispatch();
 
-  const [phone, setPhone] = useState<string>(DRIVER_PHONE);
-  const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
+  const [phone, setPhone] = useState<string>('');
+  const [formattedPhone, setFormattedPhone] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [errorText, setErrorText] = useState<string | null>(null);
   const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
 
@@ -124,18 +127,22 @@ export const RegistrationScreen = () => {
             {t('Registration_label')}
           </Text>
         </View>
-        <TextInput
-          value={phone}
-          onChangeText={(text) => {
+        <MaskedTextInput
+          mask={PHONE_MASK}
+          onChangeText={(text, rawText) => {
             if (errorText) {
               setErrorText(null);
               setIsError(INITIAL_ERROR_MAP);
             }
-            setPhone(text);
+            setFormattedPhone(text);
+            setPhone(rawText);
+            console.log('text: ', text);
+            console.log('rawText: ', rawText);
           }}
-          style={[styles.textInputContainer, isError.phone && styles.errorField]}
-          // keyboardType={'phone-pad'}
           placeholder={t('Registration_phone_input_placeholder')}
+          value={formattedPhone}
+          style={[styles.textInputContainer, isError.phone && styles.errorField]}
+          keyboardType={'phone-pad'}
         />
         <TextInput
           value={password}

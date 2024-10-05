@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { AxiosError } from 'axios';
 
 import { networkService } from 'services/network';
@@ -20,6 +21,8 @@ import {
   setManagerPhone,
   setUserRole
 } from 'store/slices';
+import { MaskedTextInput } from 'react-native-mask-text';
+import {PHONE_MASK} from "constants/user";
 
 
 export const LoginScreen = () => {
@@ -30,6 +33,7 @@ export const LoginScreen = () => {
   const dispatch = useAppDispatch();
 
   const [phone, setPhone] = useState<string>('');
+  const [formattedPhone, setFormattedPhone] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorText, setErrorText] = useState<string>('');
 
@@ -137,12 +141,16 @@ export const LoginScreen = () => {
           {/*  </Text>*/}
           {/*</Pressable>*/}
         </View>
-        <TextInput
-          value={phone}
-          onChangeText={setPhone}
+        <MaskedTextInput
+          mask={PHONE_MASK}
+          onChangeText={(text, rawText) => {
+            setFormattedPhone(text);
+            setPhone(rawText);
+          }}
+          placeholder={t('Login_phone_input_placeholder')}
+          value={formattedPhone}
           style={styles.textInputContainer}
           keyboardType={'phone-pad'}
-          placeholder={t('Login_phone_input_placeholder')}
         />
         <TextInput
           value={password}
