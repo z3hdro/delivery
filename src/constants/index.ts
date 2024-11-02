@@ -11,3 +11,4 @@ export * from './emitEvents';
 export * from './weight';
 export * from './websocket';
 export * from './regex';
+export * from './alertType';

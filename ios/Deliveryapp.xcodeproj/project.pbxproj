@@ -400,7 +400,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.z3hdro.cargodelivery;
-				PRODUCT_NAME = Deliveryapp;
+				PRODUCT_NAME = "Deliveryapp";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Delivery cargo provisioning";
 				SWIFT_OBJC_BRIDGING_HEADER = "Deliveryapp/Deliveryapp-Bridging-Header.h";
@@ -437,7 +437,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.z3hdro.cargodelivery;
-				PRODUCT_NAME = Deliveryapp;
+				PRODUCT_NAME = "Deliveryapp";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Delivery cargo provisioning";
 				SWIFT_OBJC_BRIDGING_HEADER = "Deliveryapp/Deliveryapp-Bridging-Header.h";

@@ -110,8 +110,6 @@ export const checkValidation = ({ name, address, geoData, contacts }: Validation
     }
   }
 
-  console.log('p1');
-
   return errorMap;
 };
 
@@ -124,6 +122,10 @@ export const checkContactValidation = (contact: ContactView): ContactError => {
 
   if (!contact.surname.trim()) {
     errorMap.contactSurname = true;
+  }
+
+  if (!contact.patronymic.trim()) {
+    errorMap.contactPatronymic = true;
   }
 
   const email = contact.email?.trim();

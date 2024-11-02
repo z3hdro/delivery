@@ -63,7 +63,6 @@ export const ManagerNavigator = () => {
     },
     onMessage: (e) => {
       const message = JSON.parse((e?.data as string)) as WSRegisteredDriver;
-      console.log('Received message:', message);
       if (message?.user_id && message?.status) {
         if (message.status === USER_STATUS.NEW_USER) {
           dispatch(setNewDriversQty(1));

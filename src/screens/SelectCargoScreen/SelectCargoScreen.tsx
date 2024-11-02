@@ -31,10 +31,13 @@ export const SelectCargoScreen = () => {
 
   const isLimitReached = useMemo(() => data.length < offset * NOMENCLATURE_LIMIT, [data.length, offset]);
 
+  console.log('isLimitReached: ', isLimitReached);
+
   const fetchMeasures = useCallback(async (offset: number) => {
     try {
       setIsLoading(true);
       const result = await networkService.getNomenclatures(offset);
+      console.log('result length: ', result.length);
       if (result.length) {
         setData((prevState) => offset === 0 ? result : ([...prevState, ...result]));
         setOffset((prevState) => prevState + 1);
@@ -98,7 +101,7 @@ export const SelectCargoScreen = () => {
 
   const renderItem = useCallback(({ item }: { item: Nomenclature}) => (
     <TouchableOpacity onPress={() => onSelectItem(item)} style={styles.item}>
-      <Text style={styles.itemText}>{`${item.measure.name} ${item.name}`}</Text>
+      <Text style={styles.itemText}>{item.name}</Text>
     </TouchableOpacity>
   ), [onSelectItem, styles]);
 

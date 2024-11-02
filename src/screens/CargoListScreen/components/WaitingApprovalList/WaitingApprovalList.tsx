@@ -34,7 +34,6 @@ export const WaitingApprovalList: FC<Props> = ({ initialOrder, resetInitialOrder
   const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
 
   useFocusEffect(useCallback(() => {
-    console.log('isFocused WaitingApprovalList for Orders');
     if (newOrdersQty > 0) {
       dispatch(resetNewOrdersQty());
       setShouldRefresh(true);

@@ -120,8 +120,6 @@ class NetworkService {
   public async refreshAccessToken(refreshToken: string): Promise<RefreshResponse> {
     const result = await this.unauthorizedClient.post<RefreshResponse>('auth/refresh', { refreshToken });
 
-    console.log('refresh result: ', result.data);
-
     return result.data;
   }
 

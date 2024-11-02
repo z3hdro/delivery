@@ -5,4 +5,6 @@ export type Props = {
   value: Option | null;
   onChangeValue: (item: Option) => void;
   style?: ViewStyle;
+  isError?: boolean
+  errorText?: string
 }

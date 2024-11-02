@@ -16,9 +16,9 @@ void i18next.use(initReactI18next).init({
   },
 });
 
-const langResources: Translations = {
+export const langResources: Translations = {
   [SUPPORTED_LANGUAGES.RU]: russian
-};
+} as const;
 
 supportedLngs.forEach(lang => {
   i18next.addResourceBundle(lang, defaultNS, langResources[lang], true, true );

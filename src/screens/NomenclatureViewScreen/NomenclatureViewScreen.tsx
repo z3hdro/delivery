@@ -8,6 +8,7 @@ import { InfoSection } from 'components/InfoSection';
 import { Preloader } from 'components/Preloader';
 import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
+import { displayErrorMessage } from 'utils/alert';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { DEFAULT_MEASURE_NAME } from './NomenclatureViewScreen.consts';
 import { useStyles } from './NomenclatureViewScreen.styles';
@@ -22,7 +23,6 @@ export const NomenclatureViewScreen = () => {
   const { params: { nomenclature, onUpdate } } = useManagerRoute<'NomenclatureViewScreen'>();
 
   const isEdit = useMemo(() => !!nomenclature, [nomenclature]);
-  console.log('isEdit: ', isEdit);
 
   const [name, setName] = useState<string>(nomenclature?.name || '');
   const [measure, setMeasure] = useState<Measure | null>(nomenclature?.measure || null);
@@ -48,7 +48,7 @@ export const NomenclatureViewScreen = () => {
 
       if (!nomenclatureName.length) {
         setIsError(true);
-        return
+        return;
       }
 
       let selectedMeasure = measure;
@@ -56,12 +56,12 @@ export const NomenclatureViewScreen = () => {
       if (!selectedMeasure) {
         const { measures } = await networkService.getAllMeasures(0);
         if (measures.length) {
-          selectedMeasure = measures.find(({ name }) => name.toLowerCase() === DEFAULT_MEASURE_NAME) ?? null
+          selectedMeasure = measures.find(({ name }) => name.toLowerCase() === DEFAULT_MEASURE_NAME) ?? null;
         }
       }
 
       if (!selectedMeasure) {
-        return
+        return;
       }
 
       await networkService.addNomenclature({
@@ -72,6 +72,7 @@ export const NomenclatureViewScreen = () => {
       goBack();
     } catch (e) {
       console.log('adding nomenclature error: ', e);
+      displayErrorMessage(e?.message as string ?? '');
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +86,7 @@ export const NomenclatureViewScreen = () => {
 
       if (!nomenclatureName.length) {
         setIsError(true);
-        return
+        return;
       }
 
       if (!name.trim().length || !measure || !nomenclature) {
@@ -110,20 +111,20 @@ export const NomenclatureViewScreen = () => {
 
   const onDeletePosition = useCallback(async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
 
       if (!nomenclature) {
-        return
+        return;
       }
 
-      await networkService.deleteNomenclature(nomenclature?.id)
+      await networkService.deleteNomenclature(nomenclature?.id);
 
       onUpdate();
       goBack();
     } catch (e) {
       console.log('delete nomenclature error: ', e);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }, [goBack, onUpdate, nomenclature]);
 

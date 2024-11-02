@@ -36,7 +36,7 @@ export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, us
       telegram
     } = driver;
 
-    return {
+    return <PersonData>{
       id: user.id,
       phone: user.phone,
       name,
@@ -208,7 +208,18 @@ export const checkValidation = ({
   company,
   companyName,
   companyInn,
-  companyKpp
+  companyKpp,
+  name,
+  surname,
+  jobPosition,
+  selfEmployed,
+  driverLicenseSeries,
+  driverLicenseNumber,
+  passportSeries,
+  passportNumber,
+  passportAuthority,
+  passportDateOfIssue,
+  passportDepartmentCode,
 }: ValidationArgs): ErrorMap => {
   const errorMap = { ...INITIAL_ERROR_MAP };
 
@@ -231,6 +242,50 @@ export const checkValidation = ({
     if (companyKpp.length > 0 && !IS_DIGIT_ONLY_REGEX.test(companyKpp)) {
       errorMap.companyKpp = true;
     }
+  }
+
+  if (!company && !selfEmployed) {
+    errorMap.type = true;
+  }
+
+  if (!name.trim()) {
+    errorMap.name = true;
+  }
+
+  if (!surname.trim()) {
+    errorMap.surname = true;
+  }
+
+  if (!jobPosition) {
+    errorMap.jobPosition = true;
+  }
+
+  if (!driverLicenseSeries.trim()) {
+    errorMap.driverLicenseSeries = true;
+  }
+
+  if (!driverLicenseNumber.trim()) {
+    errorMap.driverLicenseNumber = true;
+  }
+
+  if (!passportSeries.trim()) {
+    errorMap.passportSeries = true;
+  }
+
+  if (!passportNumber.trim()) {
+    errorMap.passportNumber = true;
+  }
+
+  if (!passportAuthority.trim()) {
+    errorMap.passportAuthority = true;
+  }
+
+  if (!passportDateOfIssue.trim()) {
+    errorMap.passportDateOfIssue = true;
+  }
+
+  if (!passportDepartmentCode.trim()) {
+    errorMap.passportDepartmentCode = true;
   }
 
   return errorMap;

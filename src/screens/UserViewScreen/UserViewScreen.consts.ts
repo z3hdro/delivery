@@ -93,6 +93,17 @@ export const INITIAL_ERROR_MAP: ErrorMap = {
   companyInn: false,
   companyKpp: false,
   email: false,
+  name: false,
+  surname: false,
+  jobPosition: false,
+  type: false,
+  driverLicenseSeries: false,
+  driverLicenseNumber: false,
+  passportSeries: false,
+  passportNumber: false,
+  passportAuthority: false,
+  passportDateOfIssue: false,
+  passportDepartmentCode: false,
 };
 
 export enum USER_APPROVE_ERROR_TEXT {

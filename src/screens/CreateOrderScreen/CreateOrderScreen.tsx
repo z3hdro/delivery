@@ -12,9 +12,11 @@ import { Checkbox } from 'components/Checkbox';
 import { useManagerNavigator } from 'navigation/hooks';
 import { networkService } from 'services/network';
 import { LogisticPoint } from 'services/network/types';
+import { displayErrorMessage } from 'utils/alert';
 import {
   EMPTY_CARGO_DATA,
-  INITIAL_CARGO_DATA, INITIAL_CARGO_ERROR,
+  INITIAL_CARGO_DATA,
+  INITIAL_CARGO_ERROR,
   INITIAL_CARGO_ERROR_MAP,
   INITIAL_ERROR_MAP
 } from './CreateOrderScreen.consts';
@@ -206,13 +208,13 @@ export const CreateOrderScreen = () => {
       resetForm();
 
       navigate('MainBottomTabNavigator', { screen: 'CargoListScreen' });
-
       return;
     } catch (e) {
       if (e instanceof AxiosError) {
         console.log('e message: ', e?.message);
         console.log('e status: ', e?.code);
       }
+      displayErrorMessage(e?.message as string ?? '');
       console.log('onCreateOrder error', e);
     } finally {
       setIsLoading(false);

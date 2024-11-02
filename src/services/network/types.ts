@@ -193,8 +193,8 @@ export type OrderPayload = {
   destinationId: number
   priceNonCash: number
   priceCash: number
-  plannedLoadingDate: string
-  plannedDeliveryDate: string
+  plannedLoadingDate?: string
+  plannedDeliveryDate?: string
   costType: string
   nomenclatures: Array<OrderNomenclaturePayload>
 }

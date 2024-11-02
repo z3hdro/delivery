@@ -20,7 +20,8 @@ import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
   checkValidation,
   createCompanyInitialState,
-  createDrivingLicenseInitialState, createManagerFullName,
+  createDrivingLicenseInitialState,
+  createManagerFullName,
   createPassportInitialState,
   createPersonInitialState,
   selectCompanyType,
@@ -33,25 +34,20 @@ import {
   DRIVING_LICENSE_KEYS,
   EMPLOYMENT,
   EMPLOYMENT_VALUES,
+  INITIAL_ERROR_MAP,
   PASSPORT_KEYS,
   PERSON_KEYS,
-  INITIAL_ERROR_MAP, USER_APPROVE_ERROR_TEXT
+  USER_APPROVE_ERROR_TEXT
 } from './UserViewScreen.consts';
 import { USER } from 'constants/user';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
-import {
-  CompanyData,
-  DrivingLicense,
-  ErrorMap,
-  ImageFile,
-  PassportData,
-  PersonData
-} from './UserViewScreen.types';
+import { CompanyData, DrivingLicense, ErrorMap, ImageFile, PassportData, PersonData } from './UserViewScreen.types';
 import { Option } from 'types/picker';
 import { ExtendedPerson } from 'types/user';
 import { useStyles } from './UserViewScreen.styles';
 
 import { BackIcon } from 'src/assets/icons';
+import { displayErrorMessage } from 'utils/alert';
 
 
 export const UserViewScreen = () => {
@@ -156,8 +152,12 @@ export const UserViewScreen = () => {
   }, []);
 
   const onChangeJobPosition = useCallback((item: Option | null) => {
+    if (isValidError) {
+      setErrorText(null);
+      setIsError(INITIAL_ERROR_MAP);
+    }
     setPersonData(prevState => ({ ...prevState, jobPosition: item }));
-  }, []);
+  }, [isValidError]);
 
   const onSaveUserData = async () => {
     try {
@@ -178,7 +178,18 @@ export const UserViewScreen = () => {
         companyName: companyData.name,
         companyInn: companyData.inn,
         companyKpp: companyData.kpp,
-        email: personData?.email?.trim()
+        email: personData?.email?.trim(),
+        name: personData.name,
+        surname: personData.surname,
+        jobPosition: personData.jobPosition,
+        selfEmployed: personData.self_employed,
+        driverLicenseSeries: drivingLicenseData.series,
+        driverLicenseNumber: drivingLicenseData.number,
+        passportSeries: passportData.series,
+        passportNumber: passportData.number,
+        passportAuthority: passportData.authority,
+        passportDateOfIssue: passportData.date_of_issue,
+        passportDepartmentCode: passportData.department_code,
       });
 
       if (Object.values(errorMap).some((err) => err)) {
@@ -261,6 +272,7 @@ export const UserViewScreen = () => {
         console.log('e.request: ', e?.request);
       }
       console.log('error on confirm driver: ', e);
+      displayErrorMessage(e?.message as string ?? '');
     } finally {
       setIsLoading(false);
     }
@@ -285,7 +297,18 @@ export const UserViewScreen = () => {
         companyName: companyData.name,
         companyInn: companyData.inn,
         companyKpp: companyData.kpp,
-        email: personData?.email?.trim()
+        email: personData?.email?.trim(),
+        name: personData.name,
+        surname: personData.surname,
+        jobPosition: personData.jobPosition,
+        selfEmployed: personData.self_employed,
+        driverLicenseSeries: drivingLicenseData.series,
+        driverLicenseNumber: drivingLicenseData.number,
+        passportSeries: passportData.series,
+        passportNumber: passportData.number,
+        passportAuthority: passportData.authority,
+        passportDateOfIssue: passportData.date_of_issue,
+        passportDepartmentCode: passportData.department_code,
       });
 
       if (Object.values(errorMap).some((err) => err)) {
@@ -340,6 +363,7 @@ export const UserViewScreen = () => {
         console.log('e.request: ', e?.request);
       }
       console.log('error on update driver data: ', e);
+      displayErrorMessage(e?.message as string ?? '');
     } finally {
       setIsLoading(false);
 
@@ -373,15 +397,6 @@ export const UserViewScreen = () => {
             value={personData.phone}
             editable={false}
             isRequired
-            // onUpdate={(text: string) => {
-            //   if (errorText) {
-            //     setErrorText(null);
-            //     setIsError(INITIAL_ERROR_MAP);
-            //   }
-            //   updatePersonData(PERSON_KEYS.PHONE, text);
-            // }}
-            // isError={isError.phone}
-            // errorText={errorText}
           />
           <InfoSection
             style={styles.section}
@@ -404,20 +419,34 @@ export const UserViewScreen = () => {
           </Text>
 
           <InfoSection
+            isRequired
             style={styles.section}
             label={t('UserView_driver_first_label')}
             value={personData.name}
             onUpdate={(text: string) => {
+              if (isValidError) {
+                setErrorText(null);
+                setIsError(INITIAL_ERROR_MAP);
+              }
               updatePersonData(PERSON_KEYS.NAME, text);
             }}
+            isError={isError.name}
+            errorText={t(errorText || 'Error_user_empty_name')}
           />
           <InfoSection
+            isRequired
             style={styles.section}
             label={t('UserView_driver_second_label')}
             value={personData.surname}
             onUpdate={(text: string) => {
+              if (isValidError) {
+                setErrorText(null);
+                setIsError(INITIAL_ERROR_MAP);
+              }
               updatePersonData(PERSON_KEYS.SURNAME, text);
             }}
+            isError={isError.name}
+            errorText={t(errorText || 'Error_user_empty_surname')}
           />
           <InfoSection
             style={styles.section}
@@ -438,12 +467,19 @@ export const UserViewScreen = () => {
           />
 
           <Text style={[styles.label, styles.section]}>
+            <Text style={styles.required}>*{'  '}</Text>
             {t('UserView_driver_fifth_label')}
           </Text>
           <Checkbox
             label={t('UserView_driver_checkbox_first_label')}
             value={personData.self_employed}
+            isError={isError.type}
+            errorText={t(errorText || 'Error_user_empty_type')}
             onPress={() => {
+              if (isValidError) {
+                setErrorText(null);
+                setIsError(INITIAL_ERROR_MAP);
+              }
               onToggleEmployment(EMPLOYMENT.SELF_EMPLOYED);
             }}
           />
@@ -451,7 +487,13 @@ export const UserViewScreen = () => {
             style={styles.section}
             label={t('UserView_driver_checkbox_third_label')}
             value={personData.company}
+            isError={isError.type}
+            errorText={t(errorText || 'Error_user_empty_type')}
             onPress={() => {
+              if (isValidError) {
+                setErrorText(null);
+                setIsError(INITIAL_ERROR_MAP);
+              }
               onToggleEmployment(EMPLOYMENT.COMPANY);
             }}
           />
@@ -541,17 +583,21 @@ export const UserViewScreen = () => {
           )}
 
           <Text style={[styles.label, styles.jobPositionSection]}>
+            <Text style={styles.required}>*{'  '}</Text>
             {t('UserView_driver_sixth_label')}
           </Text>
           <JobPositionPicker
             value={personData.jobPosition}
             onChangeValue={onChangeJobPosition}
+            isError={isError.jobPosition}
+            errorText={t(errorText || 'Error_user_empty_job_position')}
           />
 
           <Text style={styles.sectionTitle}>
             {t('UserView_contact_section_title')}
           </Text>
           <InfoSection
+            isRequired
             style={styles.section}
             label={t('UserView_contact_first_label')}
             value={personData.email ?? ''}
@@ -579,21 +625,35 @@ export const UserViewScreen = () => {
           </Text>
           <View style={styles.row}>
             <InfoSection
+              isRequired
               style={styles.rowItem}
               label={t('UserView_driver_license_first_label')}
               value={drivingLicenseData.series}
               onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
                 updateDriverLicenseData(DRIVING_LICENSE_KEYS.SERIES, text);
               }}
+              isError={isError.driverLicenseSeries}
+              errorText={t(errorText || 'Error_user_empty_driver_license_series')}
             />
             <InfoSection
+              isRequired
               style={styles.rowItem}
               label={t('UserView_driver_license_second_label')}
               value={drivingLicenseData.number}
               onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
                 updateDriverLicenseData(DRIVING_LICENSE_KEYS.NUMBER, text);
               }}
               keyboardType={'numeric'}
+              isError={isError.driverLicenseNumber}
+              errorText={t(errorText || 'Error_user_empty_driver_license_number')}
             />
           </View>
 
@@ -602,49 +662,84 @@ export const UserViewScreen = () => {
           </Text>
           <View style={styles.row}>
             <InfoSection
+              isRequired
               style={styles.rowItem}
               label={t('UserView_passport_first_label')}
               value={passportData.series}
               onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
                 updatePassportData(PASSPORT_KEYS.SERIES, text);
               }}
+              isError={isError.passportSeries}
+              errorText={t(errorText || 'Error_user_empty_passport_series')}
             />
             <InfoSection
+              isRequired
               style={styles.rowItem}
               label={t('UserView_passport_second_label')}
               value={passportData.number}
               onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
                 updatePassportData(PASSPORT_KEYS.NUMBER, text);
               }}
               keyboardType={'numeric'}
+              isError={isError.passportNumber}
+              errorText={t(errorText || 'Error_user_empty_passport_number')}
             />
           </View>
           <InfoSection
+            isRequired
             style={styles.section}
             label={t('UserView_passport_third_label')}
             value={passportData.authority}
             onUpdate={(text: string) => {
+              if (isValidError) {
+                setErrorText(null);
+                setIsError(INITIAL_ERROR_MAP);
+              }
               updatePassportData(PASSPORT_KEYS.AUTHORITY, text);
             }}
+            isError={isError.passportAuthority}
+            errorText={t(errorText || 'Error_user_empty_passport_authority')}
           />
           <View style={styles.row}>
             <InfoSection
+              isRequired
               style={styles.rowItem}
               label={t('UserView_passport_fourth_label')}
               value={passportData.date_of_issue}
               onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
                 updatePassportData(PASSPORT_KEYS.DATE_OF_ISSUE, text);
               }}
               type={INFO_SECTION_TYPE.DATE_PICKER}
               minimumDate={undefined}
+              isError={isError.passportDateOfIssue}
+              errorText={t(errorText || 'Error_user_empty_passport_date_of_issue')}
             />
             <InfoSection
+              isRequired
               style={styles.rowItem}
               label={t('UserView_passport_fifth_label')}
               value={passportData.department_code}
               onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
                 updatePassportData(PASSPORT_KEYS.DEPARTMENT_CODE, text);
               }}
+              isError={isError.passportDepartmentCode}
+              errorText={t(errorText || 'Error_user_empty_passport_department_code')}
             />
           </View>
 

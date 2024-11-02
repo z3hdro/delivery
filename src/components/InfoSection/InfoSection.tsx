@@ -34,7 +34,7 @@ export const  InfoSection: FC<Props> = ({
     });
 
     return () => {
-      subscription.remove();
+      subscription?.remove?.();
     };
   }, []);
 
@@ -78,7 +78,10 @@ export const  InfoSection: FC<Props> = ({
 
     if (type === INFO_SECTION_TYPE.SCREEN) {
       return (
-        <TouchableOpacity disabled={!editable} style={[styles.valueContainer, isError && styles.error]} onPress={onNavigate}>
+        <TouchableOpacity
+          disabled={!editable}
+          style={[styles.valueContainer, isError && styles.error]}
+          onPress={onNavigate}>
           <Text style={styles.value}>
             {value ?? ''}
           </Text>

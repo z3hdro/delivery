@@ -52,6 +52,17 @@ export type ErrorMap = {
   companyInn: boolean
   companyKpp: boolean
   email: boolean
+  name: boolean
+  surname: boolean
+  jobPosition: boolean
+  type: boolean
+  driverLicenseSeries: boolean
+  driverLicenseNumber: boolean
+  passportSeries: boolean
+  passportNumber: boolean
+  passportAuthority: boolean
+  passportDateOfIssue: boolean
+  passportDepartmentCode: boolean
 }
 
 export type ValidationArgs = {
@@ -61,4 +72,15 @@ export type ValidationArgs = {
   companyInn: string
   companyKpp: string
   email?: string
+  name: string
+  surname: string
+  jobPosition: Option | null
+  selfEmployed: boolean
+  driverLicenseSeries: string
+  driverLicenseNumber: string
+  passportSeries: string
+  passportNumber: string
+  passportAuthority: string
+  passportDateOfIssue: string
+  passportDepartmentCode: string
 }

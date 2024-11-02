@@ -9,9 +9,8 @@ import { Preloader } from 'components/Preloader';
 import { FirstStep, SecondStep, ThirdStep } from './components';
 import { NUMBER_OF_CELLS } from './ForgotPasswordScreen.consts';
 import { useStyles } from './ForgotPasswordScreen.styles';
-import {CONTAINS_LETTERS_REGEX, DIGIT_REGEX} from "constants/regex";
-import {REGISTRATION_ERROR_TEXT} from "screens/RegistrationScreen/RegistrationScreen.consts";
-import {AxiosError} from "axios";
+import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX } from 'constants/regex';
+import { AxiosError } from 'axios';
 
 export const ForgotPasswordScreen = () => {
   const { t } = useTranslation();

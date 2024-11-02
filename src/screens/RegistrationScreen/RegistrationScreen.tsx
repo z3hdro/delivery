@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Platform, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { MaskedTextInput } from 'react-native-mask-text';
 
 import { Screen } from 'components/Screen';
 import { LinkButton } from 'components/LinkButton';
@@ -9,7 +10,6 @@ import { useLoginNavigator } from 'navigation/hooks';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 
 import { useStyles } from './RegistrationScreen.styles';
-import { DRIVER_PASSWORD, DRIVER_PHONE } from 'mocks/mockUsers';
 import { networkService } from 'services/network';
 import { AxiosError } from 'axios';
 import { useAppSelector } from 'hooks/useAppSelector';
@@ -19,8 +19,7 @@ import { setCurrentPerson, setIsAuthorizationFinished, setManagerPhone, setUserR
 import { INITIAL_ERROR_MAP, NETWORK_ERROR_TEXT, REGISTRATION_ERROR_TEXT } from './RegistrationScreen.consts';
 import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX } from 'constants/regex';
 import { ErrorMap } from './RegistrationScreen.types';
-import {MaskedTextInput} from "react-native-mask-text";
-import {PHONE_MASK} from "constants/user";
+import { PHONE_MASK } from 'constants/user';
 
 export const RegistrationScreen = () => {
   const { t } = useTranslation();
@@ -136,8 +135,6 @@ export const RegistrationScreen = () => {
             }
             setFormattedPhone(text);
             setPhone(rawText);
-            console.log('text: ', text);
-            console.log('rawText: ', rawText);
           }}
           placeholder={t('Registration_phone_input_placeholder')}
           value={formattedPhone}

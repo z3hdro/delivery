@@ -21,10 +21,12 @@ import {
   createInitialExpandMap,
   createInitialGeoData, creatInitialContactErrorMap
 } from './ShippingPointViewScreen.utils';
+import { displayErrorMessage } from 'utils/alert';
 import { useStyles } from './ShippingPointViewScreen.styles';
 import { colors } from 'constants/colors';
 import { EMPTY_CONTACT } from 'constants/contact';
 import {
+  CONTACT_ERROR_KEYS,
   INITIAL_CONTACT_ERROR_MAP,
   INITIAL_ERROR_MAP
 } from './ShippingPointViewScreen.consts';
@@ -75,8 +77,6 @@ export const ShippingPointViewScreen = () => {
     Object.values(isError).some((error) => error),
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [JSON.stringify(isError)]);
-
-  console.log('isValidError: ', isValidError);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -269,6 +269,7 @@ export const ShippingPointViewScreen = () => {
         goBack();
       } catch (e) {
         console.log('adding shipping point error: ', e);
+        displayErrorMessage(e?.message as string ?? '');
       } finally {
         setIsLoading(false);
       }
@@ -532,7 +533,7 @@ export const ShippingPointViewScreen = () => {
     return (
       <View style={styles.contactBlock}>
         {fields.map(([key, value], index) => {
-          const isRequired = key === 'name' || key === 'surname' || key === 'phone';
+          const isRequiredField = CONTACT_ERROR_KEYS[key]
 
           const [isError, errorText] = checkContactError(key, contactError);
 
@@ -541,7 +542,7 @@ export const ShippingPointViewScreen = () => {
               key={`contact_${index}_${key}`}
               style={index > 0 ? styles.block : undefined}
               textInputStyle={styles.addressTextInput}
-              isRequired={isRequired}
+              isRequired={isRequiredField}
               label={t(`ShippingPointView_contact_label_${index + 1}`)}
               value={value}
               onUpdate={(text) => {

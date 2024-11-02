@@ -33,7 +33,6 @@ export const WaitingApprovalList = () => {
   const isLimitReached = useMemo(() => data.length < offset * DRIVER_LIST_LIMIT, [data.length, offset]);
 
   useFocusEffect(useCallback(() => {
-    console.log('isFocused WaitingApprovalList for Drivers');
     if (newDriversQty > 0) {
       dispatch(resetNewDriversQty());
       setShouldRefresh(true);

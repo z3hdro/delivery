@@ -16,9 +16,7 @@ import {
   setUserRole,
   setIsAuthorizationFinished
 } from 'store/slices';
-import { selectCurrentOrder, selectCurrentPerson } from 'store/selectors';
 import { Props } from './App.types';
-import { useAppSelector } from 'hooks/useAppSelector';
 
 Notifications.setNotificationHandler({
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -30,13 +28,7 @@ Notifications.setNotificationHandler({
 });
 
 export const AppProvider: FC<Props> = ({ children }) => {
-  const person = useAppSelector(selectCurrentPerson);
-  const currentOrder = useAppSelector(selectCurrentOrder);
-
   const dispatch = useAppDispatch();
-
-  console.log('currentOrder on appProvider: ', !!currentOrder);
-  console.log('currentPerson on appProvider: ', !!person);
 
   useEffect(() => {
     void (async () => {
@@ -47,7 +39,6 @@ export const AppProvider: FC<Props> = ({ children }) => {
           dispatch(setDeviceToken(token));
         }
         const role = await appStorage.getData(STORAGE_KEYS.ROLE);
-        console.log('role: ', role);
 
         if (role) {
           dispatch(setUserRole(role));
@@ -55,9 +46,6 @@ export const AppProvider: FC<Props> = ({ children }) => {
 
         const accessToken = await appStorage.getData(STORAGE_KEYS.ACCESS_TOKEN);
         const refreshToken = await appStorage.getData(STORAGE_KEYS.REFRESH_TOKEN);
-
-        console.log('accessToken: ', accessToken);
-        console.log('refreshToken: ', refreshToken);
 
         if (accessToken) {
           networkService.setAuthHeader(accessToken);

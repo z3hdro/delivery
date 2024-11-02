@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
+import { MaskedTextInput } from 'react-native-mask-text';
 import { View, Text, TextInput, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { AxiosError } from 'axios';
 
 import { networkService } from 'services/network';
@@ -21,9 +21,7 @@ import {
   setManagerPhone,
   setUserRole
 } from 'store/slices';
-import { MaskedTextInput } from 'react-native-mask-text';
-import {PHONE_MASK} from "constants/user";
-
+import { PHONE_MASK } from 'constants/user';
 
 export const LoginScreen = () => {
   const { t } = useTranslation();
@@ -43,9 +41,11 @@ export const LoginScreen = () => {
 
   const onLoginPress = useCallback(async () => {
     try {
-      if (!phone.trim().length || !password.trim().length) {
+      const trimPhone = phone.trim();
+      if (!trimPhone.length || !password.trim().length) {
         return;
       }
+
       const { accessToken, refreshToken, user } = await networkService.login({
         phone: phone.replace('+', ''),
         password,
@@ -144,6 +144,9 @@ export const LoginScreen = () => {
         <MaskedTextInput
           mask={PHONE_MASK}
           onChangeText={(text, rawText) => {
+            if (errorText) {
+              setErrorText('');
+            }
             setFormattedPhone(text);
             setPhone(rawText);
           }}

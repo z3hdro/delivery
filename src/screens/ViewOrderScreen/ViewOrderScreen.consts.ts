@@ -10,3 +10,9 @@ export enum ORDER_KEYS {
   DEPARTURE_DATE_PLAN = 'departureDatePlan',
   TRUCK_VIN = 'truckVin',
 }
+
+export const INITIAL_ERROR_MAP = {
+  driver: false,
+  phone: false,
+  vin: false,
+};
