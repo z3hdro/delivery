@@ -105,14 +105,16 @@ export const createDrivingLicenseInitialState = (
       drivingLicense
     } = driver;
 
+    console.log('drivingLicense: ', drivingLicense);
+
     if (drivingLicense) {
       const {
-        series,
+        serial,
         number,
       } = drivingLicense;
 
       return {
-        series: String(series),
+        series: String(serial),
         number: String(number),
       };
     }
@@ -203,7 +205,6 @@ export const createManagerFullName = (person?: ExtendedPerson): string => {
 };
 
 export const checkValidation = ({
-  manager,
   email,
   company,
   companyName,
@@ -220,6 +221,7 @@ export const checkValidation = ({
   passportAuthority,
   passportDateOfIssue,
   passportDepartmentCode,
+  photos,
 }: ValidationArgs): ErrorMap => {
   const errorMap = { ...INITIAL_ERROR_MAP };
 
@@ -227,8 +229,8 @@ export const checkValidation = ({
     errorMap.email = true;
   }
 
-  if (!manager.trim()) {
-    errorMap.manager = true;
+  if (photos < 1) {
+    errorMap.photos = true;
   }
 
   if (company) {

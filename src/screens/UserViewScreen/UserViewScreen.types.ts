@@ -47,7 +47,6 @@ export type CompanyData = {
 
 export type ErrorMap = {
   phone: boolean
-  manager: boolean
   companyName: boolean
   companyInn: boolean
   companyKpp: boolean
@@ -63,10 +62,10 @@ export type ErrorMap = {
   passportAuthority: boolean
   passportDateOfIssue: boolean
   passportDepartmentCode: boolean
+  photos: boolean
 }
 
 export type ValidationArgs = {
-  manager: string
   company: boolean
   companyName: string
   companyInn: string
@@ -83,4 +82,5 @@ export type ValidationArgs = {
   passportAuthority: string
   passportDateOfIssue: string
   passportDepartmentCode: string
+  photos: number
 }

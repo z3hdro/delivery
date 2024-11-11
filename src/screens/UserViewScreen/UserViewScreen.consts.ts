@@ -88,7 +88,6 @@ export const COMPANY_TYPE_VALUES = Object.values(COMPANY_TYPE);
 
 export const INITIAL_ERROR_MAP: ErrorMap = {
   phone: false,
-  manager: false,
   companyName: false,
   companyInn: false,
   companyKpp: false,
@@ -104,6 +103,7 @@ export const INITIAL_ERROR_MAP: ErrorMap = {
   passportAuthority: false,
   passportDateOfIssue: false,
   passportDepartmentCode: false,
+  photos: false
 };
 
 export enum USER_APPROVE_ERROR_TEXT {

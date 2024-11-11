@@ -14,14 +14,11 @@ import { Button } from 'components/Button';
 import { Preloader } from 'components/Preloader';
 import { JobPositionPicker } from 'components/JobPositionPicker';
 import { networkService } from 'services/network';
-import { useAppSelector } from 'hooks/useAppSelector';
-import { selectCurrentPerson } from 'store/selectors';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
   checkValidation,
   createCompanyInitialState,
   createDrivingLicenseInitialState,
-  createManagerFullName,
   createPassportInitialState,
   createPersonInitialState,
   selectCompanyType,
@@ -56,8 +53,6 @@ export const UserViewScreen = () => {
   const { goBack } = useManagerNavigator();
   const { params: { user, driver, type, onUpdate } } = useManagerRoute<'UserViewScreen'>();
 
-  const person = useAppSelector(selectCurrentPerson);
-
   const [personData, setPersonData] = useState<PersonData>(
     createPersonInitialState(type, driver, user)
   );
@@ -69,9 +64,6 @@ export const UserViewScreen = () => {
   );
   const [companyData, setCompanyData] = useState<CompanyData>(
     createCompanyInitialState(type, driver, user)
-  );
-  const [manager, setManager] = useState<string>(
-    createManagerFullName(person as ExtendedPerson)
   );
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -141,9 +133,13 @@ export const UserViewScreen = () => {
     });
 
     if (!result.canceled && result?.assets[0]) {
+      if (isValidError) {
+        setErrorText(null);
+        setIsError(INITIAL_ERROR_MAP);
+      }
       setImages((prevState) => ([...prevState, result.assets[0].uri ?? '']));
     }
-  }, []);
+  }, [isValidError]);
 
   const onDeleteImage = useCallback((selectedIndex: number) => {
     setImages((prevState) =>
@@ -173,7 +169,6 @@ export const UserViewScreen = () => {
       console.log('images: ', images);
 
       const errorMap = checkValidation({
-        manager: manager.trim(),
         company: personData.company,
         companyName: companyData.name,
         companyInn: companyData.inn,
@@ -190,6 +185,7 @@ export const UserViewScreen = () => {
         passportAuthority: passportData.authority,
         passportDateOfIssue: passportData.date_of_issue,
         passportDepartmentCode: passportData.department_code,
+        photos: images.length,
       });
 
       if (Object.values(errorMap).some((err) => err)) {
@@ -292,7 +288,6 @@ export const UserViewScreen = () => {
       console.log('images: ', images);
 
       const errorMap = checkValidation({
-        manager: manager.trim(),
         company: personData.company,
         companyName: companyData.name,
         companyInn: companyData.inn,
@@ -309,6 +304,7 @@ export const UserViewScreen = () => {
         passportAuthority: passportData.authority,
         passportDateOfIssue: passportData.date_of_issue,
         passportDepartmentCode: passportData.department_code,
+        photos: images.length,
       });
 
       if (Object.values(errorMap).some((err) => err)) {
@@ -398,21 +394,6 @@ export const UserViewScreen = () => {
             editable={false}
             isRequired
           />
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_manager_second_label')}
-            value={manager}
-            onUpdate={(text) => {
-              if (isValidError) {
-                setErrorText(null);
-                setIsError(INITIAL_ERROR_MAP);
-              }
-              setManager(text);
-            }}
-            isRequired
-            isError={isError.manager}
-            errorText={t(errorText || USER_APPROVE_ERROR_TEXT.MANAGER_EMPTY)}
-          />
 
           <Text style={styles.sectionTitle}>
             {t('UserView_driver_section_title')}
@@ -456,15 +437,17 @@ export const UserViewScreen = () => {
               updatePersonData(PERSON_KEYS.PATRONYMIC, text);
             }}
           />
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_driver_fourth_label')}
-            value={personData.inn ?? ''}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.INN, text);
-            }}
-            keyboardType={'numeric'}
-          />
+          {!personData.company && (
+            <InfoSection
+              style={styles.section}
+              label={t('UserView_driver_fourth_label')}
+              value={personData.inn ?? ''}
+              onUpdate={(text: string) => {
+                updatePersonData(PERSON_KEYS.INN, text);
+              }}
+              keyboardType={'numeric'}
+            />
+          )}
 
           <Text style={[styles.label, styles.section]}>
             <Text style={styles.required}>*{'  '}</Text>
@@ -744,6 +727,7 @@ export const UserViewScreen = () => {
           </View>
 
           <Text style={[styles.label, styles.section]}>
+            <Text style={styles.required}>*{'  '}</Text>
             {t('UserView_passport_sixth_label')}
           </Text>
           <RoundButton
@@ -752,6 +736,12 @@ export const UserViewScreen = () => {
             title={t('UserView_passport_add_photo_button')}
             onPress={onImageSelect}
           />
+
+          {isError.photos && (
+            <Text style={styles.errorText}>
+              {t('Error_user_empty_photos')}
+            </Text>
+          )}
 
           {!!images.length && (
             <View style={styles.photoSection}>

@@ -110,7 +110,7 @@
   "CreateOrder_error_empty_cargo_net_weight": "Введите вес",
   "CreateOrder_error_empty_price": "Укажите, как минимум, одну из цен",
   "Nomenclature_header_title": "Список номенклатур",
-  "Nomenclature_view_header_title": "Номенклатурар",
+  "Nomenclature_view_header_title": "Номенклатура",
   "Nomenclature_add_position_button": "Добавить позицию",
   "Nomenclature_add_first_section": "Наименование",
   "Nomenclature_add_second_section": "Единица измерения",
@@ -259,5 +259,6 @@
   "Error_approve_order_empty_driver": "Выберите водителя",
   "Error_approve_order_empty_phone": "Введите номер телефона",
   "Error_approve_order_empty_vin": "Введите vin номер",
-  "Error_alert_title": "Возникла ошибка"
+  "Error_alert_title": "Возникла ошибка",
+  "Error_user_empty_photos": "Загрузите фото"
 }
