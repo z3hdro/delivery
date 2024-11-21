@@ -193,6 +193,8 @@
   "ShippingPointView_contact_label_7": "Telegram",
   "ShippingPointView_contact_label_8": "Доп. описание",
   "ShippingPointView_find_geo": "Найти геолокацию",
+  "ShippingPointView_find_by_geo_position": "Найти по координатам",
+  "ShippingPointView_find_by_geo_position_error": "Неверный формат введеных координат",
   "ShippingPointView_delete_contact_button": "Удалить контакт",
   "ShippingPointView_add_contact_button": "Добавить контакт",
   "ShippingPointView_save_button": "Сохранить",
@@ -260,5 +262,6 @@
   "Error_approve_order_empty_phone": "Введите номер телефона",
   "Error_approve_order_empty_vin": "Введите vin номер",
   "Error_alert_title": "Возникла ошибка",
-  "Error_user_empty_photos": "Загрузите фото"
+  "Error_user_empty_photos": "Загрузите фото",
+  "Close_photo_preview": "Закрыть"
 }

@@ -163,13 +163,15 @@ export const useStyles = () => {
       color: colors.color2
     },
     geoPosition: {
-      top: 16,
-      left: 8,
-      right: 8,
+      marginTop: 16,
+      paddingHorizontal: 8,
+      // top: 16,
+      // left: 8,
+      // right: 8,
       backgroundColor: colors.white,
       padding: 8,
-      position: 'absolute',
-      zIndex: 99,
+      // position: 'absolute',
+      // zIndex: 99,
     },
     geoPositionLabelBox: {
       flexDirection: 'row',
@@ -193,6 +195,7 @@ export const useStyles = () => {
       borderColor: colors.red,
     },
     errorText: {
+      marginTop: 8,
       color: colors.red,
       fontFamily: 'Roboto',
       fontSize: 14,

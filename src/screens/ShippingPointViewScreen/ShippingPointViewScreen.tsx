@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import YaMap, { Geocoder, Marker } from 'react-native-yamap';
@@ -19,7 +19,7 @@ import {
   createInitialAddressData,
   createInitialContactData,
   createInitialExpandMap,
-  createInitialGeoData, creatInitialContactErrorMap
+  createInitialGeoData, createInitialPointData, createPoint, creatInitialContactErrorMap
 } from './ShippingPointViewScreen.utils';
 import { displayErrorMessage } from 'utils/alert';
 import { useStyles } from './ShippingPointViewScreen.styles';
@@ -35,7 +35,7 @@ import {
   ContactKeys, ContactView, ErrorMap,
   ExpandedMap
 } from './ShippingPointViewScreen.types';
-import { GeoPosition } from 'types/geolocation';
+import { GeoPosition, MapGeoPosition } from 'types/geolocation';
 
 import { AddressMarkerIcon, BackIcon, PlusIcon, XIcon } from 'src/assets/icons';
 
@@ -63,11 +63,13 @@ export const ShippingPointViewScreen = () => {
     createInitialContactData(point)
   );
   const [geoPosition, setGeoPosition] = useState<GeoPosition>(createInitialGeoData(point));
+  const [marker, setMarker] = useState<MapGeoPosition>(createInitialPointData(point));
   const [isCanCancelContentTouches, setCanCancelContentTouches] = useState<boolean>(true);
   const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
   const [isContactError, setIsErrorContact] = useState<ContactErrorMap>(
     creatInitialContactErrorMap(!!point, contactData.length)
   );
+  const [pointError, setPointError] = useState<boolean>(false);
 
   console.log('contactData: ', contactData);
 
@@ -78,17 +80,18 @@ export const ShippingPointViewScreen = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [JSON.stringify(isError)]);
 
-  useEffect(() => {
+  const applyGeoPosition = useCallback((newGeoPosition: MapGeoPosition) => {
     if (mapRef.current) {
-      console.log('geoPosition: ', geoPosition);
-      if (geoPosition.lat && geoPosition.lon) {
-        mapRef.current?.fitMarkers?.([geoPosition]);
+      console.log('newGeoPosition: ', newGeoPosition);
+      if (newGeoPosition.lat && newGeoPosition.lon) {
+        setMarker(newGeoPosition);
+        mapRef.current?.fitMarkers?.([newGeoPosition]);
       } else {
         mapRef.current?.fitAllMarkers?.();
       }
     }
-    // eslint-disable-next-line
-  }, [JSON.stringify(geoPosition)]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapRef.current]);
 
   const getGeoForAddress = useCallback(async (address: AddressView) => {
     try {
@@ -122,14 +125,15 @@ export const ShippingPointViewScreen = () => {
         if (isValidError) {
           setIsError(INITIAL_ERROR_MAP);
         }
-        setGeoPosition(result);
+        setGeoPosition({ lat: String(result.lat), lon: String(result.lon) });
+        applyGeoPosition(result);
       }
       console.log('result of Geocoder: ', result);
     } catch (e) {
       console.log('error while Searching geo: ', e);
     }
     // eslint-disable-next-line
-  }, [JSON.stringify(addressData)]);
+  }, [applyGeoPosition, JSON.stringify(addressData)]);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -343,16 +347,16 @@ export const ShippingPointViewScreen = () => {
 
         console.log('contactIds: ', contactIds);
 
-        const updatedContacts = [] as ContactView[]
-        const newContacts = [] as ContactView[]
+        const updatedContacts = [] as ContactView[];
+        const newContacts = [] as ContactView[];
 
         contacts.forEach((contact, index) => {
           if (contactIds[index]) {
-            updatedContacts.push(contact)
+            updatedContacts.push(contact);
           } else {
-            newContacts.push(contact)
+            newContacts.push(contact);
           }
-        })
+        });
 
         const { id: addressId } = await networkService.updateAddress(addressPayload, point.Address.id);
         const contactResult = await Promise.all(
@@ -361,13 +365,13 @@ export const ShippingPointViewScreen = () => {
           })
         );
 
-        let contactResultIds = contactResult.map(({ id }) => id)
+        let contactResultIds = contactResult.map(({ id }) => id);
 
         if (newContacts.length) {
           const contactNewResult = await Promise.all(
             newContacts.map((contact) => networkService.addContact(contact))
           );
-          contactResultIds = [...contactResultIds, ...contactNewResult.map(({ contact }) => contact.id)]
+          contactResultIds = [...contactResultIds, ...contactNewResult.map(({ contact }) => contact.id)];
         }
 
         console.log('contactResultIds: ', contactResultIds);
@@ -409,8 +413,9 @@ export const ShippingPointViewScreen = () => {
   }, [onUpdate, goBack, point]);
 
   const onUpdateGeoInput = useCallback((text: string , key: string) => {
-    const updatedText = text.replace(/,/g, '');
-    setGeoPosition((prevState) => ({ ...prevState, [key]: +updatedText }));
+    const updatedText = text.replaceAll(',', '.');
+    setPointError(false);
+    setGeoPosition((prevState) => ({ ...prevState, [key]: updatedText }));
   }, []);
 
   const onTouchStart = useCallback(() => {
@@ -457,58 +462,77 @@ export const ShippingPointViewScreen = () => {
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
           style={styles.mapContainer}>
-
-          <View style={styles.geoPosition}>
-            <View style={styles.geoPositionLabelBox}>
-              <View style={styles.geoField}>
-                <Text style={styles.geoLabel}>
-                  <Text style={styles.requiredLabel}>*</Text>{' '}
-                  {t('Geo_lat')}
-                </Text>
-                <TextInput
-                  keyboardType={'numeric'}
-                  style={[styles.geoInput, isError.geo && styles.errorLabel]}
-                  value={String(geoPosition.lat)}
-                  onChangeText={(text) => onUpdateGeoInput(text, 'lat')}
-                />
-              </View>
-
-              <View style={styles.geoField}>
-                <Text style={styles.geoLabel}>
-                  <Text style={styles.requiredLabel}>*</Text>{' '}
-                  {t('Geo_lon')}
-                </Text>
-                <TextInput
-                  keyboardType={'numeric'}
-                  style={[styles.geoInput, isError.geo && styles.errorLabel]}
-                  value={String(geoPosition.lon)}
-                  onChangeText={(text) => onUpdateGeoInput(text, 'lon')}
-                />
-              </View>
-            </View>
-
-            {isError.geo && (
-              <Text style={styles.errorText}>{t('ShippingPointView_error_geo')}</Text>
-            )}
-          </View>
-
           <YaMap
             ref={mapRef}
             style={styles.map}
-            onMapLoaded={() => {
-              if (mapRef.current) {
-                mapRef.current?.fitAllMarkers?.();
-              }
+            onMapLongPress={(event) => {
+              const { lat, lon } = event.nativeEvent
+              const newPoint = { lon, lat }
+              setGeoPosition({ lon: lon.toFixed(6), lat: lat.toFixed(6) })
+              applyGeoPosition(newPoint)
             }}
           >
-            <Marker point={geoPosition} zIndex={10}>
+            <Marker point={marker} zIndex={10}>
               <AddressMarkerIcon height={37} width={26} />
             </Marker>
           </YaMap>
         </View>
+
+        <View style={styles.geoPosition}>
+          <View style={styles.geoPositionLabelBox}>
+            <View style={styles.geoField}>
+              <Text style={styles.geoLabel}>
+                <Text style={styles.requiredLabel}>*</Text>{' '}
+                {t('Geo_lat')}
+              </Text>
+              <TextInput
+                keyboardType={'numeric'}
+                style={[styles.geoInput, isError.geo && styles.errorLabel]}
+                value={String(geoPosition.lat)}
+                onChangeText={(text) => onUpdateGeoInput(text, 'lat')}
+              />
+            </View>
+
+            <View style={styles.geoField}>
+              <Text style={styles.geoLabel}>
+                <Text style={styles.requiredLabel}>*</Text>{' '}
+                {t('Geo_lon')}
+              </Text>
+              <TextInput
+                keyboardType={'numeric'}
+                style={[styles.geoInput, isError.geo && styles.errorLabel]}
+                value={String(geoPosition.lon)}
+                onChangeText={(text) => onUpdateGeoInput(text, 'lon')}
+              />
+            </View>
+          </View>
+
+          {isError.geo && !pointError && (
+            <Text style={styles.errorText}>{t('ShippingPointView_error_geo')}</Text>
+          )}
+
+          {pointError && (
+            <Text style={styles.errorText}>{t('ShippingPointView_find_by_geo_position_error')}</Text>
+          )}
+
+          <RoundButton
+            style={styles.geoSearchButton}
+            textStyle={styles.geoSearchButtonText}
+            title={t('ShippingPointView_find_by_geo_position')}
+            onPress={() => {
+              const point = createPoint(geoPosition);
+              if (point) {
+                applyGeoPosition(point);
+              } else {
+                setPointError(true);
+              }
+            }}
+          />
+        </View>
       </>
     );
   }, [
+    marker,
     addressData,
     styles,
     t,
@@ -519,7 +543,9 @@ export const ShippingPointViewScreen = () => {
     getGeoForAddress,
     onUpdateGeoInput,
     isError.geo,
-    isValidError
+    isValidError,
+    applyGeoPosition,
+    pointError
   ]);
 
   const renderContactContent = useCallback((
@@ -533,7 +559,7 @@ export const ShippingPointViewScreen = () => {
     return (
       <View style={styles.contactBlock}>
         {fields.map(([key, value], index) => {
-          const isRequiredField = CONTACT_ERROR_KEYS[key]
+          const isRequiredField = CONTACT_ERROR_KEYS[key];
 
           const [isError, errorText] = checkContactError(key, contactError);
 

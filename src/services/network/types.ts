@@ -57,7 +57,7 @@ export type RefreshResponse = {
 export type ApprovedDriverResponse = {
   count: number
   totalPages: number
-  users: ApprovedDriver[]
+  userList: ApprovedDriver[]
 }
 
 export type UnapprovedDriverResponse = {

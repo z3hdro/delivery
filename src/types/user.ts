@@ -52,6 +52,7 @@ export type Passport = {
   department_code: string
   createdAt: string
   updatedAt: string
+  photos: string[]
 }
 
 export type PersonJobPosition = {

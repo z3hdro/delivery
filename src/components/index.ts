@@ -21,3 +21,4 @@ export * from './InfoModal';
 export * from './OrderDriverView';
 export * from './OrderManagerView';
 export * from './Label';
+export * from './PhotoPreview';

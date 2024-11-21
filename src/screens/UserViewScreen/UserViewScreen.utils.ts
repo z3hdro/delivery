@@ -14,7 +14,7 @@ import {
   EMPTY_PASSPORT,
   EMPTY_PERSON, INITIAL_ERROR_MAP,
 } from './UserViewScreen.consts';
-import { ApprovedDriver, ExtendedPerson, UnapprovedDriver } from 'types/user';
+import { ApprovedDriver, UnapprovedDriver } from 'types/user';
 import { EMAIL_REGEX, IS_DIGIT_ONLY_REGEX } from 'constants/regex';
 
 export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): PersonData => {
@@ -76,7 +76,8 @@ export const createPassportInitialState = (
         number,
         date_of_issue,
         authority,
-        department_code
+        department_code,
+        photos,
       } = passport;
 
       return {
@@ -85,11 +86,27 @@ export const createPassportInitialState = (
         date_of_issue,
         authority,
         department_code,
-        photo: []
+        photo: photos?.length ? photos : []
       };
     }
   }
   return { ...EMPTY_PASSPORT, photo: []};
+};
+
+export const createPhotoInitialState = (
+  type: USER,
+  driver?: ApprovedDriver,
+  user?: UnapprovedDriver
+): string[] => {
+  if (type === USER.WAITING_APPROVAL && user) {
+    return [];
+  }
+  if (type === USER.APPROVED && driver) {
+    if (driver?.passport?.photos?.length) {
+      return (driver?.passport?.photos ?? []);
+    }
+  }
+  return [];
 };
 
 export const createDrivingLicenseInitialState = (
@@ -178,30 +195,6 @@ export const selectCompanyType = (companyData: CompanyData): string => {
     return COMPANY_TYPE.TRANSPORT_COMPANY;
   }
   return '';
-};
-
-export const createManagerFullName = (person?: ExtendedPerson): string => {
-  let fullName = '';
-
-  if (!person) {
-    return fullName;
-  }
-
-  const { surname, name, patronymic } = person;
-
-  if (surname) {
-    fullName += surname;
-  }
-
-  if (name) {
-    fullName += fullName.length ? ` ${name}` : name;
-  }
-
-  if (patronymic) {
-    fullName += fullName.length ? ` ${patronymic}` : patronymic;
-  }
-
-  return fullName;
 };
 
 export const checkValidation = ({

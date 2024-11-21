@@ -4,6 +4,11 @@ export type Geolocation = {
 }
 
 export type GeoPosition = {
-  lat: number;
-  lon: number;
+  lat: string
+  lon: string
+}
+
+export type MapGeoPosition = {
+  lat: number
+  lon: number
 }

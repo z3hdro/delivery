@@ -33,3 +33,5 @@ export const CONTACT_ERROR_KEYS: Record<string, boolean> = {
   phone: true,
   patronymic: true
 };
+
+export const POINT_REGEX = /^\d+(\.\d+)?$/;

@@ -1,7 +1,6 @@
-import { parseGeo } from 'utils/geo';
 import {
   EMPTY_ADDRESS, INITIAL_CONTACT_ERROR_MAP, INITIAL_CONTACTS_ERROR_MAP,
-  INITIAL_ERROR_MAP
+  INITIAL_ERROR_MAP, POINT_REGEX
 } from './ShippingPointViewScreen.consts';
 import { EMPTY_CONTACT } from 'constants/contact';
 import {
@@ -12,8 +11,9 @@ import {
   ValidationArgs
 } from './ShippingPointViewScreen.types';
 import { LogisticPoint } from 'services/network/types';
-import { GeoPosition } from 'types/geolocation';
+import { GeoPosition, MapGeoPosition } from 'types/geolocation';
 import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX, EMAIL_REGEX } from 'constants/regex';
+import { parseGeo } from 'utils/geo';
 
 export const createInitialExpandMap = (point?: LogisticPoint): ExpandedMap => {
   if (!point) {
@@ -80,6 +80,16 @@ export const createInitialContactData = (point?: LogisticPoint): ContactView[] =
 };
 
 export const createInitialGeoData = (point?: LogisticPoint): GeoPosition => {
+  if (!point || !point.geo) {
+    return { lat: '0', lon: '0' };
+  }
+
+  const [lat, lon] = point.geo.coordinates;
+
+  return { lat: String(lat), lon: String(lon) };
+};
+
+export const createInitialPointData = (point?: LogisticPoint): MapGeoPosition => {
   if (!point || !point.geo) {
     return { lat: 0, lon: 0 };
   }
@@ -176,3 +186,20 @@ export const creatInitialContactErrorMap = (isEdit: boolean, contactsQty: number
   }
   return INITIAL_CONTACTS_ERROR_MAP;
 };
+
+export const createPoint = (geoPosition: GeoPosition): MapGeoPosition | undefined => {
+  const { lat, lon } = geoPosition;
+  console.log('geoPosition createPoint: ', geoPosition);
+
+  console.log('POINT_REGEX.test(lat): ', POINT_REGEX.test(lat));
+  console.log('POINT_REGEX.test(lon): ', POINT_REGEX.test(lon));
+
+  if (POINT_REGEX.test(lat) && POINT_REGEX.test(lon)) {
+    console.log('{ lat: Number(lat), lon: Number(lon) }: ', { lat: Number(lat), lon: Number(lon) });
+    return { lat: Number(lat), lon: Number(lon) };
+  }
+};
+
+export const parsePoint = (geoPosition: GeoPosition): MapGeoPosition => ({
+  lat: Number(geoPosition.lat), lon: Number(geoPosition.lon)
+});
