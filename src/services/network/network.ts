@@ -109,14 +109,16 @@ class NetworkService {
     this.authorizedClient.defaults.headers.common.Authorization = `Bearer ${token}`;
   }
 
+  public getAuthorizationToken(): string {
+    return this.authorizedClient.defaults.headers.common.Authorization as string;
+  }
+
   public clearAuthHeader() {
     this.authorizedClient.defaults.headers.common.Authorization = '';
   }
 
   public async refreshAccessToken(refreshToken: string): Promise<RefreshResponse> {
     const result = await this.unauthorizedClient.post<RefreshResponse>('auth/refresh', { refreshToken });
-
-    console.log('refresh result: ', result.data);
 
     return result.data;
   }
@@ -296,6 +298,14 @@ class NetworkService {
     console.log('updateLogisticPoint result: ', result.data);
   }
 
+  public async deleteLogisticPoint(pointId: number): Promise<void> {
+    console.log('deleteLogisticPoint pointId: ', pointId);
+    const result =
+      await this.authorizedClient.delete<void>(`logisticPoint/${pointId}`);
+
+    console.log('deleteLogisticPoint result: ', result.data);
+  }
+
   public async getAllMeasures(offset: number): Promise<MeasureResponse> {
     const result =
       await this.authorizedClient.get<MeasureResponse>(
@@ -330,6 +340,7 @@ class NetworkService {
   }
 
   public async addNomenclature(data: AddNomenclaturePayload): Promise<Nomenclature> {
+    console.log('AddNomenclaturePayload: ', data);
     const result = await this.authorizedClient.post<Nomenclature>('nomenclature', data);
 
     console.log('addNomenclature result: ', result.data);
@@ -346,6 +357,17 @@ class NetworkService {
 
     return result.data;
   }
+
+  public async deleteNomenclature(nomenclatureId: number): Promise<MessageResponse> {
+    console.log('nomenclatureId: ', nomenclatureId);
+    const result = await this.authorizedClient.delete<MessageResponse>(`nomenclature/${nomenclatureId}`);
+
+    console.log('deleteNomenclature result: ', result.data);
+
+    return result.data;
+  }
+
+
 
   public async getAvailableOrders(
     offset: number,
@@ -440,6 +462,7 @@ class NetworkService {
   }
 
   public async takeOrder(data: TakeOrderPayload): Promise<MessageResponse> {
+    console.log('TakeOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/take', data);
 
     console.log('takeOrder result: ', result.data);
@@ -448,6 +471,7 @@ class NetworkService {
   }
 
   public async confirmOrder(data: ConfirmOrderPayload): Promise<MessageResponse> {
+    console.log('ConfirmOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/confirm', data);
 
     console.log('confirmOrder result: ', result.data);
@@ -456,6 +480,7 @@ class NetworkService {
   }
 
   public async rejectOrder(data: RejectOrderPayload): Promise<MessageResponse> {
+    console.log('RejectOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/rejectDriver', data);
 
     console.log('rejectOrder result: ', result.data);
@@ -464,6 +489,7 @@ class NetworkService {
   }
 
   public async departOrder(data: DepartOrderPayload): Promise<MessageResponse> {
+    console.log('DepartOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/depart', data);
 
     console.log('departOrder result: ', result.data);
@@ -472,6 +498,7 @@ class NetworkService {
   }
 
   public async completeOrder(data: CompleteOrderPayload): Promise<MessageResponse> {
+    console.log('CompleteOrderPayload: ', data);
     const result = await this.authorizedClient.post<MessageResponse>('orders/complete', data);
 
     console.log('completeOrder result: ', result.data);

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import useWebSocket from 'react-native-use-websocket';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -12,27 +13,6 @@ import { Preloader } from 'components/Preloader';
 import { RoundButton } from 'components/RoundButton';
 import { InfoModal } from 'components/InfoModal';
 import { Map } from 'components/Map';
-import { useDriverNavigator, useDriverRoute } from 'navigation/hooks';
-import { networkService } from 'services/network';
-import {
-  runLocationService,
-  stopLocationService,
-} from 'wrapper/LocationWrapper';
-import { parseDateToInfoMap } from 'utils/parseDate';
-import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
-import { formatAddress } from 'utils/address';
-import { parseGeo, updateOrderGeo } from 'utils/geo';
-import { getPrimaryButtonText } from 'screens/OrderScreen/OrderScreen.utils';
-import { EXPAND_MAP, INITIAL_STATE } from './OrderScreen.consts';
-import { ORDER_STATUS } from 'constants/order';
-import { LOGISTIC_POINT } from 'constants/map';
-import { useStyles } from './OrderScreen.styles';
-import { Address } from 'types/address';
-import { MapPointInfo } from 'types/infoModal';
-import { ExpandMap } from './OrderScreen.types';
-import { Order } from 'types/order';
-
-import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectCurrentOrder } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
@@ -45,6 +25,30 @@ import {
   updateCurrentOrderStatus
 } from 'store/slices';
 import { locationService } from 'services/locationService';
+import { useDriverNavigator, useDriverRoute } from 'navigation/hooks';
+import { networkService } from 'services/network';
+import {
+  runLocationService,
+  stopLocationService,
+} from 'wrapper/LocationWrapper';
+import { parseDateToInfoMap } from 'utils/parseDate';
+import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
+import { formatAddress } from 'utils/address';
+import { parseGeo, updateOrderGeo } from 'utils/geo';
+import { getDescriptionByStatus, getPrimaryButtonText } from './OrderScreen.utils';
+import { ALERT_DISPLAY_STATUS, EXPAND_MAP, INITIAL_STATE } from './OrderScreen.consts';
+import { ORDER_STATUS } from 'constants/order';
+import { LOGISTIC_POINT } from 'constants/map';
+import { WEBSOCKET_URL } from 'constants/websocket';
+import { WSOrderManager } from 'types/websocket';
+import { ExpandMap } from './OrderScreen.types';
+import { Order } from 'types/order';
+import { Address } from 'types/address';
+import { MapPointInfo } from 'types/infoModal';
+
+import { useStyles } from './OrderScreen.styles';
+
+import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
 
 export const OrderScreen = () => {
   const styles = useStyles();
@@ -101,6 +105,29 @@ export const OrderScreen = () => {
     }
     return [styles.declineButton, styles.declineButtonText];
   },[styles, order.status]);
+
+  useWebSocket(WEBSOCKET_URL.ORDER, {
+    onOpen: () => console.log('ws opened on OrderScreen'),
+    options: {
+      headers: {
+        Authorization: networkService.getAuthorizationToken(),
+      }
+    },
+    onMessage: (e) => {
+      const message = JSON.parse((e.data as string)) as WSOrderManager;
+      console.log('Received message:', message);
+      if (message?.id && message?.status) {
+        if (message.status.toLowerCase() === ORDER_STATUS.CONFIRMED) {
+          dispatch(updateCurrentOrderStatus(ORDER_STATUS.LOADING));
+        }
+      }
+    },
+    onClose: (e) => console.log('ws closed', e),
+    onError: (e) => console.log('ws error', e),
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: () => true,
+    reconnectAttempts: 5
+  });
 
   useEffect(() => {
     const isWatching = locationService.checkSubscription();
@@ -164,6 +191,19 @@ export const OrderScreen = () => {
     );
   }, [order, styles]);
 
+  const displayAlert = useCallback((status: ORDER_STATUS, onPress?: () => void) => {
+    console.log('display alert status: ', status);
+    if (!ALERT_DISPLAY_STATUS.includes(status)) {
+      return;
+    }
+
+    const description = getDescriptionByStatus(status);
+
+    Alert.alert(t('Alert_title'), t(description), [
+      { text: t('ok'), style: 'destructive', onPress },
+    ]);
+  }, [t]);
+
   const onPressMain = useCallback(async (orderId: number, status: ORDER_STATUS) => {
     try {
       setIsLoading(true);
@@ -176,7 +216,6 @@ export const OrderScreen = () => {
 
       if (status === ORDER_STATUS.LOADING) {
         result = await networkService.departOrder({ orderId });
-        // setCurrentOrderId(orderId);
         dispatch(setGeoCurrentOrderId(orderId));
 
         await runLocationService();
@@ -190,27 +229,33 @@ export const OrderScreen = () => {
 
         dispatch(clearGeoCurrentOrderId());
 
-        onUpdate();
-        goBack();
-        dispatch(resetGeoState());
-        dispatch(resetCurrentOrder());
+        displayAlert(status, () => {
+          onUpdate();
+          goBack();
+          dispatch(resetGeoState());
+          dispatch(resetCurrentOrder());
+        });
+
         return;
       }
 
       if (result?.order && result.order.status !== status) {
-        dispatch(updateCurrentOrderStatus(result.order.status));
+        const newStatus = result.order.status;
+
+        dispatch(updateCurrentOrderStatus(newStatus));
       }
+
+      displayAlert(status);
 
       if (result?.order && result.order.status === ORDER_STATUS.LOADING) {
         dispatch(setCurrentOrder(order));
       }
-
     } catch (e) {
       console.log('error while press main on Order Screen: ', e);
     } finally {
       setIsLoading(false);
     }
-  }, [dispatch, goBack, onUpdate, order]);
+  }, [dispatch, goBack, onUpdate, order, displayAlert]);
 
   const onDecline = useCallback(async (orderId: number) => {
     try {

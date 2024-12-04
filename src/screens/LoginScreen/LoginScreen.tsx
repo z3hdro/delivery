@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, Pressable } from 'react-native';
+import { MaskedTextInput } from 'react-native-mask-text';
+import { View, Text, TextInput, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
@@ -10,12 +11,17 @@ import { LinkButton } from 'components/LinkButton';
 import { Button } from 'components/Button';
 import { useLoginNavigator } from 'navigation/hooks';
 import { useStyles } from './LoginScreen.styles';
-import { DRIVER_PASSWORD, DRIVER_PHONE, MANAGER_PASSWORD, MANAGER_PHONE } from 'mocks/mockUsers';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectDeviceToken } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
-import { setCurrentOrder, setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
-
+import {
+  setCurrentOrder,
+  setCurrentPerson,
+  setIsAuthorizationFinished,
+  setManagerPhone,
+  setUserRole
+} from 'store/slices';
+import { PHONE_MASK } from 'constants/user';
 
 export const LoginScreen = () => {
   const { t } = useTranslation();
@@ -24,8 +30,9 @@ export const LoginScreen = () => {
   const deviceToken = useAppSelector(selectDeviceToken);
   const dispatch = useAppDispatch();
 
-  const [phone, setPhone] = useState<string>(DRIVER_PHONE);
-  const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
+  const [phone, setPhone] = useState<string>('');
+  const [formattedPhone, setFormattedPhone] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [errorText, setErrorText] = useState<string>('');
 
   const onForgotPassword = useCallback(() => {
@@ -34,13 +41,16 @@ export const LoginScreen = () => {
 
   const onLoginPress = useCallback(async () => {
     try {
-      if (!phone.trim().length || !password.trim().length) {
+      const trimPhone = phone.trim();
+      if (!trimPhone.length || !password.trim().length) {
         return;
       }
+
       const { accessToken, refreshToken, user } = await networkService.login({
         phone: phone.replace('+', ''),
         password,
-        fcmToken: deviceToken ?? ''
+        fcmToken: deviceToken ?? '',
+        deviceType: Platform.OS
       });
 
       networkService.setAuthHeader(accessToken);
@@ -61,7 +71,6 @@ export const LoginScreen = () => {
         try {
           const { order } = await networkService.getCurrentOrder();
 
-          // setDriverOrder(order);
           if (order) {
             dispatch(setCurrentOrder(order));
           }
@@ -93,6 +102,8 @@ export const LoginScreen = () => {
         setErrorText(t('Login_bottom_unauthorized_user'));
       }
       console.log('error on Login screen: ', error?.response?.data || error);
+    } finally {
+      dispatch(setIsAuthorizationFinished(true));
     }
   }, [deviceToken, dispatch, password, phone, t]);
 
@@ -117,22 +128,32 @@ export const LoginScreen = () => {
     >
       <View style={styles.container}>
         <View style={styles.labelContainer}>
-          <Pressable onPress={() => {
-            // TODO: remove it later
-            setPhone((prevState) => prevState === DRIVER_PHONE ? MANAGER_PHONE : DRIVER_PHONE);
-            setPassword((prevState) => prevState === DRIVER_PASSWORD ? MANAGER_PASSWORD : DRIVER_PASSWORD);
-          }}>
-            <Text style={styles.label}>
-              {t('Login_label')}
-            </Text>
-          </Pressable>
+          <Text style={styles.label}>
+            {t('Login_label')}
+          </Text>
+          {/*<Pressable onPress={() => {*/}
+          {/*  // TODO: remove it later*/}
+          {/*  setPhone((prevState) => prevState === DRIVER_PHONE ? MANAGER_PHONE : DRIVER_PHONE);*/}
+          {/*  setPassword((prevState) => prevState === DRIVER_PASSWORD ? MANAGER_PASSWORD : DRIVER_PASSWORD);*/}
+          {/*}}>*/}
+          {/*  <Text style={styles.label}>*/}
+          {/*    {t('Login_label')}*/}
+          {/*  </Text>*/}
+          {/*</Pressable>*/}
         </View>
-        <TextInput
-          value={phone}
-          onChangeText={setPhone}
+        <MaskedTextInput
+          mask={PHONE_MASK}
+          onChangeText={(text, rawText) => {
+            if (errorText) {
+              setErrorText('');
+            }
+            setFormattedPhone(text);
+            setPhone(rawText);
+          }}
+          placeholder={t('Login_phone_input_placeholder')}
+          value={formattedPhone}
           style={styles.textInputContainer}
           keyboardType={'phone-pad'}
-          placeholder={t('Login_phone_input_placeholder')}
         />
         <TextInput
           value={password}

@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
+import { mask, MaskedTextInput } from 'react-native-mask-text';
 import { DeviceEventEmitter, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { format } from 'date-fns';
 import { useStyles } from './InfoSection.styles';
@@ -7,6 +8,7 @@ import { DISPLAY_DATE_FORMAT } from './InfoSection.consts';
 import { Props } from './InfoSection.types';
 import DatePicker from 'react-native-date-picker';
 import { EMIT_EVENTS } from 'constants/emitEvents';
+import { PHONE_MASK } from 'constants/user';
 
 export const  InfoSection: FC<Props> = ({
   label,
@@ -19,10 +21,16 @@ export const  InfoSection: FC<Props> = ({
   type = INFO_SECTION_TYPE.INPUT,
   keyboardType,
   minimumDate = new Date(),
+  isRequired = false,
+  isError = false,
+  errorText = '',
   onNavigate,
 }) => {
   const styles = useStyles();
   const [inputValue, setInputValue] = useState<string>(value);
+  const [formattedValue, setFormattedValue] = useState<string>(
+    type === INFO_SECTION_TYPE.MASK_INPUT && value ? mask(value, PHONE_MASK) : ''
+  );
   const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -31,7 +39,7 @@ export const  InfoSection: FC<Props> = ({
     });
 
     return () => {
-      subscription.remove();
+      subscription?.remove?.();
     };
   }, []);
 
@@ -50,6 +58,13 @@ export const  InfoSection: FC<Props> = ({
     }
   }, [onUpdate]);
 
+  const onChangeMaskText = useCallback((text: string, rawText: string) => {
+    setFormattedValue(text);
+    if (onUpdate) {
+      onUpdate(rawText);
+    }
+  }, [onUpdate]);
+
   const onUpdateDate = useCallback((date: Date) => {
     if (onUpdate) {
       const selectedDate = new Date(date);
@@ -62,7 +77,10 @@ export const  InfoSection: FC<Props> = ({
   const renderContent = () => {
     if (type === INFO_SECTION_TYPE.DATE_PICKER) {
       return (
-        <TouchableOpacity style={styles.valueContainer} onPress={onTogglePicker}>
+        <TouchableOpacity
+          disabled={!editable}
+          style={[styles.valueContainer, isError && styles.error]}
+          onPress={onTogglePicker}>
           <Text style={styles.value}>
             {value ? format(value, DISPLAY_DATE_FORMAT) : ''}
           </Text>
@@ -72,7 +90,10 @@ export const  InfoSection: FC<Props> = ({
 
     if (type === INFO_SECTION_TYPE.SCREEN) {
       return (
-        <TouchableOpacity style={styles.valueContainer} onPress={onNavigate}>
+        <TouchableOpacity
+          disabled={!editable}
+          style={[styles.valueContainer, isError && styles.error]}
+          onPress={onNavigate}>
           <Text style={styles.value}>
             {value ?? ''}
           </Text>
@@ -80,10 +101,23 @@ export const  InfoSection: FC<Props> = ({
       );
     }
 
+    if (type === INFO_SECTION_TYPE.MASK_INPUT) {
+      return (
+        <MaskedTextInput
+          mask={PHONE_MASK}
+          onChangeText={onChangeMaskText}
+          value={formattedValue}
+          style={[styles.textInput, !editable && styles.displayText, textInputStyle, isError && styles.error]}
+          keyboardType={keyboardType}
+          editable={editable}
+        />
+      );
+    }
+
     return (
       <TextInput
         keyboardType={keyboardType}
-        style={[styles.textInput, !editable && styles.displayText, textInputStyle]}
+        style={[styles.textInput, !editable && styles.displayText, textInputStyle, isError && styles.error]}
         value={inputValue}
         onChangeText={onChangeText}
         editable={editable}
@@ -95,9 +129,11 @@ export const  InfoSection: FC<Props> = ({
     <>
       <View style={style}>
         <Text style={[styles.label, labelStyle]}>
+          {isRequired && <Text style={styles.required}>*{'  '}</Text>}
           {label}
         </Text>
         {renderContent()}
+        {isError && errorText && <Text style={styles.errorText}>{errorText}</Text>}
       </View>
 
       {type === INFO_SECTION_TYPE.DATE_PICKER && (

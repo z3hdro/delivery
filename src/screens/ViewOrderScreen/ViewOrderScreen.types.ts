@@ -17,3 +17,9 @@ export type MapPointInfo = {
   address: string
   planDate: string
 }
+
+export type ErrorMap = {
+  driver: boolean
+  phone: boolean
+  vin: boolean
+}

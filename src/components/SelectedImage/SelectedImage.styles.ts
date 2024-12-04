@@ -24,6 +24,6 @@ export const useStyles = () => {
       width: 48,
       marginHorizontal: 10,
       borderRadius: 8
-    },
+    }
   }), []);
 };

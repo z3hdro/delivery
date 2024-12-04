@@ -9,23 +9,36 @@ import { Preloader } from 'components/Preloader';
 import { FirstStep, SecondStep, ThirdStep } from './components';
 import { NUMBER_OF_CELLS } from './ForgotPasswordScreen.consts';
 import { useStyles } from './ForgotPasswordScreen.styles';
+import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX } from 'constants/regex';
+import { AxiosError } from 'axios';
 
 export const ForgotPasswordScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
   const { goBack } = useLoginNavigator();
 
-  // TODO: should we display errors ?
   const [step, setStep] = useState<number>(1);
   const [userPhone, setUserPhone] = useState<string>('');
   const [userCode, setUserCode] = useState<string>('');
-  // const [errorText, setErrorText] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   const onSendCode = useCallback(async (phone: string) => {
     try {
       setIsLoading(true);
-      if (!phone.trim().length) {
+      const trimPhone = phone.trim();
+
+      if (!trimPhone.length) {
+        return;
+      }
+
+      if (!CONTAINS_LETTERS_REGEX.test(trimPhone)) {
+        setErrorText('Registration_error_contain_words');
+        return;
+      }
+
+      if ((trimPhone.match(DIGIT_REGEX) || []).length !== 11) {
+        setErrorText('ShippingPointView_error_phone_length');
         return;
       }
 
@@ -35,6 +48,7 @@ export const ForgotPasswordScreen = () => {
       setUserPhone(phone);
     } catch (e) {
       console.log('onSendCode error:', e);
+      setErrorText((e as AxiosError)?.message);
     } finally {
       setIsLoading(false);
     }
@@ -96,9 +110,17 @@ export const ForgotPasswordScreen = () => {
     }
   }, [userPhone, userCode, goBack]);
 
+  const onResetError = useCallback(() => {
+    setErrorText(null);
+  },[]);
+
   const renderContent = useCallback(() => {
     if (step === 1) {
-      return <FirstStep onSendCode={onSendCode} />;
+      return <FirstStep
+        onSendCode={onSendCode}
+        errorText={errorText}
+        onResetError={onResetError}
+      />;
     }
     if (step === 2) {
       return <SecondStep
@@ -111,7 +133,16 @@ export const ForgotPasswordScreen = () => {
       return <ThirdStep restorePassword={restorePassword} />;
     }
     return null;
-  }, [onSendCode, onSendConfirmCode, resendCode, restorePassword, step, userPhone]);
+  }, [
+    errorText,
+    onResetError,
+    onSendCode,
+    onSendConfirmCode,
+    resendCode,
+    restorePassword,
+    step,
+    userPhone
+  ]);
 
   return (
     <Screen style={styles.screen} hideLogout>

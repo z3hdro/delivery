@@ -2,14 +2,6 @@ import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 export const registerForPushNotificationsAsync = async () => {
   let token;
 
@@ -23,7 +15,7 @@ export const registerForPushNotificationsAsync = async () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  if (Device.isDevice) {
+  if (Device.isDevice || Platform.OS === 'android') {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
 
     let finalStatus = existingStatus;
@@ -31,7 +23,13 @@ export const registerForPushNotificationsAsync = async () => {
     console.log('finalStatus p0:', finalStatus);
 
     if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
+      const { status } = await Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+        },
+      });
       finalStatus = status;
     }
 

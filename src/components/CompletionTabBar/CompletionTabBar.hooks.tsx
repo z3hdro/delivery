@@ -9,6 +9,8 @@ export const useTabRoutes = (
   secondLabel: string,
   thirdScreen?: JSX.Element,
   thirdLabel?: string,
+  fourthScreen?: JSX.Element,
+  fourthLabel?: string,
 ): Array<Route> => {
   return useMemo<Array<Route>>(() => {
     const items = [
@@ -24,14 +26,22 @@ export const useTabRoutes = (
       },
     ];
 
-    if (thirdScreen && thirdLabel) {
+    if (thirdScreen) {
       items.push({
         key: ROUTE_KEYS.THIRD,
         screen: thirdScreen,
-        title: thirdLabel,
+        title: thirdLabel ?? '',
+      });
+    }
+
+    if (fourthScreen) {
+      items.push({
+        key: ROUTE_KEYS.FOURTH,
+        screen: fourthScreen,
+        title: fourthLabel ?? '',
       });
     }
 
     return items.map((item, index) => ({ ...item, index }));
-  }, [firstScreen, firstLabel, secondScreen, secondLabel, thirdScreen, thirdLabel]);
+  }, [firstScreen, firstLabel, secondScreen, secondLabel, thirdScreen, thirdLabel, fourthScreen, fourthLabel]);
 };

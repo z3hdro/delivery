@@ -5,6 +5,7 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
 import { colors } from 'constants/colors';
 import { createStyles } from './BottomTab.styles';
+import { Label } from 'components/Label';
 
 export const BottomTab: FC<BottomTabBarProps> = ({
   state,
@@ -59,6 +60,7 @@ export const BottomTab: FC<BottomTabBarProps> = ({
             onLongPress={onLongPress}>
             <View style={styles.tabContainer}>
               <View style={styles.content}>
+                {!!options.tabBarBadge && <Label qty={options.tabBarBadge as number} />}
                 {options.tabBarIcon &&
                   options.tabBarIcon({
                     focused: isFocused,

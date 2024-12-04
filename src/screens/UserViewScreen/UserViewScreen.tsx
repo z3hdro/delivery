@@ -1,7 +1,15 @@
-import React, { useCallback, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
+import { AxiosError } from 'axios';
 
 import { ScreenHeader } from 'components/ScreenHeader';
 import { InfoSection } from 'components/InfoSection';
@@ -12,17 +20,19 @@ import { Checkbox } from 'components/Checkbox';
 import { Button } from 'components/Button';
 import { Preloader } from 'components/Preloader';
 import { JobPositionPicker } from 'components/JobPositionPicker';
+import { PhotoPreview } from 'components/PhotoPreview';
 import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import {
+  checkValidation,
   createCompanyInitialState,
   createDrivingLicenseInitialState,
   createPassportInitialState,
-  createPersonInitialState,
+  createPersonInitialState, createPhotoInitialState,
   selectCompanyType,
   selectEmploymentType
 } from './UserViewScreen.utils';
-import { useStyles } from './UserViewScreen.styles';
+import { displayErrorMessage } from 'utils/alert';
 import {
   COMPANY_KEYS,
   COMPANY_TYPE,
@@ -30,16 +40,19 @@ import {
   DRIVING_LICENSE_KEYS,
   EMPLOYMENT,
   EMPLOYMENT_VALUES,
+  INITIAL_ERROR_MAP,
   PASSPORT_KEYS,
-  PERSON_KEYS
+  PERSON_KEYS,
+  USER_APPROVE_ERROR_TEXT
 } from './UserViewScreen.consts';
+import { USER } from 'constants/user';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
-import { CompanyData, DrivingLicense, ImageFile, PassportData, PersonData } from './UserViewScreen.types';
+import { CompanyData, DrivingLicense, ErrorMap, ImageFile, PassportData, PersonData } from './UserViewScreen.types';
 import { Option } from 'types/picker';
+import { useStyles } from './UserViewScreen.styles';
 
 import { BackIcon } from 'src/assets/icons';
-import { AxiosError } from 'axios';
-import { USER } from 'constants/user';
+
 
 export const UserViewScreen = () => {
   const { t } = useTranslation();
@@ -59,8 +72,19 @@ export const UserViewScreen = () => {
   const [companyData, setCompanyData] = useState<CompanyData>(
     createCompanyInitialState(type, driver, user)
   );
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>(createPhotoInitialState(type, driver, user));
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [errorText, setErrorText] = useState<string | null>(null);
+  const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
+
+  console.log('images: ', images);
+
+  const isValidError = useMemo(() => {
+    return Object.values(isError).some((err) => err);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(isError)]);
 
   const renderLeftPart = useCallback(() => {
     return (
@@ -87,6 +111,16 @@ export const UserViewScreen = () => {
 
   const updateCompanyData = useCallback((key: COMPANY_KEYS, value: string) => {
     setCompanyData(prevState => ({ ...prevState, [key]: value }));
+  }, []);
+
+  const openPhotoView = useCallback((imageUri: string) => {
+    setSelectedImage(imageUri);
+    setModalVisible(true);
+  }, []);
+
+  const closePhotoView = useCallback(() => {
+    setModalVisible(false);
+    setSelectedImage(null);
   }, []);
 
   const onToggleEmployment = useCallback((selectedKey: EMPLOYMENT) => {
@@ -119,9 +153,13 @@ export const UserViewScreen = () => {
     });
 
     if (!result.canceled && result?.assets[0]) {
+      if (isValidError) {
+        setErrorText(null);
+        setIsError(INITIAL_ERROR_MAP);
+      }
       setImages((prevState) => ([...prevState, result.assets[0].uri ?? '']));
     }
-  }, []);
+  }, [isValidError]);
 
   const onDeleteImage = useCallback((selectedIndex: number) => {
     setImages((prevState) =>
@@ -130,10 +168,14 @@ export const UserViewScreen = () => {
   }, []);
 
   const onChangeJobPosition = useCallback((item: Option | null) => {
+    if (isValidError) {
+      setErrorText(null);
+      setIsError(INITIAL_ERROR_MAP);
+    }
     setPersonData(prevState => ({ ...prevState, jobPosition: item }));
-  }, []);
+  }, [isValidError]);
 
-  const onSaveUserData = useCallback(async () => {
+  const onSaveUserData = async () => {
     try {
       setIsLoading(true);
 
@@ -145,6 +187,31 @@ export const UserViewScreen = () => {
       console.log('companyData: ', companyData);
       console.log('passportData: ', passportData);
       console.log('images: ', images);
+
+      const errorMap = checkValidation({
+        company: personData.company,
+        companyName: companyData.name,
+        companyInn: companyData.inn,
+        companyKpp: companyData.kpp,
+        email: personData?.email?.trim(),
+        name: personData.name,
+        surname: personData.surname,
+        jobPosition: personData.jobPosition,
+        selfEmployed: personData.self_employed,
+        driverLicenseSeries: drivingLicenseData.series,
+        driverLicenseNumber: drivingLicenseData.number,
+        passportSeries: passportData.series,
+        passportNumber: passportData.number,
+        passportAuthority: passportData.authority,
+        passportDateOfIssue: passportData.date_of_issue,
+        passportDepartmentCode: passportData.department_code,
+        photos: images.length,
+      });
+
+      if (Object.values(errorMap).some((err) => err)) {
+        setIsError(errorMap);
+        return;
+      }
 
       const files: ImageFile[] = [];
 
@@ -221,20 +288,11 @@ export const UserViewScreen = () => {
         console.log('e.request: ', e?.request);
       }
       console.log('error on confirm driver: ', e);
+      displayErrorMessage(e?.message as string ?? '');
     } finally {
       setIsLoading(false);
     }
-  }, [
-    isLoading,
-    personData,
-    companyData,
-    passportData,
-    images,
-    drivingLicenseData.series,
-    drivingLicenseData.number,
-    onUpdate,
-    goBack
-  ]);
+  };
 
   const onUpdateUserData = async () => {
     try {
@@ -248,6 +306,31 @@ export const UserViewScreen = () => {
       console.log('companyData: ', companyData);
       console.log('passportData: ', passportData);
       console.log('images: ', images);
+
+      const errorMap = checkValidation({
+        company: personData.company,
+        companyName: companyData.name,
+        companyInn: companyData.inn,
+        companyKpp: companyData.kpp,
+        email: personData?.email?.trim(),
+        name: personData.name,
+        surname: personData.surname,
+        jobPosition: personData.jobPosition,
+        selfEmployed: personData.self_employed,
+        driverLicenseSeries: drivingLicenseData.series,
+        driverLicenseNumber: drivingLicenseData.number,
+        passportSeries: passportData.series,
+        passportNumber: passportData.number,
+        passportAuthority: passportData.authority,
+        passportDateOfIssue: passportData.date_of_issue,
+        passportDepartmentCode: passportData.department_code,
+        photos: images.length,
+      });
+
+      if (Object.values(errorMap).some((err) => err)) {
+        setIsError(errorMap);
+        return;
+      }
 
       const files: ImageFile[] = [];
 
@@ -296,6 +379,7 @@ export const UserViewScreen = () => {
         console.log('e.request: ', e?.request);
       }
       console.log('error on update driver data: ', e);
+      displayErrorMessage(e?.message as string ?? '');
     } finally {
       setIsLoading(false);
 
@@ -307,300 +391,424 @@ export const UserViewScreen = () => {
   }, [goBack]);
 
   return (
-    <Screen
-      style={styles.screen}
-      header={
-        <ScreenHeader
-          title={t('UserView_header_title')}
-          leftPart={renderLeftPart()}
-          style={styles.header}
-          titleTextStyle={styles.titleText}
-        />
-      }>
-      {isLoading && <Preloader style={styles.preloader} />}
-      <KeyboardAvoidingView
-        style={styles.avoidingContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_manager_first_label')}
-            value={personData.phone}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.PHONE, text);
-            }}
-          />
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_manager_second_label')}
-            value={'Петров Петр Петрович'}
-            editable={false}
-          />
+    <>
+      <PhotoPreview
+        isVisible={modalVisible}
+        selectedImage={selectedImage}
+        closePhotoView={closePhotoView}
+      />
 
-          <Text style={styles.sectionTitle}>
-            {t('UserView_driver_section_title')}
-          </Text>
+      <Screen
+        style={styles.screen}
+        header={
+          <ScreenHeader
+            title={t('UserView_header_title')}
+            leftPart={renderLeftPart()}
+            style={styles.header}
+            titleTextStyle={styles.titleText}
+          />
+        }>
+        {isLoading && <Preloader style={styles.preloader} />}
 
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_driver_first_label')}
-            value={personData.name}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.NAME, text);
-            }}
-          />
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_driver_second_label')}
-            value={personData.surname}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.SURNAME, text);
-            }}
-          />
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_driver_third_label')}
-            value={personData.patronymic}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.PATRONYMIC, text);
-            }}
-          />
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_driver_fourth_label')}
-            value={personData.inn ?? ''}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.INN, text);
-            }}
-            keyboardType={'numeric'}
-          />
+        <KeyboardAvoidingView
+          style={styles.avoidingContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+            <InfoSection
+              style={styles.section}
+              label={t('UserView_manager_first_label')}
+              value={personData.phone}
+              editable={false}
+              isRequired
+            />
 
-          <Text style={[styles.label, styles.section]}>
-            {t('UserView_driver_fifth_label')}
-          </Text>
-          <Checkbox
-            label={t('UserView_driver_checkbox_first_label')}
-            value={personData.self_employed}
-            onPress={() => {
-              onToggleEmployment(EMPLOYMENT.SELF_EMPLOYED);
-            }}
-          />
-          <Checkbox
-            style={styles.section}
-            label={t('UserView_driver_checkbox_third_label')}
-            value={personData.company}
-            onPress={() => {
-              onToggleEmployment(EMPLOYMENT.COMPANY);
-            }}
-          />
+            <Text style={styles.sectionTitle}>
+              {t('UserView_driver_section_title')}
+            </Text>
 
-          {personData.company && (
-            <View style={styles.companyContainer}>
+            <InfoSection
+              isRequired
+              style={styles.section}
+              label={t('UserView_driver_first_label')}
+              value={personData.name}
+              onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
+                updatePersonData(PERSON_KEYS.NAME, text);
+              }}
+              isError={isError.name}
+              errorText={t(errorText || 'Error_user_empty_name')}
+            />
+            <InfoSection
+              isRequired
+              style={styles.section}
+              label={t('UserView_driver_second_label')}
+              value={personData.surname}
+              onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
+                updatePersonData(PERSON_KEYS.SURNAME, text);
+              }}
+              isError={isError.name}
+              errorText={t(errorText || 'Error_user_empty_surname')}
+            />
+            <InfoSection
+              style={styles.section}
+              label={t('UserView_driver_third_label')}
+              value={personData.patronymic}
+              onUpdate={(text: string) => {
+                updatePersonData(PERSON_KEYS.PATRONYMIC, text);
+              }}
+            />
+            {!personData.company && (
               <InfoSection
                 style={styles.section}
-                textInputStyle={styles.companySection}
-                label={t('UserView_company_first_label')}
-                value={companyData.name}
+                label={t('UserView_driver_fourth_label')}
+                value={personData.inn ?? ''}
                 onUpdate={(text: string) => {
-                  updateCompanyData(COMPANY_KEYS.NAME, text);
-                }}
-              />
-              <InfoSection
-                style={styles.section}
-                textInputStyle={styles.companySection}
-                label={t('UserView_company_second_label')}
-                value={companyData.inn}
-                onUpdate={(text: string) => {
-                  updateCompanyData(COMPANY_KEYS.INN, text);
+                  updatePersonData(PERSON_KEYS.INN, text);
                 }}
                 keyboardType={'numeric'}
               />
-              <InfoSection
-                style={styles.section}
-                textInputStyle={styles.companySection}
-                label={t('UserView_company_third_label')}
-                value={companyData.kpp}
-                onUpdate={(text: string) => {
-                  updateCompanyData(COMPANY_KEYS.KPP, text);
-                }}
-                keyboardType={'numeric'}
-              />
-              <View style={styles.section}>
-                <Text style={styles.label}>
-                  {t('UserView_company_fourth_label')}
-                </Text>
-                <Checkbox
-                  label={t('UserView_company_checkbox_first_label')}
-                  value={companyData.supplier}
-                  onPress={() => {
-                    onToggleCompanyType(COMPANY_TYPE.SUPPLIER);
-                  }}
-                />
-                <Checkbox
+            )}
+
+            <Text style={[styles.label, styles.section]}>
+              <Text style={styles.required}>*{'  '}</Text>
+              {t('UserView_driver_fifth_label')}
+            </Text>
+            <Checkbox
+              label={t('UserView_driver_checkbox_first_label')}
+              value={personData.self_employed}
+              isError={isError.type}
+              errorText={t(errorText || 'Error_user_empty_type')}
+              onPress={() => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
+                onToggleEmployment(EMPLOYMENT.SELF_EMPLOYED);
+              }}
+            />
+            <Checkbox
+              style={styles.section}
+              label={t('UserView_driver_checkbox_third_label')}
+              value={personData.company}
+              isError={isError.type}
+              errorText={t(errorText || 'Error_user_empty_type')}
+              onPress={() => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
+                onToggleEmployment(EMPLOYMENT.COMPANY);
+              }}
+            />
+
+            {personData.company && (
+              <View style={styles.companyContainer}>
+                <InfoSection
                   style={styles.section}
-                  label={t('UserView_company_checkbox_second_label')}
-                  value={companyData.buyer}
-                  onPress={() => {
-                    onToggleCompanyType(COMPANY_TYPE.BUYER);
+                  textInputStyle={styles.companySection}
+                  label={t('UserView_company_first_label')}
+                  value={companyData.name}
+                  onUpdate={(text: string) => {
+                    if (isValidError) {
+                      setErrorText(null);
+                      setIsError(INITIAL_ERROR_MAP);
+                    }
+                    updateCompanyData(COMPANY_KEYS.NAME, text);
                   }}
+                  isRequired
+                  isError={isError.companyName}
+                  errorText={t(errorText || USER_APPROVE_ERROR_TEXT.COMPANY_NAME_EMPTY)}
                 />
-                <Checkbox
+                <InfoSection
                   style={styles.section}
-                  label={t('UserView_company_checkbox_third_label')}
-                  value={companyData.transport_company}
-                  onPress={() => {
-                    onToggleCompanyType(COMPANY_TYPE.TRANSPORT_COMPANY);
+                  textInputStyle={styles.companySection}
+                  label={t('UserView_company_second_label')}
+                  value={companyData.inn}
+                  onUpdate={(text: string) => {
+                    if (isValidError) {
+                      setErrorText(null);
+                      setIsError(INITIAL_ERROR_MAP);
+                    }
+                    updateCompanyData(COMPANY_KEYS.INN, text);
                   }}
+                  keyboardType={'numeric'}
+                  isRequired
+                  isError={isError.companyInn}
+                  errorText={t(errorText || USER_APPROVE_ERROR_TEXT.COMPANY_INN_EMPTY)}
                 />
+                <InfoSection
+                  style={styles.section}
+                  textInputStyle={styles.companySection}
+                  label={t('UserView_company_third_label')}
+                  value={companyData.kpp}
+                  onUpdate={(text: string) => {
+                    if (isValidError) {
+                      setErrorText(null);
+                      setIsError(INITIAL_ERROR_MAP);
+                    }
+                    updateCompanyData(COMPANY_KEYS.KPP, text);
+                  }}
+                  keyboardType={'numeric'}
+                  isError={isError.companyKpp}
+                  errorText={t(errorText || USER_APPROVE_ERROR_TEXT.COMPANY_KPP_ONLY_NUMBERS)}
+                />
+                <View style={styles.section}>
+                  <Text style={styles.label}>
+                    <Text style={styles.required}>*</Text>
+                    {' '}
+                    {t('UserView_company_fourth_label')}
+                  </Text>
+                  <Checkbox
+                    label={t('UserView_company_checkbox_first_label')}
+                    value={companyData.supplier}
+                    onPress={() => {
+                      onToggleCompanyType(COMPANY_TYPE.SUPPLIER);
+                    }}
+                  />
+                  <Checkbox
+                    style={styles.section}
+                    label={t('UserView_company_checkbox_second_label')}
+                    value={companyData.buyer}
+                    onPress={() => {
+                      onToggleCompanyType(COMPANY_TYPE.BUYER);
+                    }}
+                  />
+                  <Checkbox
+                    style={styles.section}
+                    label={t('UserView_company_checkbox_third_label')}
+                    value={companyData.transport_company}
+                    onPress={() => {
+                      onToggleCompanyType(COMPANY_TYPE.TRANSPORT_COMPANY);
+                    }}
+                  />
+                </View>
               </View>
+            )}
+
+            <Text style={[styles.label, styles.jobPositionSection]}>
+              <Text style={styles.required}>*{'  '}</Text>
+              {t('UserView_driver_sixth_label')}
+            </Text>
+            <JobPositionPicker
+              value={personData.jobPosition}
+              onChangeValue={onChangeJobPosition}
+              isError={isError.jobPosition}
+              errorText={t(errorText || 'Error_user_empty_job_position')}
+            />
+
+            <Text style={styles.sectionTitle}>
+              {t('UserView_contact_section_title')}
+            </Text>
+            <InfoSection
+              isRequired
+              style={styles.section}
+              label={t('UserView_contact_first_label')}
+              value={personData.email ?? ''}
+              onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
+                updatePersonData(PERSON_KEYS.EMAIL, text);
+              }}
+              isError={isError.email}
+              errorText={t(errorText || USER_APPROVE_ERROR_TEXT.INCORRECT_EMAIL)}
+            />
+            <InfoSection
+              style={styles.section}
+              label={t('UserView_contact_second_label')}
+              value={personData.telegram ?? ''}
+              onUpdate={(text: string) => {
+                updatePersonData(PERSON_KEYS.TELEGRAM, text);
+              }}
+            />
+
+            <Text style={styles.sectionTitle}>
+              {t('UserView_driver_license_section_title')}
+            </Text>
+            <View style={styles.row}>
+              <InfoSection
+                isRequired
+                style={styles.rowItem}
+                label={t('UserView_driver_license_first_label')}
+                value={drivingLicenseData.series}
+                onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
+                  updateDriverLicenseData(DRIVING_LICENSE_KEYS.SERIES, text);
+                }}
+                isError={isError.driverLicenseSeries}
+                errorText={t(errorText || 'Error_user_empty_driver_license_series')}
+              />
+              <InfoSection
+                isRequired
+                style={styles.rowItem}
+                label={t('UserView_driver_license_second_label')}
+                value={drivingLicenseData.number}
+                onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
+                  updateDriverLicenseData(DRIVING_LICENSE_KEYS.NUMBER, text);
+                }}
+                keyboardType={'numeric'}
+                isError={isError.driverLicenseNumber}
+                errorText={t(errorText || 'Error_user_empty_driver_license_number')}
+              />
             </View>
-          )}
 
-          <Text style={[styles.label, styles.jobPositionSection]}>
-            {t('UserView_driver_sixth_label')}
-          </Text>
-          <JobPositionPicker
-            value={personData.jobPosition}
-            onChangeValue={onChangeJobPosition}
-          />
-
-          <Text style={styles.sectionTitle}>
-            {t('UserView_contact_section_title')}
-          </Text>
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_contact_first_label')}
-            value={personData.email ?? ''}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.EMAIL, text);
-            }}
-          />
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_contact_second_label')}
-            value={personData.telegram ?? ''}
-            onUpdate={(text: string) => {
-              updatePersonData(PERSON_KEYS.TELEGRAM, text);
-            }}
-          />
-
-          <Text style={styles.sectionTitle}>
-            {t('UserView_driver_license_section_title')}
-          </Text>
-          <View style={styles.row}>
-            <InfoSection
-              style={styles.rowItem}
-              label={t('UserView_driver_license_first_label')}
-              value={drivingLicenseData.series}
-              onUpdate={(text: string) => {
-                updateDriverLicenseData(DRIVING_LICENSE_KEYS.SERIES, text);
-              }}
-            />
-            <InfoSection
-              style={styles.rowItem}
-              label={t('UserView_driver_license_second_label')}
-              value={drivingLicenseData.number}
-              onUpdate={(text: string) => {
-                updateDriverLicenseData(DRIVING_LICENSE_KEYS.NUMBER, text);
-              }}
-              keyboardType={'numeric'}
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>
-            {t('UserView_passport_section_title')}
-          </Text>
-          <View style={styles.row}>
-            <InfoSection
-              style={styles.rowItem}
-              label={t('UserView_passport_first_label')}
-              value={passportData.series}
-              onUpdate={(text: string) => {
-                updatePassportData(PASSPORT_KEYS.SERIES, text);
-              }}
-            />
-            <InfoSection
-              style={styles.rowItem}
-              label={t('UserView_passport_second_label')}
-              value={passportData.number}
-              onUpdate={(text: string) => {
-                updatePassportData(PASSPORT_KEYS.NUMBER, text);
-              }}
-              keyboardType={'numeric'}
-            />
-          </View>
-          <InfoSection
-            style={styles.section}
-            label={t('UserView_passport_third_label')}
-            value={passportData.authority}
-            onUpdate={(text: string) => {
-              updatePassportData(PASSPORT_KEYS.AUTHORITY, text);
-            }}
-          />
-          <View style={styles.row}>
-            <InfoSection
-              style={styles.rowItem}
-              label={t('UserView_passport_fourth_label')}
-              value={passportData.date_of_issue}
-              onUpdate={(text: string) => {
-                updatePassportData(PASSPORT_KEYS.DATE_OF_ISSUE, text);
-              }}
-              type={INFO_SECTION_TYPE.DATE_PICKER}
-              minimumDate={undefined}
-            />
-            <InfoSection
-              style={styles.rowItem}
-              label={t('UserView_passport_fifth_label')}
-              value={passportData.department_code}
-              onUpdate={(text: string) => {
-                updatePassportData(PASSPORT_KEYS.DEPARTMENT_CODE, text);
-              }}
-            />
-          </View>
-
-          <Text style={[styles.label, styles.section]}>
-            {t('UserView_passport_sixth_label')}
-          </Text>
-          <RoundButton
-            style={styles.addPhotoButton}
-            textStyle={styles.addPhotoButtonText}
-            title={t('UserView_passport_add_photo_button')}
-            onPress={onImageSelect}
-          />
-
-          {!!images.length && (
-            <View style={styles.photoSection}>
-              {images.map((image, index) => (
-                <SelectedImage
-                  key={`${index}_${image}`}
-                  imageSrc={image}
-                  onPress={() => {
-                    onDeleteImage(index);
-                  }}
-                />
-              ))}
+            <Text style={styles.sectionTitle}>
+              {t('UserView_passport_section_title')}
+            </Text>
+            <View style={styles.row}>
+              <InfoSection
+                isRequired
+                style={styles.rowItem}
+                label={t('UserView_passport_first_label')}
+                value={passportData.series}
+                onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
+                  updatePassportData(PASSPORT_KEYS.SERIES, text);
+                }}
+                isError={isError.passportSeries}
+                errorText={t(errorText || 'Error_user_empty_passport_series')}
+              />
+              <InfoSection
+                isRequired
+                style={styles.rowItem}
+                label={t('UserView_passport_second_label')}
+                value={passportData.number}
+                onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
+                  updatePassportData(PASSPORT_KEYS.NUMBER, text);
+                }}
+                keyboardType={'numeric'}
+                isError={isError.passportNumber}
+                errorText={t(errorText || 'Error_user_empty_passport_number')}
+              />
             </View>
-          )}
+            <InfoSection
+              isRequired
+              style={styles.section}
+              label={t('UserView_passport_third_label')}
+              value={passportData.authority}
+              onUpdate={(text: string) => {
+                if (isValidError) {
+                  setErrorText(null);
+                  setIsError(INITIAL_ERROR_MAP);
+                }
+                updatePassportData(PASSPORT_KEYS.AUTHORITY, text);
+              }}
+              isError={isError.passportAuthority}
+              errorText={t(errorText || 'Error_user_empty_passport_authority')}
+            />
+            <View style={styles.row}>
+              <InfoSection
+                isRequired
+                style={styles.rowItem}
+                label={t('UserView_passport_fourth_label')}
+                value={passportData.date_of_issue}
+                onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
+                  updatePassportData(PASSPORT_KEYS.DATE_OF_ISSUE, text);
+                }}
+                type={INFO_SECTION_TYPE.DATE_PICKER}
+                minimumDate={undefined}
+                isError={isError.passportDateOfIssue}
+                errorText={t(errorText || 'Error_user_empty_passport_date_of_issue')}
+              />
+              <InfoSection
+                isRequired
+                style={styles.rowItem}
+                label={t('UserView_passport_fifth_label')}
+                value={passportData.department_code}
+                onUpdate={(text: string) => {
+                  if (isValidError) {
+                    setErrorText(null);
+                    setIsError(INITIAL_ERROR_MAP);
+                  }
+                  updatePassportData(PASSPORT_KEYS.DEPARTMENT_CODE, text);
+                }}
+                isError={isError.passportDepartmentCode}
+                errorText={t(errorText || 'Error_user_empty_passport_department_code')}
+              />
+            </View>
 
-          <View style={styles.buttonSection}>
-            <Button
-              style={styles.primaryButton}
-              textStyle={styles.primaryButtonText}
-              title={t('UserView_save_button')}
-              onPress={type === USER.WAITING_APPROVAL ? onSaveUserData : onUpdateUserData}
-              disabled={isLoading}
+            <Text style={[styles.label, styles.section]}>
+              <Text style={styles.required}>*{'  '}</Text>
+              {t('UserView_passport_sixth_label')}
+            </Text>
+            <RoundButton
+              style={styles.addPhotoButton}
+              textStyle={styles.addPhotoButtonText}
+              title={t('UserView_passport_add_photo_button')}
+              onPress={onImageSelect}
             />
-            <Button
-              style={styles.secondaryButton}
-              textStyle={styles.primaryButtonText}
-              title={t('UserView_cancel_button')}
-              onPress={onCancel}
-              disabled={isLoading}
-            />
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </Screen>
+
+            {isError.photos && (
+              <Text style={styles.errorText}>
+                {t('Error_user_empty_photos')}
+              </Text>
+            )}
+
+            {!!images.length && (
+              <View style={styles.photoSection}>
+                {images.map((image, index) => (
+                  <SelectedImage
+                    key={`${index}_${image}`}
+                    imageSrc={image}
+                    onPress={() => {
+                      if (type === USER.APPROVED) {
+                        openPhotoView(image);
+                      } else {
+                        onDeleteImage(index);
+                      }
+                    }}
+                    type={type}
+                  />
+                ))}
+              </View>
+            )}
+
+            <View style={styles.buttonSection}>
+              <Button
+                style={styles.primaryButton}
+                textStyle={styles.primaryButtonText}
+                title={t('UserView_save_button')}
+                onPress={type === USER.WAITING_APPROVAL ? onSaveUserData : onUpdateUserData}
+                disabled={isLoading || isValidError}
+              />
+              <Button
+                style={styles.secondaryButton}
+                textStyle={styles.primaryButtonText}
+                title={t('UserView_cancel_button')}
+                onPress={onCancel}
+                disabled={isLoading}
+              />
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Screen>
+    </>
   );
 };

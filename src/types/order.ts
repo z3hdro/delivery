@@ -81,4 +81,6 @@ export type Order = {
   manager: any
 }
 
+export type ORDER_STATUS_VALUES = `${ORDER_STATUS}`
+
 

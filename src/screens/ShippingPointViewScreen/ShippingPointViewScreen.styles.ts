@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from 'constants/colors';
@@ -6,7 +5,7 @@ import { colors } from 'constants/colors';
 export const useStyles = () => {
   const { bottom } = useSafeAreaInsets();
 
-  return useMemo(() => StyleSheet.create({
+  return StyleSheet.create({
     screen: {
       backgroundColor: colors.color6,
     },
@@ -163,13 +162,17 @@ export const useStyles = () => {
       color: colors.color2
     },
     geoPosition: {
-      top: 16,
-      left: 8,
-      right: 8,
+      marginTop: 16,
+      paddingHorizontal: 8,
+      // top: 16,
+      // left: 8,
+      // right: 8,
       backgroundColor: colors.white,
       padding: 8,
-      position: 'absolute',
-      zIndex: 99,
+      // position: 'absolute',
+      // zIndex: 99,
+    },
+    geoPositionLabelBox: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between'
@@ -183,5 +186,22 @@ export const useStyles = () => {
       height: 320,
       width: '100%',
     },
-  }), [bottom]);
+    requiredLabel: {
+      color: colors.red,
+    },
+    errorLabel: {
+      borderWidth: 1,
+      borderColor: colors.red,
+    },
+    errorText: {
+      marginTop: 8,
+      color: colors.red,
+      fontFamily: 'Roboto',
+      fontSize: 14,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 16,
+      letterSpacing: 0.2,
+    }
+  });
 };

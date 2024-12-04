@@ -2,11 +2,15 @@
   "expo": {
     "name": "Cargo Delivery",
     "slug": "cargo-delivery",
+    "scheme": "cargodelivery",
     "owner": "z3hdro",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./src/assets/icons/app_icon.png",
+    "notification": {
+      "iosDisplayInForeground": true
+    },
     "splash": {
       "image": "./src/assets/icons/splash.png",
       "resizeMode": "contain",

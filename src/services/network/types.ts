@@ -12,12 +12,14 @@ export type LoginPayload = {
   phone: string
   password: string
   fcmToken: string
+  deviceType: string
 }
 
 export type RegisterPayload = {
   phone: string
   password: string
   fcmToken: string
+  deviceType: string
 }
 
 export type LoginResponse = {
@@ -55,7 +57,7 @@ export type RefreshResponse = {
 export type ApprovedDriverResponse = {
   count: number
   totalPages: number
-  users: ApprovedDriver[]
+  userList: ApprovedDriver[]
 }
 
 export type UnapprovedDriverResponse = {
@@ -134,7 +136,6 @@ export type AddressPayload = {
   house: string
   building: string
   floor: number
-  postcode: string
   description: string
 }
 
@@ -192,8 +193,8 @@ export type OrderPayload = {
   destinationId: number
   priceNonCash: number
   priceCash: number
-  plannedLoadingDate: string
-  plannedDeliveryDate: string
+  plannedLoadingDate?: string
+  plannedDeliveryDate?: string
   costType: string
   nomenclatures: Array<OrderNomenclaturePayload>
 }

@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import useWebSocket from 'react-native-use-websocket';
 
 import { Screen } from 'components/Screen';
 import { ScreenHeader } from 'components/ScreenHeader';
@@ -17,17 +18,18 @@ import { createInitialGeo, createInitialState, getPrimaryButtonText } from './Vi
 import { parseGeo } from 'utils/geo';
 import { getNomenclatureLabel } from 'utils/nomeclatureLabel';
 import { parseDateToInfoMap } from 'utils/parseDate';
-import { useStyles } from './ViewOrderScreen.styles';
-import { ORDER_KEYS } from './ViewOrderScreen.consts';
+import { INITIAL_ERROR_MAP, ORDER_KEYS } from './ViewOrderScreen.consts';
 import { ORDER_LIST } from 'constants/order';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
 import { LOGISTIC_POINT } from 'constants/map';
-import { MapPointInfo, ViewOrder } from './ViewOrderScreen.types';
+import { WEBSOCKET_URL } from 'constants/websocket';
+import { ErrorMap, MapPointInfo, ViewOrder } from './ViewOrderScreen.types';
+import { GeoPosition } from 'types/geolocation';
+import { WSOrderLocation } from 'types/websocket';
 import { Address } from 'types/address';
+import { useStyles } from './ViewOrderScreen.styles';
 
 import { ArrowBackIcon, BackIcon, MapIcon } from 'src/assets/icons';
-import isEqual from 'lodash/isEqual';
-import { GeoPosition } from 'types/geolocation';
 
 export const ViewOrderScreen = () => {
   const { t } = useTranslation();
@@ -35,12 +37,23 @@ export const ViewOrderScreen = () => {
   const { params: { order, type, onUpdate } } = useManagerRoute<'ViewOrderScreen'>();
   const { goBack } = useManagerNavigator();
 
+  const [isWaitingApproval, isAvailable] = useMemo(() => (
+    [type === ORDER_LIST.WAITING_APPROVAL, type === ORDER_LIST.AVAILABLE]
+  ), [type]);
+
   const [displayMap, setDisplayMap] = useState<boolean>(false);
   const [currentGeo, setCurrentGeo] = useState<GeoPosition>(createInitialGeo(order));
   const [orderData, setOrderData] = useState<ViewOrder>(createInitialState(order));
   const [mapPointInfo, setMapPointInfo] = useState<MapPointInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCanCancelContentTouches, setCanCancelContentTouches] = useState<boolean>(true);
+
+  const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
+
+  const isValidError = useMemo(() =>
+    Object.values(isError).some((err) => err),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [JSON.stringify(isError)]);
 
   const nomenclatureLabel = useMemo(() => {
     if (order.nomenclatures) {
@@ -59,31 +72,59 @@ export const ViewOrderScreen = () => {
   },
   [order.driver, orderData]);
 
-  useEffect(() => {
-    if (!order.id || type !== ORDER_LIST.IN_PROGRESS) {
-      return;
+  const resetIsError = useCallback(() => {
+    if (isValidError) {
+      setIsError({ ...INITIAL_ERROR_MAP });
     }
+  }, [isValidError]);
 
-    const interval = setInterval(async () => {
-      try {
-        const result = await networkService.getOrderGeo(order.id);
-        if (result) {
-          const { latitude, longitude } = result;
-          const newCoordinates = { lat: latitude, lon: longitude };
-
-          if (!isEqual(currentGeo, newCoordinates)) {
-            setCurrentGeo(newCoordinates);
-          }
-        }
-      } catch (e) {
-        console.log('error while polling order geo');
+  useWebSocket(`${WEBSOCKET_URL.ORDER_LOCATION}/${order.id}`, {
+    onOpen: () => console.log('ws opened on ViewOrderScreen'),
+    options: {
+      headers: {
+        Authorization: networkService.getAuthorizationToken(),
       }
-    }, 1000 * 15);
+    },
+    onMessage: (e) => {
+      const message = JSON.parse((e?.data as string)) as WSOrderLocation;
+      console.log('Received message:', message);
+      if (message?.latitude && message?.longitude) {
+        const newCoordinates = { lat: message?.latitude, lon: message?.longitude };
+        setCurrentGeo(newCoordinates);
+      }
+    },
+    onClose: (e) => console.log('ws closed', e),
+    onError: (e) => console.log('ws error', e),
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: () => true,
+    reconnectAttempts: 5
+  });
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [currentGeo, order.id, order.status, type]);
+  // useEffect(() => {
+  //   if (!order.id || type !== ORDER_LIST.IN_PROGRESS) {
+  //     return;
+  //   }
+  //
+  //   const interval = setInterval(async () => {
+  //     try {
+  //       const result = await networkService.getOrderGeo(order.id);
+  //       if (result) {
+  //         const { latitude, longitude } = result;
+  //         const newCoordinates = { lat: latitude, lon: longitude };
+  //
+  //         if (!isEqual(currentGeo, newCoordinates)) {
+  //           setCurrentGeo(newCoordinates);
+  //         }
+  //       }
+  //     } catch (e) {
+  //       console.log('error while polling order geo');
+  //     }
+  //   }, 1000 * 15);
+  //
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [currentGeo, order.id, order.status, type]);
 
   const onUpdateOrder = useCallback((key: ORDER_KEYS, value: string) => {
     setOrderData((prevState) => ({ ...prevState, [key]: value }));
@@ -103,10 +144,29 @@ export const ViewOrderScreen = () => {
     try {
       setIsLoading(true);
 
-      if (type === ORDER_LIST.IN_PROGRESS) {
+      if (type === ORDER_LIST.IN_PROGRESS || type === ORDER_LIST.COMPLETED) {
         goBack();
         console.log('close');
       } else if (type === ORDER_LIST.WAITING_APPROVAL) {
+        const errorMap = { ...INITIAL_ERROR_MAP };
+
+        if (!driverName) {
+          errorMap.driver = true;
+        }
+
+        if (!order.driver?.user?.phone) {
+          errorMap.phone = true;
+        }
+
+        if (!orderData.truckVin.trim()) {
+          errorMap.vin = true;
+        }
+
+        if (Object.values(errorMap).some((err) => err)) {
+          setIsError(errorMap);
+          return;
+        }
+
         const payload = {
           orderId: orderData.id,
           plannedLoadingDate: orderData.departureDatePlan,
@@ -118,11 +178,31 @@ export const ViewOrderScreen = () => {
         onUpdate();
         goBack();
       } else if (type === ORDER_LIST.AVAILABLE) {
+        const errorMap = { ...INITIAL_ERROR_MAP };
+
+        if (!driverName) {
+          errorMap.driver = true;
+        }
+
+        if (!order.driver?.user?.phone) {
+          errorMap.phone = true;
+        }
+
+        if (!orderData.truckVin.trim()) {
+          errorMap.vin = true;
+        }
+
+        if (Object.values(errorMap).some((err) => err)) {
+          setIsError(errorMap);
+          return;
+        }
+
         const payload = {
           departure_date_plan: orderData.departureDatePlan,
           delivery_date_plan: orderData.deliveryDatePlan,
           vin: orderData.truckVin
         };
+
         await networkService.updateOrder(orderData.id, payload);
         onUpdate();
         goBack();
@@ -134,7 +214,7 @@ export const ViewOrderScreen = () => {
       setIsLoading(false);
     }
 
-  }, [goBack, onUpdate, type]);
+  }, [driverName, goBack, onUpdate, order.driver?.user?.phone, type]);
 
   const onToggleMap = useCallback(() => {
     setDisplayMap(prevState => !prevState);
@@ -214,29 +294,36 @@ export const ViewOrderScreen = () => {
               destination={{ ...order.destination.Address, geo: parseGeo(order.destination.geo) }}
               onInfoPress={onInfoPress}
               track={order.geo ? currentGeo : undefined}
-              displayTrack={type === ORDER_LIST.IN_PROGRESS}
+              displayTrack={type === ORDER_LIST.IN_PROGRESS || type === ORDER_LIST.COMPLETED}
               showUserPosition={false}
             />
           </View>
         ) : (
           <>
             <InfoSection
+              isRequired={isWaitingApproval || isAvailable}
               style={styles.section}
               label={t('ViewOrder_first_section')}
               value={driverName}
               editable={false}
+              isError={isError.driver}
+              errorText={t('Error_approve_order_empty_driver')}
             />
             <InfoSection
+              isRequired={isWaitingApproval || isAvailable}
               style={styles.section}
               label={t('ViewOrder_second_section')}
               value={order.driver?.user?.phone || ''}
               editable={false}
+              isError={isError.phone}
+              errorText={t('Error_approve_order_empty_phone')}
             />
             <InfoSection
               style={styles.section}
               label={t('ViewOrder_third_section')}
               value={orderData.departureDatePlan}
               type={INFO_SECTION_TYPE.DATE_PICKER}
+              editable={type !== ORDER_LIST.COMPLETED}
               onUpdate={(text: string) => {
                 onUpdateOrder(ORDER_KEYS.DEPARTURE_DATE_PLAN, text);
               }}
@@ -246,19 +333,24 @@ export const ViewOrderScreen = () => {
               label={t('ViewOrder_fourth_section')}
               value={orderData.deliveryDatePlan}
               type={INFO_SECTION_TYPE.DATE_PICKER}
+              editable={type !== ORDER_LIST.COMPLETED}
               minimumDate={new Date(orderData.departureDatePlan)}
               onUpdate={(text: string) => {
                 onUpdateOrder(ORDER_KEYS.DELIVERY_DATE_PLAN, text);
               }}
             />
             <InfoSection
+              isRequired={isWaitingApproval || isAvailable}
               style={styles.section}
               label={t('ViewOrder_fifth_section')}
               value={orderData.truckVin}
               editable={type === ORDER_LIST.IN_PROGRESS || type === ORDER_LIST.WAITING_APPROVAL}
               onUpdate={(text: string) => {
+                resetIsError();
                 onUpdateOrder(ORDER_KEYS.TRUCK_VIN, text);
               }}
+              isError={isError.vin}
+              errorText={t('Error_approve_order_empty_vin')}
             />
           </>
         )}
@@ -280,7 +372,7 @@ export const ViewOrderScreen = () => {
               onPress={() => onPress(orderData)}
               disabled={isLoading}
             />
-            {type !== ORDER_LIST.IN_PROGRESS && (
+            {(type !== ORDER_LIST.IN_PROGRESS && type !== ORDER_LIST.COMPLETED) && (
               <View style={styles.secondaryButtonContainer}>
                 {type === ORDER_LIST.WAITING_APPROVAL ? (
                   <Button

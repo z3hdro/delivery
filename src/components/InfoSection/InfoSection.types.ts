@@ -12,5 +12,8 @@ export type Props = {
   type?: INFO_SECTION_TYPE;
   keyboardType?: KeyboardTypeOptions;
   minimumDate?: Date;
+  isRequired?: boolean;
+  isError?: boolean;
+  errorText?: string | null;
   onNavigate?: () => void;
 }

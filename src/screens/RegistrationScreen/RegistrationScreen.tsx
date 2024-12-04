@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Platform, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { MaskedTextInput } from 'react-native-mask-text';
 
 import { Screen } from 'components/Screen';
 import { LinkButton } from 'components/LinkButton';
@@ -9,13 +10,16 @@ import { useLoginNavigator } from 'navigation/hooks';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 
 import { useStyles } from './RegistrationScreen.styles';
-import { DRIVER_PASSWORD, DRIVER_PHONE } from 'mocks/mockUsers';
 import { networkService } from 'services/network';
 import { AxiosError } from 'axios';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectDeviceToken } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
-import { setCurrentPerson, setManagerPhone, setUserRole } from 'store/slices';
+import { setCurrentPerson, setIsAuthorizationFinished, setManagerPhone, setUserRole } from 'store/slices';
+import { INITIAL_ERROR_MAP, NETWORK_ERROR_TEXT, REGISTRATION_ERROR_TEXT } from './RegistrationScreen.consts';
+import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX } from 'constants/regex';
+import { ErrorMap } from './RegistrationScreen.types';
+import { PHONE_MASK } from 'constants/user';
 
 export const RegistrationScreen = () => {
   const { t } = useTranslation();
@@ -24,18 +28,43 @@ export const RegistrationScreen = () => {
   const deviceToken = useAppSelector(selectDeviceToken);
   const dispatch = useAppDispatch();
 
-  const [phone, setPhone] = useState<string>(DRIVER_PHONE);
-  const [password, setPassword] = useState<string>(DRIVER_PASSWORD);
+  const [phone, setPhone] = useState<string>('');
+  const [formattedPhone, setFormattedPhone] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [errorText, setErrorText] = useState<string | null>(null);
+  const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
 
-  const onRegisterPress = useCallback(async () => {
+  const onRegisterPress = useCallback(async (enteredPhone: string, enteredPassword: string) => {
     try {
-      if (!phone.trim().length || !password.trim().length) {
+      const trimPhone = enteredPhone.trim();
+      const trimPassword = enteredPassword.trim();
+      if (!trimPhone.length || !trimPassword.length) {
         return;
       }
+
+      if (!CONTAINS_LETTERS_REGEX.test(trimPhone)) {
+        setErrorText(REGISTRATION_ERROR_TEXT.PHONE_CONTAIN_WORDS);
+        setIsError(prevState => ({ ...prevState, phone: true }));
+        return;
+      }
+
+      if ((trimPhone.match(DIGIT_REGEX) || []).length !== 11) {
+        setErrorText(REGISTRATION_ERROR_TEXT.PHONE_LENGTH);
+        setIsError(prevState => ({ ...prevState, phone: true }));
+        return;
+      }
+
+      if (trimPassword.length < 6) {
+        setErrorText(REGISTRATION_ERROR_TEXT.PASSWORD_LENGTH);
+        setIsError(prevState => ({ ...prevState, password: true }));
+        return;
+      }
+
       const { accessToken, refreshToken, user } = await networkService.register({
-        phone: phone.replace('+', ''),
+        phone: enteredPhone.replace('+', ''),
         password,
-        fcmToken: deviceToken ?? ''
+        fcmToken: deviceToken ?? '',
+        deviceType: Platform.OS
       });
 
       networkService.setAuthHeader(accessToken);
@@ -64,8 +93,13 @@ export const RegistrationScreen = () => {
     } catch (e) {
       const error = e as AxiosError;
       console.log('registration screen error: ', error?.response?.data ?? error);
+      if ((error?.response?.data as { message: string })?.message === NETWORK_ERROR_TEXT.USER_ALREADY_EXISTS) {
+        setErrorText(REGISTRATION_ERROR_TEXT.USER_EXISTS);
+      }
+    } finally {
+      dispatch(setIsAuthorizationFinished(true));
     }
-  }, [phone, password, deviceToken, dispatch]);
+  }, [password, deviceToken, dispatch]);
 
   const onLoginPress = useCallback(() => {
     navigate('LoginScreen');
@@ -92,21 +126,43 @@ export const RegistrationScreen = () => {
             {t('Registration_label')}
           </Text>
         </View>
-        <TextInput
-          value={phone}
-          onChangeText={setPhone}
-          style={styles.textInputContainer}
-          keyboardType={'phone-pad'}
+        <MaskedTextInput
+          mask={PHONE_MASK}
+          onChangeText={(text, rawText) => {
+            if (errorText) {
+              setErrorText(null);
+              setIsError(INITIAL_ERROR_MAP);
+            }
+            setFormattedPhone(text);
+            setPhone(rawText);
+          }}
           placeholder={t('Registration_phone_input_placeholder')}
+          value={formattedPhone}
+          style={[styles.textInputContainer, isError.phone && styles.errorField]}
+          keyboardType={'phone-pad'}
         />
         <TextInput
           value={password}
-          onChangeText={setPassword}
-          style={styles.textInputContainer}
+          onChangeText={(text) => {
+            if (errorText) {
+              setErrorText(null);
+              setIsError(INITIAL_ERROR_MAP);
+            }
+            setPassword(text);
+          }}
+          style={[styles.textInputContainer, isError.password && styles.errorField]}
           placeholder={t('Registration_password_input_placeholder')}
           secureTextEntry
         />
-        <Button hasShadows onPress={onRegisterPress} title={t('Registration_button')} style={styles.button} />
+        {errorText && (
+          <Text style={styles.errorText}>{t(errorText)}</Text>
+        )}
+        <Button
+          hasShadows
+          onPress={() => onRegisterPress(phone, password)}
+          title={t('Registration_button')}
+          style={errorText ? styles.buttonWithError : styles.button}
+        />
       </View>
     </Screen>
   );

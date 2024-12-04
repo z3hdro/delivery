@@ -11,6 +11,8 @@ import { DriverListScreen } from 'screens/DriverListScreen';
 import { ShippingPointScreen } from 'screens/ShippingPointScreen';
 
 import { CargoIcon, DriversIcon, HomeIcon, NomenclatureIcon, PlusIcon } from 'src/assets/icons';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { selectNewOrdersQty, selectNewDriversQty } from 'store/selectors';
 
 const Tab = createBottomTabNavigator<MainBottomTabNavigatorParamList>();
 
@@ -21,6 +23,8 @@ const customOptions = {
 
 export const MainBottomTabNavigator = () => {
   const { t } = useTranslation();
+  const newOrdersQty = useAppSelector(selectNewOrdersQty);
+  const newDriversQty = useAppSelector(selectNewDriversQty);
 
   return (
     <Tab.Navigator
@@ -34,7 +38,8 @@ export const MainBottomTabNavigator = () => {
           tabBarLabel: t('CargoList'),
           tabBarIcon: ({ color, size }) => (
             <CargoIcon height={size} width={size} color={color} />
-          )
+          ),
+          tabBarBadge: newOrdersQty
         }}
       />
       <Tab.Screen
@@ -54,7 +59,8 @@ export const MainBottomTabNavigator = () => {
           tabBarLabel: t('DriverList'),
           tabBarIcon: ({ color, size }) => (
             <DriversIcon height={size} width={size} color={color} />
-          )
+          ),
+          tabBarBadge: newDriversQty
         }}
       />
       <Tab.Screen

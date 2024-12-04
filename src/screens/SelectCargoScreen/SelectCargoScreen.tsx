@@ -9,7 +9,7 @@ import { Preloader } from 'components/Preloader';
 import { networkService } from 'services/network';
 import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
 import { useStyles } from './SelectCargoScreen.styles';
-import { MEASURE_LIMIT, ORDER_LIMIT } from 'constants/limit';
+import { NOMENCLATURE_LIMIT } from 'constants/limit';
 import { Nomenclature } from 'types/nomenclature';
 
 import { BackIcon } from 'assets/icons';
@@ -29,12 +29,15 @@ export const SelectCargoScreen = () => {
 
   const [debouncedSearchValue] = useDebounce(search, 500);
 
-  const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
+  const isLimitReached = useMemo(() => data.length < offset * NOMENCLATURE_LIMIT, [data.length, offset]);
+
+  console.log('isLimitReached: ', isLimitReached);
 
   const fetchMeasures = useCallback(async (offset: number) => {
     try {
       setIsLoading(true);
       const result = await networkService.getNomenclatures(offset);
+      console.log('result length: ', result.length);
       if (result.length) {
         setData((prevState) => offset === 0 ? result : ([...prevState, ...result]));
         setOffset((prevState) => prevState + 1);
@@ -98,7 +101,7 @@ export const SelectCargoScreen = () => {
 
   const renderItem = useCallback(({ item }: { item: Nomenclature}) => (
     <TouchableOpacity onPress={() => onSelectItem(item)} style={styles.item}>
-      <Text style={styles.itemText}>{`${item.measure.name} ${item.name}`}</Text>
+      <Text style={styles.itemText}>{item.name}</Text>
     </TouchableOpacity>
   ), [onSelectItem, styles]);
 

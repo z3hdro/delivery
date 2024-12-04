@@ -13,6 +13,7 @@ import { LOGISTIC_POINT_LIMIT } from 'constants/limit';
 import { LogisticPoint } from 'services/network/types';
 
 import { PlusIcon } from 'src/assets/icons';
+import {displayAddress} from "screens/ShippingPointScreen/ShippingPointScreen.utils";
 
 export const ShippingPointScreen = () => {
   const { t } = useTranslation();
@@ -67,28 +68,32 @@ export const ShippingPointScreen = () => {
     });
   }, [navigate]);
 
-  const renderItem = useCallback(({ item }: { item: LogisticPoint}) => (
-    <TouchableOpacity
-      style={styles.itemContainer}
-      onPress={() => onLogisticPointPress(item)}>
-      <View>
-        <Text style={styles.label}>
-          {t('ShippingPointScreen_first_label')}
-        </Text>
-        <Text style={styles.value}>
-          {item.name}
-        </Text>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.label}>
-          {t('ShippingPoint_second_label')}
-        </Text>
-        <Text style={styles.value}>
-          {`${item.Address.City.name}, ${item.Address.Street.name}, ${item.Address.house}`}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  ), [onLogisticPointPress, styles, t]);
+  const renderItem = useCallback(({ item }: { item: LogisticPoint}) => {
+    const userAddress = displayAddress(item.Address)
+
+    return (
+      <TouchableOpacity
+        style={styles.itemContainer}
+        onPress={() => onLogisticPointPress(item)}>
+        <View>
+          <Text style={styles.label}>
+            {t('ShippingPointScreen_first_label')}
+          </Text>
+          <Text style={styles.value}>
+            {item.name}
+          </Text>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.label}>
+            {t('ShippingPoint_second_label')}
+          </Text>
+          <Text style={styles.value}>
+            {userAddress}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }, [onLogisticPointPress, styles, t]);
 
   return (
     <Screen

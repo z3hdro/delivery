@@ -47,6 +47,9 @@ export const useStyles = () => {
     button: {
       marginTop: 52,
     },
+    buttonWithError: {
+      marginTop: 36
+    },
     bottomContainer: {
       alignItems: 'center'
     },
@@ -60,6 +63,19 @@ export const useStyles = () => {
       fontStyle: 'normal',
       fontWeight: '400',
       lineHeight: 14,
+      letterSpacing: 0.2,
+    },
+    errorField: {
+      borderColor: colors.red,
+      borderWidth: 1,
+    },
+    errorText: {
+      color: colors.red,
+      fontFamily: 'Roboto',
+      fontSize: 14,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 16,
       letterSpacing: 0.2,
     }
   }), [bottom]);

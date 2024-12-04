@@ -10,23 +10,24 @@ import { Preloader } from 'src/components/Preloader';
 import { OrderCard } from 'components/OrderCard';
 import { Button } from 'components/Button';
 import { LinkButton } from 'components/LinkButton';
-import { useDriverNavigator } from 'navigation/hooks';
-// import { INSTRUCTION_LINK } from 'constants/geolocation';
-import { useStyles } from './OrderListScreen.styles';
+import { useDriverNavigator, useDriverRoute } from 'navigation/hooks';
 import { appStorage, STORAGE_KEYS } from 'services/appStorage';
 import { networkService } from 'services/network';
-import { ORDER_LIMIT } from 'constants/limit';
-import { Order } from 'types/order';
 import { useAppSelector } from 'hooks/useAppSelector';
 import { selectCurrentOrder } from 'store/selectors';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { setCurrentOrder } from 'store/slices';
+import { ORDER_LIMIT } from 'constants/limit';
+import { Order } from 'types/order';
+import { useStyles } from './OrderListScreen.styles';
 
 export const OrderListScreen = () => {
   const { t } = useTranslation();
   const styles = useStyles();
 
   const { navigate } = useDriverNavigator();
+  const route = useDriverRoute<'OrderListScreen'>();
+  const { setParams } = useDriverNavigator();
 
   const currentOrder = useAppSelector(selectCurrentOrder);
   const dispatch = useAppDispatch();
@@ -37,8 +38,10 @@ export const OrderListScreen = () => {
   const [displayModal, setDisplayModal] = useState<boolean>(false);
   const [offset, setOffset] = useState<number>(0);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const isLimitReached = useMemo(() => data.length < offset * ORDER_LIMIT, [data.length, offset]);
+  const isNotificationLink = useMemo(() => !!route?.params?.orderId, [route?.params?.orderId]);
 
   console.log('currentOrder: ', !!currentOrder);
 
@@ -49,6 +52,8 @@ export const OrderListScreen = () => {
       if (orders.length) {
         setData((prevState) => offset === 0 ? orders : ([...prevState, ...orders]));
         setOffset((prevState) => prevState + 1);
+      } else {
+        setData([]);
       }
     } catch (e) {
       console.log(e);
@@ -59,11 +64,8 @@ export const OrderListScreen = () => {
 
   useEffect(() => {
     void (async () => {
-      if (currentOrder) {
+      if (currentOrder && (isInitialLoading || isNotificationLink)) {
         await new Promise(resolve => setTimeout(resolve, 0));
-        console.log('p1');
-
-        dispatch(setCurrentOrder(currentOrder));
 
         navigate('OrderScreen', {
           onUpdate: () => {
@@ -71,11 +73,16 @@ export const OrderListScreen = () => {
             setOffset(0);
           }
         });
+
+        if (isNotificationLink) {
+          setParams({ orderId: undefined });
+        }
+
       }
       setIsInitialLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isInitialLoading, navigate]);
+  }, [isInitialLoading, navigate, isNotificationLink]);
 
   useEffect(() => {
     void (async () => {
@@ -83,6 +90,7 @@ export const OrderListScreen = () => {
         await fetchData(0);
       }
       setShouldRefresh(false);
+      setIsRefreshing(false);
     })();
   }, [fetchData, shouldRefresh]);
 
@@ -109,20 +117,14 @@ export const OrderListScreen = () => {
     }
   };
 
-  // const onOpenLink = useCallback(async (url: string) => {
-  //   const supported = await Linking.canOpenURL(url);
-  //
-  //   if (supported) {
-  //     // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-  //     // by some browser in the mobile
-  //     await Linking.openURL(url);
-  //   } else {
-  //     console.error(`Don't know how to open this URL: ${url}`);
-  //   }
-  // }, []);
-
   const onCloseModal = useCallback(() => {
     setDisplayModal(false);
+  }, []);
+
+  const handleOnRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    setShouldRefresh(true);
+    setOffset(0);
   }, []);
 
   // TODO: uncomment when sorting and filtering will be applied
@@ -213,6 +215,8 @@ export const OrderListScreen = () => {
             renderItem={renderItem}
             onEndReachedThreshold={0.5}
             onEndReached={onEndReached}
+            refreshing={isRefreshing}
+            onRefresh={handleOnRefresh}
           />
         )}
       </View>

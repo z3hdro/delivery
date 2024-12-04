@@ -8,4 +8,6 @@ export type Props = {
   content: ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
+  isError?: boolean;
+  errorText?: string;
 }

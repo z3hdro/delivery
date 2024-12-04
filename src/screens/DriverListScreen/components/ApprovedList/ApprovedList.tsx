@@ -26,9 +26,9 @@ export const ApprovedList = () => {
   const fetchLogisticPoints = useCallback(async (offset: number) => {
     try {
       setIsLoading(true);
-      const { users } = await networkService.getApprovedDrivers(offset);
-      if (users?.length) {
-        setData((prevState) => offset === 0 ? users : ([...prevState, ...users]));
+      const { userList } = await networkService.getApprovedDrivers(offset);
+      if (userList?.length) {
+        setData((prevState) => offset === 0 ? userList : ([...prevState, ...userList]));
         setOffset((prevState) => prevState + 1);
       }
     } catch (e) {

@@ -1,5 +1,6 @@
 import { Job } from 'types/jobs';
 import { DrivingLicense } from 'screens/UserViewScreen/UserViewScreen.types';
+import { USER_STATUS } from 'constants/user';
 
 export type Role = {
   id: number
@@ -51,6 +52,7 @@ export type Passport = {
   department_code: string
   createdAt: string
   updatedAt: string
+  photos: string[]
 }
 
 export type PersonJobPosition = {
@@ -64,7 +66,12 @@ export type Person = {
   user: UserPerson
   contragent: Contragent
   jobPosition: PersonJobPosition
+}
 
+export type ExtendedPerson = Person & {
+  name: string | null
+  surname: string | null
+  patronymic: string | null
 }
 
 export type ApprovedDriver = {
@@ -129,3 +136,5 @@ export type Manager = {
     updatedAt: string
   }
 }
+
+export type USER_STATUS_VALUES = `${USER_STATUS}`

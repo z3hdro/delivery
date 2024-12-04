@@ -10,29 +10,29 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		2E25D2067F7486763B0E3627 /* Pods_Deliveryapp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0036498F2F62F0F95FF97F4B /* Pods_Deliveryapp.framework */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		734BC2F6BDF847A8BD7890BF /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = A58614A44D734A8299BBABA0 /* noop-file.swift */; };
+		7C316D617B934A13B4792BF1 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5D6781D9F34FC0B52C9FCB /* noop-file.swift */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		E1C28C0F6372437F94843B2D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86E01C64B58F4545AD802549 /* GoogleService-Info.plist */; };
+		E1E81CE158574C0F8E8BED90 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BF2367816A4043159FA425E2 /* GoogleService-Info.plist */; };
+		EB61EC7803E7CDC1F66A2EA6 /* Pods_Deliveryapp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EE0181CA03EF54C23FDCF4A /* Pods_Deliveryapp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0036498F2F62F0F95FF97F4B /* Pods_Deliveryapp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Deliveryapp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* Deliveryapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Deliveryapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Deliveryapp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Deliveryapp/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Deliveryapp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Deliveryapp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Deliveryapp/main.m; sourceTree = "<group>"; };
+		4B80CEC5BE7543C8A14A551B /* Deliveryapp-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "Deliveryapp-Bridging-Header.h"; path = "Deliveryapp/Deliveryapp-Bridging-Header.h"; sourceTree = "<group>"; };
 		6C2E3173556A471DD304B334 /* Pods-Deliveryapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Deliveryapp.debug.xcconfig"; path = "Target Support Files/Pods-Deliveryapp/Pods-Deliveryapp.debug.xcconfig"; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-Deliveryapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Deliveryapp.release.xcconfig"; path = "Target Support Files/Pods-Deliveryapp/Pods-Deliveryapp.release.xcconfig"; sourceTree = "<group>"; };
-		86E01C64B58F4545AD802549 /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Deliveryapp/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		A58614A44D734A8299BBABA0 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "Deliveryapp/noop-file.swift"; sourceTree = "<group>"; };
+		7EE0181CA03EF54C23FDCF4A /* Pods_Deliveryapp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Deliveryapp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Deliveryapp/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B370EA82BC3F432CB4001867 /* Deliveryapp-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "Deliveryapp-Bridging-Header.h"; path = "Deliveryapp/Deliveryapp-Bridging-Header.h"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		BF2367816A4043159FA425E2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Deliveryapp/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CB5D6781D9F34FC0B52C9FCB /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "Deliveryapp/noop-file.swift"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Deliveryapp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -42,7 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2E25D2067F7486763B0E3627 /* Pods_Deliveryapp.framework in Frameworks */,
+				EB61EC7803E7CDC1F66A2EA6 /* Pods_Deliveryapp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,9 +59,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				86E01C64B58F4545AD802549 /* GoogleService-Info.plist */,
-				A58614A44D734A8299BBABA0 /* noop-file.swift */,
-				B370EA82BC3F432CB4001867 /* Deliveryapp-Bridging-Header.h */,
+				BF2367816A4043159FA425E2 /* GoogleService-Info.plist */,
+				CB5D6781D9F34FC0B52C9FCB /* noop-file.swift */,
+				4B80CEC5BE7543C8A14A551B /* Deliveryapp-Bridging-Header.h */,
 			);
 			name = Deliveryapp;
 			sourceTree = "<group>";
@@ -70,7 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				0036498F2F62F0F95FF97F4B /* Pods_Deliveryapp.framework */,
+				7EE0181CA03EF54C23FDCF4A /* Pods_Deliveryapp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -148,13 +148,13 @@
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
-				71E3BB3D8495CA1AFF838023 /* [Expo] Configure project */,
+				0C3F1569EF259553AD4976DB /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				46484FE4BF3717B12DA7FEF7 /* [CP] Embed Pods Frameworks */,
+				2F3F09E88E17BC5AC11DBE38 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -204,7 +204,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				E1C28C0F6372437F94843B2D /* GoogleService-Info.plist in Resources */,
+				E1E81CE158574C0F8E8BED90 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,25 +247,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		46484FE4BF3717B12DA7FEF7 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Deliveryapp/Pods-Deliveryapp-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Deliveryapp/Pods-Deliveryapp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		71E3BB3D8495CA1AFF838023 /* [Expo] Configure project */ = {
+		0C3F1569EF259553AD4976DB /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -283,6 +265,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Deliveryapp/expo-configure-project.sh\"\n";
+		};
+		2F3F09E88E17BC5AC11DBE38 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Deliveryapp/Pods-Deliveryapp-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Deliveryapp/Pods-Deliveryapp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -335,7 +335,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				734BC2F6BDF847A8BD7890BF /* noop-file.swift in Sources */,
+				7C316D617B934A13B4792BF1 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,7 +372,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.z3hdro.cargodelivery;
-				PRODUCT_NAME = Deliveryapp;
+				PRODUCT_NAME = "Deliveryapp";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Delivery cargo provisioning";
 				SWIFT_OBJC_BRIDGING_HEADER = "Deliveryapp/Deliveryapp-Bridging-Header.h";
@@ -408,7 +408,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.z3hdro.cargodelivery;
-				PRODUCT_NAME = Deliveryapp;
+				PRODUCT_NAME = "Deliveryapp";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Delivery cargo provisioning";
 				SWIFT_OBJC_BRIDGING_HEADER = "Deliveryapp/Deliveryapp-Bridging-Header.h";

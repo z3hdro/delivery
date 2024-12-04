@@ -1,20 +1,29 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { Preloader } from 'components/Preloader';
+import { UserCard } from 'components/UserCard';
 import { networkService } from 'services/network';
 import { useManagerNavigator } from 'navigation/hooks';
-import { useStyles } from './WaitingApprovalList.styles';
-import { USER } from 'constants/user';
-import { UserCard } from 'components/UserCard';
+import { useAppSelector } from 'hooks/useAppSelector';
+import { resetNewDriversQty } from 'store/slices';
+import { selectNewDriversQty } from 'store/selectors';
 import { DRIVER_LIST_LIMIT } from 'constants/limit';
+import { USER } from 'constants/user';
 import { UnapprovedDriver } from 'types/user';
+
+import { useStyles } from './WaitingApprovalList.styles';
+import { useAppDispatch } from 'hooks/useAppDispatch';
 
 export const WaitingApprovalList = () => {
   const { t } = useTranslation();
-  const { navigate } = useManagerNavigator();
   const styles = useStyles();
+
+  const newDriversQty = useAppSelector(selectNewDriversQty);
+  const dispatch = useAppDispatch();
+  const { navigate } = useManagerNavigator();
 
   const [data, setData] = useState<UnapprovedDriver[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,6 +31,13 @@ export const WaitingApprovalList = () => {
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(true);
 
   const isLimitReached = useMemo(() => data.length < offset * DRIVER_LIST_LIMIT, [data.length, offset]);
+
+  useFocusEffect(useCallback(() => {
+    if (newDriversQty > 0) {
+      dispatch(resetNewDriversQty());
+      setShouldRefresh(true);
+    }
+  }, [newDriversQty, dispatch]));
 
   const fetchLogisticPoints = useCallback(async (offset: number) => {
     try {

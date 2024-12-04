@@ -136,5 +136,18 @@ export const useStyles = () => {
       borderRadius: 50,
       backgroundColor: colors.color2,
     },
+    required: {
+      color: colors.red,
+    },
+    errorText: {
+      marginVertical: 4,
+      color: colors.red,
+      fontFamily: 'Roboto',
+      fontSize: 14,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 16,
+      letterSpacing: 0.2,
+    }
   }), [bottom]);
 };

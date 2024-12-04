@@ -46,5 +46,14 @@ export const useStyles = () => {
     button: {
       marginTop: 36,
     },
+    errorText: {
+      color: colors.red,
+      fontFamily: 'Roboto',
+      fontSize: 14,
+      fontStyle: 'normal',
+      fontWeight: '400',
+      lineHeight: 16,
+      letterSpacing: 0.2,
+    }
   }), []);
 };

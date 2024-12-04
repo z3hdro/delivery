@@ -1,17 +1,20 @@
 import React, { FC, useCallback, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { MaskedTextInput } from 'react-native-mask-text';
 
 import { Button } from 'components/Button';
+import { PHONE_MASK } from 'constants/user';
 import { useStyles } from './FirstStep.styles';
 import { Props } from './FirstStep.types';
 
-export const FirstStep: FC<Props> = ({ onSendCode }) => {
+export const FirstStep: FC<Props> = ({ onSendCode, errorText, onResetError }) => {
   const { t } = useTranslation();
   const styles = useStyles();
 
   const [phone, setPhone] = useState<string>('');
-  
+  const [formattedPhone, setFormattedPhone] = useState<string>('');
+
   const onPress = useCallback(async () => {
     await onSendCode(phone);
   }, [onSendCode, phone]);
@@ -26,14 +29,30 @@ export const FirstStep: FC<Props> = ({ onSendCode }) => {
       <Text style={styles.inputLabel}>
         {t('ForgotPassword_phone_input_label')}
       </Text>
-      <TextInput
-        value={phone}
-        onChangeText={setPhone}
+      <MaskedTextInput
+        mask={PHONE_MASK}
+        onChangeText={(text, rawText) => {
+          if (errorText) {
+            onResetError();
+          }
+          setFormattedPhone(text);
+          setPhone(rawText);
+        }}
+        placeholder={t('ForgotPassword_phone_input_placeholder')}
+        value={formattedPhone}
         style={styles.textInputContainer}
         keyboardType={'phone-pad'}
-        placeholder={t('ForgotPassword_phone_input_placeholder')}
       />
-      <Button hasShadows onPress={onPress} title={t('ForgotPassword_send_button')} style={styles.button} />
+      {errorText && (
+        <Text style={styles.errorText}>{t(errorText)}</Text>
+      )}
+      <Button
+        style={styles.button}
+        hasShadows
+        disabled={!!errorText}
+        onPress={onPress}
+        title={t('ForgotPassword_send_button')}
+      />
     </>
   );
 };

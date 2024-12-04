@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 
-import { appReducer, geoReducer, orderReducer } from 'store/slices';
+import { appReducer, geoReducer, notificationReducer, orderReducer } from 'store/slices';
 
 const persistConfig = {
   key: 'root',
@@ -15,7 +15,8 @@ const reducer = persistReducer(
   combineReducers({
     app: appReducer,
     order: orderReducer,
-    geo: geoReducer
+    geo: geoReducer,
+    notification: notificationReducer
   })
 );
 

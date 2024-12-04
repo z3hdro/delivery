@@ -13,11 +13,10 @@ import {
   setCurrentPerson,
   setDeviceToken,
   setManagerPhone,
-  setUserRole
+  setUserRole,
+  setIsAuthorizationFinished
 } from 'store/slices';
-import { selectCurrentOrder, selectCurrentPerson } from 'store/selectors';
 import { Props } from './App.types';
-import { useAppSelector } from 'hooks/useAppSelector';
 
 Notifications.setNotificationHandler({
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -29,13 +28,7 @@ Notifications.setNotificationHandler({
 });
 
 export const AppProvider: FC<Props> = ({ children }) => {
-  const person = useAppSelector(selectCurrentPerson);
-  const currentOrder = useAppSelector(selectCurrentOrder);
-
   const dispatch = useAppDispatch();
-
-  console.log('currentOrder on appProvider: ', !!currentOrder);
-  console.log('currentPerson on appProvider: ', !!person);
 
   useEffect(() => {
     void (async () => {
@@ -44,10 +37,8 @@ export const AppProvider: FC<Props> = ({ children }) => {
         console.log('token: ', token);
         if (token) {
           dispatch(setDeviceToken(token));
-          // setDeviceToken(token);
         }
         const role = await appStorage.getData(STORAGE_KEYS.ROLE);
-        console.log('role: ', role);
 
         if (role) {
           dispatch(setUserRole(role));
@@ -63,6 +54,10 @@ export const AppProvider: FC<Props> = ({ children }) => {
         if (refreshToken) {
           const { person } = await networkService.getUserData();
           dispatch(setCurrentPerson(person));
+
+          if (!person) {
+            return;
+          }
 
           if (role === 'driver') {
             try {
@@ -92,6 +87,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
       } finally {
         await SplashScreen.hideAsync();
         dispatch(setIsAppLoading(false));
+        dispatch(setIsAuthorizationFinished(true));
       }
     })();
   }, [dispatch]);

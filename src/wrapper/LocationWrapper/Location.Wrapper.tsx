@@ -24,10 +24,7 @@ export const LocationWrapper: FC<Props> = ({ children }) => {
   const dispatch = useAppDispatch();
 
   const checkNotificationStatus = useCallback(async () => {
-    console.log('currentOrder checkNotificationStatus: ', !!currentOrder);
-    console.log('person checkNotificationStatus: ', !!person);
     if (!person) {
-      console.log('check fail');
       return;
     }
 
@@ -41,16 +38,11 @@ export const LocationWrapper: FC<Props> = ({ children }) => {
 
     hasFirstCheck.current = true;
 
-    console.log('foregroundStatus k1: ', foregroundStatus);
-    console.log('backgroundStatus k2: ', backgroundStatus);
-
     if (backgroundStatus === 'granted') {
       await appStorage.storeData(STORAGE_KEYS.NOTIFICATION_PERMISSION_BACKGROUND, 'true');
 
       const isLocationServiceIsRunning = await checkLocationService();
       const isBackgroundServiceEnabled = await isBackgroundServiceEnable();
-      console.log('is service running: ', isLocationServiceIsRunning);
-      console.log('order status: ', currentOrder?.status);
 
       if (!isLocationServiceIsRunning && isBackgroundServiceEnabled && currentOrder?.status === ORDER_STATUS.DEPARTED) {
         await runLocationService();
@@ -72,11 +64,8 @@ export const LocationWrapper: FC<Props> = ({ children }) => {
         return;
       }
 
-      console.log('l1');
       const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
       console.log('foregroundStatus: ', foregroundStatus);
-
-      console.log('l2');
 
       const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
       console.log('backgroundStatus: ', backgroundStatus);
@@ -86,45 +75,33 @@ export const LocationWrapper: FC<Props> = ({ children }) => {
       }
 
       if (foregroundStatus !== 'granted') {
-        console.log('l3');
-
         hasAskedPermission.current = true;
         await appStorage.removeData(STORAGE_KEYS.NOTIFICATION_PERMISSION);
         return;
       }
-
-      console.log('l4');
 
       await appStorage.storeData(STORAGE_KEYS.NOTIFICATION_PERMISSION, 'true');
 
       const isLocationServiceIsRunning = await checkLocationService();
       console.log('isLocationServiceIsRunning: ', isLocationServiceIsRunning);
 
-      console.log('l5');
-
       hasAskedPermission.current = true;
-
-      console.log('l6');
-
     })();
   }, [checkNotificationStatus]);
 
   useEffect(() => {
     if (hasAskedPermission.current && !hasFirstCheck.current && !!currentOrder && !!person) {
-      console.log('call it later');
       void checkNotificationStatus();
     }
   }, [checkNotificationStatus, currentOrder, person]);
 
   useEffect(() => {
     const appStateSubscription = AppState.addEventListener('change', async nextAppState => {
-      console.log('sub 1');
       if (
         appState.current.match(/inactive|background/) &&
         nextAppState === 'active' &&
         hasAskedPermission.current
       ) {
-        console.log('sub 2');
         await checkNotificationStatus();
       }
       appState.current = nextAppState;
@@ -190,7 +167,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
     if (locations?.length) {
       const latestLocation = locations[0];
 
-      const currentOrderId = store.getState().geo.currentOrderId;
+      const currentOrderId = store.getState().geo?.currentOrderId;
 
       console.log('currentOrderId: ', currentOrderId);
       if (latestLocation && currentOrderId) {

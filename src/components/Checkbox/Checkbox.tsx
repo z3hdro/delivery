@@ -8,16 +8,19 @@ import { CheckboxFilledIcon, CheckboxIcon } from 'assets/icons';
 
 
 export const Checkbox: FC<Props> = ({
+  isRequired = false,
   label,
   value,
   onPress,
   style,
+  isError = false,
+  errorText = '',
 }) => {
   const styles = useStyles();
 
   return (
     <Pressable onPress={onPress}>
-      <View style={[styles.container, style]}>
+      <View style={[styles.container, isError && styles.error, style]}>
         <View>
           {value ? (
             <CheckboxFilledIcon height={20} width={20} />
@@ -29,6 +32,7 @@ export const Checkbox: FC<Props> = ({
           {label}
         </Text>
       </View>
+      {isError && errorText && <Text style={styles.errorText}>{errorText}</Text>}
     </Pressable>
   );
 };

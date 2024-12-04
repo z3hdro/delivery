@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from 'react';
-import { Alert, DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { AxiosError } from 'axios';
 
 import { ScreenHeader } from 'components/ScreenHeader';
 import { Screen } from 'components/Screen';
@@ -9,19 +10,25 @@ import { Button } from 'components/Button';
 import { RoundButton } from 'components/RoundButton';
 import { Checkbox } from 'components/Checkbox';
 import { useManagerNavigator } from 'navigation/hooks';
-import { EMPTY_CARGO_DATA, INITIAL_CARGO_DATA } from './CreateOrderScreen.consts';
+import { networkService } from 'services/network';
+import { LogisticPoint } from 'services/network/types';
+import { displayErrorMessage } from 'utils/alert';
+import {
+  EMPTY_CARGO_DATA,
+  INITIAL_CARGO_DATA,
+  INITIAL_CARGO_ERROR,
+  INITIAL_CARGO_ERROR_MAP,
+  INITIAL_ERROR_MAP
+} from './CreateOrderScreen.consts';
 import { CARGO_KEYS, COST_TYPE } from 'constants/order';
 import { colors } from 'constants/colors';
 import { INFO_SECTION_TYPE } from 'constants/infoSection';
+import { EMIT_EVENTS } from 'constants/emitEvents';
 import { useStyles } from './CreateOrderScreen.styles';
-import { Cargo, LogisticPointView } from './CreateOrderScreen.types';
+import { Cargo, CargoError, ErrorMap, LogisticPointView } from './CreateOrderScreen.types';
 import { Nomenclature } from 'types/nomenclature';
 
 import { PlusIcon, XIcon } from 'src/assets/icons';
-import { networkService } from 'services/network';
-import { LogisticPoint } from 'services/network/types';
-import { AxiosError } from 'axios';
-import { EMIT_EVENTS } from 'constants/emitEvents';
 
 export const CreateOrderScreen = () => {
   const { t } = useTranslation();
@@ -37,9 +44,29 @@ export const CreateOrderScreen = () => {
   const [cashPrice, setCashPrice] = useState<string>('');
   const [cashlessPrice, setCashlessPrice] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isError, setIsError] = useState<ErrorMap>(INITIAL_ERROR_MAP);
+  const [isCargoError, setIsCargoError] = useState<CargoError[]>(INITIAL_CARGO_ERROR_MAP);
+
+  const isValidError = useMemo(() =>
+    Object.values(isError).some((err) => err),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [JSON.stringify(isError)]);
 
   const onAddCargo = useCallback(() => {
     setCargoData((prevState) => ([...prevState, { ...EMPTY_CARGO_DATA }]));
+    setIsCargoError(prevState => ([...prevState, { ...INITIAL_CARGO_ERROR }]));
+  }, []);
+
+  const resetIsError = useCallback(() => {
+    if (isValidError) {
+      setIsError({ ...INITIAL_ERROR_MAP });
+    }
+  }, [isValidError]);
+
+  const resetCargoError = useCallback((selectedIndex: number) => {
+    setIsCargoError((prevState) => prevState.map(
+      (cargo, index) => index === selectedIndex ? INITIAL_CARGO_ERROR : cargo)
+    );
   }, []);
 
   const resetForm = useCallback(() => {
@@ -70,9 +97,10 @@ export const CreateOrderScreen = () => {
     setCargoData((prevState) =>
       prevState.filter((_, index) => index !== selectedIndex)
     );
+    setIsCargoError(prevState => prevState.filter((_, index) => index !== selectedIndex));
   }, []);
 
-  const onNavigateCargo = useCallback((index: number) => {
+  const onNavigateCargo = useCallback((index: number, isValidCargoError: boolean) => {
     navigate('SelectCargoScreen', {
       onSelect: (item: Nomenclature) => {
         setCargoData((prevState) => {
@@ -82,9 +110,12 @@ export const CreateOrderScreen = () => {
           cargoItem.id = item.id;
           return tempData;
         });
+        if (isValidCargoError) {
+          resetCargoError(index);
+        }
       }
     });
-  }, [navigate]);
+  }, [navigate, resetCargoError]);
 
   const onNavigateDeparture = useCallback(() => {
     navigate('SelectLogisticPointScreen', {
@@ -93,9 +124,10 @@ export const CreateOrderScreen = () => {
           id: item.id,
           name: item.name
         });
+        resetIsError();
       }
     });
-  }, [navigate]);
+  }, [navigate, resetIsError]);
 
   const onNavigateDelivery = useCallback(() => {
     navigate('SelectLogisticPointScreen', {
@@ -104,32 +136,60 @@ export const CreateOrderScreen = () => {
           id: item.id,
           name: item.name
         });
+        resetIsError();
       }
     });
-  }, [navigate]);
+  }, [navigate, resetIsError]);
 
   const onCreateOrder = async () => {
     try {
       setIsLoading(true);
 
-      if (
-        !departure?.id
-        || !delivery?.id
-        || !cashPrice.trim().length
-        || !cashlessPrice.trim().length
-        || !departureDatePlan
-        || !deliveryDatePlan
-        || !cargoData.every(({ id }) => !!id)
-        || !cargoData.length
-      ) {
-        Alert.alert(t('CreateOrder_error_title'), t('CreateOrder_error_message'));
+      const errorMap = { ...INITIAL_ERROR_MAP };
+
+      if (!departure?.id) {
+        errorMap.departure = true;
+      }
+
+      if (!delivery?.id) {
+        errorMap.destination = true;
+      }
+
+      if (!cashPrice.trim() && !cashlessPrice.trim()) {
+        errorMap.price = true;
+      }
+
+      if (Object.values(errorMap).some((err) => err)) {
+        setIsError(errorMap);
+        return;
+      }
+
+      const cargoErrorMap = [] as CargoError[];
+      const cargoErrorSet = new Set();
+
+      cargoData.forEach((cargo, index) => {
+        const cargoError = { ...INITIAL_CARGO_ERROR };
+        if (!cargo?.id && !cargo?.name?.trim()) {
+          cargoError.cargoName = true;
+        }
+        if (!cargo.netWeight.trim()) {
+          cargoError.cargoNetWeight = true;
+        }
+        cargoErrorMap.push(cargoError);
+        if (Object.values(cargoError).some(err => err)) {
+          cargoErrorSet.add(index);
+        }
+      }, []);
+
+      if (cargoErrorSet.size > 0) {
+        setIsCargoError(cargoErrorMap);
         return;
       }
 
       console.log('cargoData: ', cargoData);
       const payload = {
-        departureId: departure.id,
-        destinationId: delivery.id,
+        departureId: departure?.id as number,
+        destinationId: delivery?.id as number,
         costType,
         priceNonCash: +cashlessPrice,
         priceCash: +cashPrice,
@@ -148,13 +208,13 @@ export const CreateOrderScreen = () => {
       resetForm();
 
       navigate('MainBottomTabNavigator', { screen: 'CargoListScreen' });
-
       return;
     } catch (e) {
       if (e instanceof AxiosError) {
         console.log('e message: ', e?.message);
         console.log('e status: ', e?.code);
       }
+      displayErrorMessage(e?.message as string ?? '');
       console.log('onCreateOrder error', e);
     } finally {
       setIsLoading(false);
@@ -175,6 +235,9 @@ export const CreateOrderScreen = () => {
           value={departure?.name || ''}
           onNavigate={onNavigateDeparture}
           type={INFO_SECTION_TYPE.SCREEN}
+          isRequired
+          isError={isError.departure}
+          errorText={t('CreateOrder_error_empty_departure')}
         />
         <InfoSection
           style={styles.section}
@@ -182,17 +245,26 @@ export const CreateOrderScreen = () => {
           value={delivery?.name || ''}
           onNavigate={onNavigateDelivery}
           type={INFO_SECTION_TYPE.SCREEN}
+          isRequired
+          isError={isError.destination}
+          errorText={t('CreateOrder_error_empty_destination')}
         />
         <View style={styles.section}>
           {cargoData.map((cargo, index) => {
+            const cargoError = isCargoError[index];
+            const isValidCargoError = Object.values(cargoError).some(error => error);
+
             return (
               <View key={`${index}_${cargo.name}`} style={styles.cargoRow}>
                 <InfoSection
                   style={styles.cargoPicker}
                   label={t('CreateOrder_third_section')}
                   value={cargoData[index].name || ''}
-                  onNavigate={() => onNavigateCargo(index)}
+                  onNavigate={() => onNavigateCargo(index, isValidCargoError)}
                   type={INFO_SECTION_TYPE.SCREEN}
+                  isRequired
+                  isError={cargoError.cargoName}
+                  errorText={t('CreateOrder_error_empty_cargo_name')}
                 />
                 <InfoSection
                   style={styles.cargoWeight}
@@ -201,9 +273,15 @@ export const CreateOrderScreen = () => {
                   label={t('CreateOrder_fifth_section')}
                   value={cargo.netWeight}
                   onUpdate={(text: string) => {
+                    if (isValidCargoError) {
+                      resetCargoError(index);
+                    }
                     updateData(index, CARGO_KEYS.NET_WEIGHT, text);
                   }}
                   keyboardType={'numeric'}
+                  isRequired
+                  isError={cargoError.cargoNetWeight}
+                  errorText={t('CreateOrder_error_empty_cargo_net_weight')}
                 />
                 <Pressable onPress={() => onDeleteCargo(index)}>
                   <View style={styles.deleteButton}>
@@ -242,8 +320,11 @@ export const CreateOrderScreen = () => {
             value={cashPrice}
             keyboardType={'numeric'}
             onUpdate={(text) => {
+              resetIsError();
               setCashPrice(text);
             }}
+            isError={isError.price}
+            errorText={t('CreateOrder_error_empty_price')}
           />
           <InfoSection
             style={styles.section}
@@ -251,8 +332,11 @@ export const CreateOrderScreen = () => {
             value={cashlessPrice}
             keyboardType={'numeric'}
             onUpdate={(text) => {
+              resetIsError();
               setCashlessPrice(text);
             }}
+            isError={isError.price}
+            errorText={t('CreateOrder_error_empty_price')}
           />
           <InfoSection
             style={styles.section}

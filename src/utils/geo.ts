@@ -1,4 +1,4 @@
-import { GeoPosition } from 'types/geolocation';
+import { MapGeoPosition } from 'types/geolocation';
 import { GeoResponse, OrderGeoPayload } from 'services/network/types';
 import { LocationObject } from 'expo-location';
 import { ORDER_STATUS } from 'constants/order';
@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 import { updateCurrentOrderGeo } from 'store/slices';
 import { store } from 'store/store';
 
-export const parseGeo = (geo: GeoResponse): GeoPosition => {
+export const parseGeo = (geo: GeoResponse): MapGeoPosition => {
   const [lat, lon] = geo.coordinates;
 
   return { lat, lon };

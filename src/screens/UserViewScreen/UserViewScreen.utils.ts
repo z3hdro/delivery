@@ -1,13 +1,21 @@
 import { USER } from 'constants/user';
-import { CompanyData, DrivingLicense, PassportData, PersonData } from './UserViewScreen.types';
+import {
+  CompanyData,
+  DrivingLicense,
+  ErrorMap,
+  PassportData,
+  PersonData,
+  ValidationArgs
+} from './UserViewScreen.types';
 import {
   COMPANY_TYPE,
   EMPLOYMENT,
   EMPTY_COMPANY, EMPTY_DRIVING_LICENSE,
   EMPTY_PASSPORT,
-  EMPTY_PERSON,
+  EMPTY_PERSON, INITIAL_ERROR_MAP,
 } from './UserViewScreen.consts';
 import { ApprovedDriver, UnapprovedDriver } from 'types/user';
+import { EMAIL_REGEX, IS_DIGIT_ONLY_REGEX } from 'constants/regex';
 
 export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, user?: UnapprovedDriver): PersonData => {
   if (type === USER.WAITING_APPROVAL && user) {
@@ -28,7 +36,7 @@ export const createPersonInitialState = (type: USER, driver?: ApprovedDriver, us
       telegram
     } = driver;
 
-    return {
+    return <PersonData>{
       id: user.id,
       phone: user.phone,
       name,
@@ -68,7 +76,8 @@ export const createPassportInitialState = (
         number,
         date_of_issue,
         authority,
-        department_code
+        department_code,
+        photos,
       } = passport;
 
       return {
@@ -77,11 +86,27 @@ export const createPassportInitialState = (
         date_of_issue,
         authority,
         department_code,
-        photo: []
+        photo: photos?.length ? photos : []
       };
     }
   }
   return { ...EMPTY_PASSPORT, photo: []};
+};
+
+export const createPhotoInitialState = (
+  type: USER,
+  driver?: ApprovedDriver,
+  user?: UnapprovedDriver
+): string[] => {
+  if (type === USER.WAITING_APPROVAL && user) {
+    return [];
+  }
+  if (type === USER.APPROVED && driver) {
+    if (driver?.passport?.photos?.length) {
+      return (driver?.passport?.photos ?? []);
+    }
+  }
+  return [];
 };
 
 export const createDrivingLicenseInitialState = (
@@ -97,14 +122,16 @@ export const createDrivingLicenseInitialState = (
       drivingLicense
     } = driver;
 
+    console.log('drivingLicense: ', drivingLicense);
+
     if (drivingLicense) {
       const {
-        series,
+        serial,
         number,
       } = drivingLicense;
 
       return {
-        series: String(series),
+        series: String(serial),
         number: String(number),
       };
     }
@@ -168,4 +195,93 @@ export const selectCompanyType = (companyData: CompanyData): string => {
     return COMPANY_TYPE.TRANSPORT_COMPANY;
   }
   return '';
+};
+
+export const checkValidation = ({
+  email,
+  company,
+  companyName,
+  companyInn,
+  companyKpp,
+  name,
+  surname,
+  jobPosition,
+  selfEmployed,
+  driverLicenseSeries,
+  driverLicenseNumber,
+  passportSeries,
+  passportNumber,
+  passportAuthority,
+  passportDateOfIssue,
+  passportDepartmentCode,
+  photos,
+}: ValidationArgs): ErrorMap => {
+  const errorMap = { ...INITIAL_ERROR_MAP };
+
+  if (email && !EMAIL_REGEX.test(email)) {
+    errorMap.email = true;
+  }
+
+  if (photos < 1) {
+    errorMap.photos = true;
+  }
+
+  if (company) {
+    if (!companyName) {
+      errorMap.companyName = true;
+    }
+
+    if (!companyInn) {
+      errorMap.companyInn = true;
+    }
+    if (companyKpp.length > 0 && !IS_DIGIT_ONLY_REGEX.test(companyKpp)) {
+      errorMap.companyKpp = true;
+    }
+  }
+
+  if (!company && !selfEmployed) {
+    errorMap.type = true;
+  }
+
+  if (!name.trim()) {
+    errorMap.name = true;
+  }
+
+  if (!surname.trim()) {
+    errorMap.surname = true;
+  }
+
+  if (!jobPosition) {
+    errorMap.jobPosition = true;
+  }
+
+  if (!driverLicenseSeries.trim()) {
+    errorMap.driverLicenseSeries = true;
+  }
+
+  if (!driverLicenseNumber.trim()) {
+    errorMap.driverLicenseNumber = true;
+  }
+
+  if (!passportSeries.trim()) {
+    errorMap.passportSeries = true;
+  }
+
+  if (!passportNumber.trim()) {
+    errorMap.passportNumber = true;
+  }
+
+  if (!passportAuthority.trim()) {
+    errorMap.passportAuthority = true;
+  }
+
+  if (!passportDateOfIssue.trim()) {
+    errorMap.passportDateOfIssue = true;
+  }
+
+  if (!passportDepartmentCode.trim()) {
+    errorMap.passportDepartmentCode = true;
+  }
+
+  return errorMap;
 };
