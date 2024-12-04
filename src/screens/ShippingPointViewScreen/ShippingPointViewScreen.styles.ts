@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from 'constants/colors';
@@ -6,7 +5,7 @@ import { colors } from 'constants/colors';
 export const useStyles = () => {
   const { bottom } = useSafeAreaInsets();
 
-  return useMemo(() => StyleSheet.create({
+  return StyleSheet.create({
     screen: {
       backgroundColor: colors.color6,
     },
@@ -204,5 +203,5 @@ export const useStyles = () => {
       lineHeight: 16,
       letterSpacing: 0.2,
     }
-  }), [bottom]);
+  });
 };

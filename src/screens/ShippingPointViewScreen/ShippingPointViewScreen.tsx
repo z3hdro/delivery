@@ -1,17 +1,17 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import YaMap, { Geocoder, Marker } from 'react-native-yamap';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
+import {Pressable, ScrollView, Text, TextInput, View} from 'react-native';
+import {useTranslation} from 'react-i18next';
+import YaMap, {Geocoder, Marker} from 'react-native-yamap';
 
-import { ScreenHeader } from 'components/ScreenHeader';
-import { Preloader } from 'components/Preloader';
-import { Screen } from 'components/Screen';
-import { InfoSection } from 'components/InfoSection';
-import { Button } from 'components/Button';
-import { RoundButton } from 'components/RoundButton';
-import { Accordion } from 'components/Accordion';
-import { networkService } from 'services/network';
-import { useManagerNavigator, useManagerRoute } from 'navigation/hooks';
+import {ScreenHeader} from 'components/ScreenHeader';
+import {Preloader} from 'components/Preloader';
+import {Screen} from 'components/Screen';
+import {InfoSection} from 'components/InfoSection';
+import {Button} from 'components/Button';
+import {RoundButton} from 'components/RoundButton';
+import {Accordion} from 'components/Accordion';
+import {networkService} from 'services/network';
+import {useManagerNavigator, useManagerRoute} from 'navigation/hooks';
 import {
   checkContactError,
   checkContactValidation,
@@ -19,25 +19,30 @@ import {
   createInitialAddressData,
   createInitialContactData,
   createInitialExpandMap,
-  createInitialGeoData, createInitialPointData, createPoint, creatInitialContactErrorMap
+  createInitialGeoData,
+  createInitialPointData,
+  createPoint,
+  creatInitialContactErrorMap
 } from './ShippingPointViewScreen.utils';
-import { displayErrorMessage } from 'utils/alert';
-import { useStyles } from './ShippingPointViewScreen.styles';
-import { colors } from 'constants/colors';
-import { EMPTY_CONTACT } from 'constants/contact';
+import {displayErrorMessage} from 'utils/alert';
+import {useStyles} from './ShippingPointViewScreen.styles';
+import {colors} from 'constants/colors';
+import {EMPTY_CONTACT} from 'constants/contact';
+import {CONTACT_ERROR_KEYS, INITIAL_CONTACT_ERROR_MAP, INITIAL_ERROR_MAP} from './ShippingPointViewScreen.consts';
 import {
-  CONTACT_ERROR_KEYS,
-  INITIAL_CONTACT_ERROR_MAP,
-  INITIAL_ERROR_MAP
-} from './ShippingPointViewScreen.consts';
-import {
-  AddressKeys, AddressView, ContactError, ContactErrorMap,
-  ContactKeys, ContactView, ErrorMap,
+  AddressKeys,
+  AddressView,
+  ContactError,
+  ContactErrorMap,
+  ContactKeys,
+  ContactView,
+  ErrorMap,
   ExpandedMap
 } from './ShippingPointViewScreen.types';
-import { GeoPosition, MapGeoPosition } from 'types/geolocation';
+import {GeoPosition, MapGeoPosition} from 'types/geolocation';
 
-import { AddressMarkerIcon, BackIcon, PlusIcon, XIcon } from 'src/assets/icons';
+import {AddressMarkerIcon, BackIcon, PlusIcon, XIcon} from 'src/assets/icons';
+import {INFO_SECTION_TYPE} from "constants/infoSection";
 
 
 export const ShippingPointViewScreen = () => {
@@ -569,6 +574,7 @@ export const ShippingPointViewScreen = () => {
               style={index > 0 ? styles.block : undefined}
               textInputStyle={styles.addressTextInput}
               isRequired={isRequiredField}
+              type={key === 'phone' ? INFO_SECTION_TYPE.MASK_INPUT : INFO_SECTION_TYPE.INPUT}
               label={t(`ShippingPointView_contact_label_${index + 1}`)}
               value={value}
               onUpdate={(text) => {

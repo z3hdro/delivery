@@ -1,3 +1,4 @@
+import { mask } from 'react-native-mask-text';
 import {
   EMPTY_ADDRESS, INITIAL_CONTACT_ERROR_MAP, INITIAL_CONTACTS_ERROR_MAP,
   INITIAL_ERROR_MAP, POINT_REGEX
@@ -14,6 +15,7 @@ import { LogisticPoint } from 'services/network/types';
 import { GeoPosition, MapGeoPosition } from 'types/geolocation';
 import { CONTAINS_LETTERS_REGEX, DIGIT_REGEX, EMAIL_REGEX } from 'constants/regex';
 import { parseGeo } from 'utils/geo';
+import {PHONE_MASK} from "constants/user";
 
 export const createInitialExpandMap = (point?: LogisticPoint): ExpandedMap => {
   if (!point) {

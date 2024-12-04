@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
+import { mask, MaskedTextInput } from 'react-native-mask-text';
 import { DeviceEventEmitter, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { format } from 'date-fns';
 import { useStyles } from './InfoSection.styles';
@@ -7,6 +8,7 @@ import { DISPLAY_DATE_FORMAT } from './InfoSection.consts';
 import { Props } from './InfoSection.types';
 import DatePicker from 'react-native-date-picker';
 import { EMIT_EVENTS } from 'constants/emitEvents';
+import { PHONE_MASK } from 'constants/user';
 
 export const  InfoSection: FC<Props> = ({
   label,
@@ -26,6 +28,9 @@ export const  InfoSection: FC<Props> = ({
 }) => {
   const styles = useStyles();
   const [inputValue, setInputValue] = useState<string>(value);
+  const [formattedValue, setFormattedValue] = useState<string>(
+    type === INFO_SECTION_TYPE.MASK_INPUT && value ? mask(value, PHONE_MASK) : ''
+  );
   const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -50,6 +55,13 @@ export const  InfoSection: FC<Props> = ({
     setInputValue(text);
     if (onUpdate) {
       onUpdate(text);
+    }
+  }, [onUpdate]);
+
+  const onChangeMaskText = useCallback((text: string, rawText: string) => {
+    setFormattedValue(text);
+    if (onUpdate) {
+      onUpdate(rawText);
     }
   }, [onUpdate]);
 
@@ -86,6 +98,19 @@ export const  InfoSection: FC<Props> = ({
             {value ?? ''}
           </Text>
         </TouchableOpacity>
+      );
+    }
+
+    if (type === INFO_SECTION_TYPE.MASK_INPUT) {
+      return (
+        <MaskedTextInput
+          mask={PHONE_MASK}
+          onChangeText={onChangeMaskText}
+          value={formattedValue}
+          style={[styles.textInput, !editable && styles.displayText, textInputStyle, isError && styles.error]}
+          keyboardType={keyboardType}
+          editable={editable}
+        />
       );
     }
 
